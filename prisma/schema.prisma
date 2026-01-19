@@ -1,0 +1,153 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model projectgroup {
+  projectgroupid                            Int                  @id @default(autoincrement())
+  projectgroupname                          String               @db.VarChar(150)
+  projecttypeid                             Int
+  guidestaffname                            String?              @db.VarChar(150)
+  projecttitle                              String?              @db.VarChar(200)
+  projectarea                               String?              @db.VarChar(150)
+  projectdescription                        String?
+  averagecpi                                Decimal?             @db.Decimal(4, 2)
+  convenerstaffid                           Int?
+  expertstaffid                             Int?
+  description                               String?
+  created                                   DateTime             @default(now()) @db.Timestamp(6)
+  modified                                  DateTime?            @db.Timestamp(6)
+  staff_projectgroup_convenerstaffidTostaff staff?               @relation("projectgroup_convenerstaffidTostaff", fields: [convenerstaffid], references: [staffid], onDelete: NoAction, onUpdate: NoAction, map: "fk_convener")
+  staff_projectgroup_expertstaffidTostaff   staff?               @relation("projectgroup_expertstaffidTostaff", fields: [expertstaffid], references: [staffid], onDelete: NoAction, onUpdate: NoAction, map: "fk_expert")
+  projecttype                               projecttype          @relation(fields: [projecttypeid], references: [projecttypeid], onDelete: NoAction, onUpdate: NoAction, map: "fk_projecttype")
+  projectgroupmember                        projectgroupmember[]
+  projectmeeting                            projectmeeting[]
+}
+
+model projectgroupmember {
+  projectgroupmemberid Int          @id @default(autoincrement())
+  projectgroupid       Int
+  studentid            Int
+  isgroupleader        Boolean      @default(false)
+  studentcgpa          Decimal?     @db.Decimal(4, 2)
+  description          String?
+  created              DateTime     @default(now()) @db.Timestamp(6)
+  modified             DateTime?    @db.Timestamp(6)
+  projectgroup         projectgroup @relation(fields: [projectgroupid], references: [projectgroupid], onDelete: Cascade, onUpdate: NoAction, map: "fk_group")
+  student              student      @relation(fields: [studentid], references: [studentid], onDelete: Cascade, onUpdate: NoAction, map: "fk_student")
+
+  @@unique([projectgroupid, studentid], map: "uq_group_student")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model projectmeeting {
+  projectmeetingid         Int                        @id @default(autoincrement())
+  projectgroupid           Int
+  guidestaffid             Int
+  meetingdatetime          DateTime                   @db.Timestamp(6)
+  meetingpurpose           String?                    @db.VarChar(200)
+  meetinglocation          String?                    @db.VarChar(150)
+  meetingnotes             String?
+  meetingstatus            String?                    @db.VarChar(30)
+  meetingstatusdescription String?
+  meetingstatusdatetime    DateTime?                  @db.Timestamp(6)
+  description              String?
+  created                  DateTime                   @default(now()) @db.Timestamp(6)
+  modified                 DateTime?                  @db.Timestamp(6)
+  projectgroup             projectgroup               @relation(fields: [projectgroupid], references: [projectgroupid], onDelete: Cascade, onUpdate: NoAction, map: "fk_meeting_group")
+  staff                    staff                      @relation(fields: [guidestaffid], references: [staffid], onDelete: NoAction, onUpdate: NoAction, map: "fk_meeting_guide")
+  projectmeetingattendance projectmeetingattendance[]
+}
+
+model projectmeetingattendance {
+  projectmeetingattendanceid Int            @id @default(autoincrement())
+  projectmeetingid           Int
+  studentid                  Int
+  ispresent                  Boolean
+  attendanceremarks          String?        @db.VarChar(100)
+  description                String?
+  created                    DateTime       @default(now()) @db.Timestamp(6)
+  modified                   DateTime?      @db.Timestamp(6)
+  projectmeeting             projectmeeting @relation(fields: [projectmeetingid], references: [projectmeetingid], onDelete: Cascade, onUpdate: NoAction, map: "fk_attendance_meeting")
+  student                    student        @relation(fields: [studentid], references: [studentid], onDelete: Cascade, onUpdate: NoAction, map: "fk_attendance_student")
+
+  @@unique([projectmeetingid, studentid], map: "uq_meeting_student")
+}
+
+model projecttype {
+  projecttypeid   Int            @id @default(autoincrement())
+  projecttypename String         @unique @db.VarChar(100)
+  description     String?
+  created         DateTime       @default(now()) @db.Timestamp(6)
+  modified        DateTime?      @db.Timestamp(6)
+  projectgroup    projectgroup[]
+}
+
+model staff {
+  staffid     Int      @id @default(autoincrement())
+  staffname   String   @db.VarChar(150)
+  phone       String?  @db.VarChar(20)
+  email       String?  @unique @db.VarChar(150)
+  description String?
+  created     DateTime @default(now()) @db.Timestamp(6)
+  modified    DateTime? @db.Timestamp(6)
+
+  userid Int?   @unique
+  users  users? @relation(fields: [userid], references: [userid])
+
+  projectgroup_projectgroup_convenerstaffidTostaff projectgroup[] @relation("projectgroup_convenerstaffidTostaff")
+  projectgroup_projectgroup_expertstaffidTostaff   projectgroup[] @relation("projectgroup_expertstaffidTostaff")
+  projectmeeting                                   projectmeeting[]
+}
+model student {
+  studentid   Int      @id @default(autoincrement())
+  studentname String   @db.VarChar(150)
+  phone       String?  @db.VarChar(20)
+  email       String?  @unique @db.VarChar(150)
+  description String?
+  created     DateTime @default(now()) @db.Timestamp(6)
+  modified    DateTime? @db.Timestamp(6)
+
+  userid Int?   @unique
+  users  users? @relation(fields: [userid], references: [userid])
+
+  projectgroupmember       projectgroupmember[]
+  projectmeetingattendance projectmeetingattendance[]
+}
+
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model users {
+  userid    Int      @id @default(autoincrement())
+  clerkid   String   @unique @db.VarChar(255) // Clerk userId
+  email     String   @unique @db.VarChar(255)
+  name      String?  @db.VarChar(255)
+  role      Role     @default(STUDENT)
+  isactive  Boolean  @default(true)
+  created   DateTime @default(now()) @db.Timestamp(6)
+  modified  DateTime? @db.Timestamp(6)
+
+  staff     staff?
+  student   student?
+  posts     Post[]
+}
+enum Role {
+  ADMIN
+  FACULTY
+  STUDENT
+}
+
+model Post {
+  id        Int      @id @default(autoincrement())
+  title     String
+  content   String?
+  published Boolean  @default(false)
+  authorId  Int
+  author    users    @relation(fields: [authorId], references: [userid])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
