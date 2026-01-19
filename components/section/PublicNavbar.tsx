@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { SignInButton, SignedOut, SignedIn, UserButton } from "@clerk/nextjs";
+import { SignInButton, SignUpButton, SignedOut, SignedIn, UserButton } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import { useScroll } from "@/hooks/use-scroll";
 import { cn } from "@/lib/utils";
@@ -34,9 +34,9 @@ export default function PublicNavbar() {
             <SignInButton mode="modal" forceRedirectUrl="/check-role">
               <Button variant="ghost" className="text-sm font-medium">Log In</Button>
             </SignInButton>
-            <SignInButton mode="modal" forceRedirectUrl="/check-role">
+            <SignUpButton mode="modal" forceRedirectUrl="/check-role">
               <Button className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-5">Get Started</Button>
-            </SignInButton>
+            </SignUpButton>
           </SignedOut>
           <SignedIn>
             <UserButton afterSignOutUrl="/" />

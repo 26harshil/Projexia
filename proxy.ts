@@ -1,32 +1,44 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
-const isPublicRoute = createRouteMatcher(["/", "/check-role", "/api/webhooks(.*)"]);
+const isPublicRoute = createRouteMatcher(["/", "/api/webhooks(.*)"]);
+const isCheckRoleRoute = createRouteMatcher(["/check-role"]);
 const isAdminRoute = createRouteMatcher(["/admin(.*)"]);
 const isFacultyRoute = createRouteMatcher(["/faculty(.*)"]);
 const isStudentRoute = createRouteMatcher(["/student(.*)"]);
+const isDashboardRoute = createRouteMatcher(["/admin/dashboard", "/faculty/dashboard", "/student/dashboard"]);
 
 export default clerkMiddleware(async (auth, req) => {
     const { userId, sessionClaims } = await auth();
-    const role = sessionClaims?.metadata?.role as string;
+    const role = (sessionClaims?.metadata?.role as string) || "STUDENT";
 
     // Protect all non-public routes
-    if (!isPublicRoute(req)) {
+    if (!isPublicRoute(req) && !isCheckRoleRoute(req)) {
         await auth.protect();
     }
 
-    // Role-based protection
+    // Automatic redirect for authenticated users (but NOT if already on a dashboard)
     if (userId) {
-        if (isAdminRoute(req) && role !== "ADMIN") {
-            return NextResponse.redirect(new URL("/", req.url));
+        const { pathname } = req.nextUrl;
+
+        // Only redirect from home or check-role, NOT from dashboard pages
+        if ((pathname === "/" || isCheckRoleRoute(req)) && !isDashboardRoute(req)) {
+            const dashboardPath = `/${role.toLowerCase()}/dashboard`;
+            return NextResponse.redirect(new URL(dashboardPath, req.url));
         }
 
-        if (isFacultyRoute(req) && role !== "FACULTY") {
-            return NextResponse.redirect(new URL("/", req.url));
+        // Role-based route protection - redirect to user's own dashboard if accessing wrong role
+        // But don't redirect if already on the correct dashboard
+        if (isAdminRoute(req) && role !== "ADMIN" && !isDashboardRoute(req)) {
+            return NextResponse.redirect(new URL(`/${role.toLowerCase()}/dashboard`, req.url));
         }
 
-        if (isStudentRoute(req) && role !== "STUDENT") {
-            return NextResponse.redirect(new URL("/", req.url));
+        if (isFacultyRoute(req) && role !== "FACULTY" && !isDashboardRoute(req)) {
+            return NextResponse.redirect(new URL(`/${role.toLowerCase()}/dashboard`, req.url));
+        }
+
+        if (isStudentRoute(req) && role !== "STUDENT" && !isDashboardRoute(req)) {
+            return NextResponse.redirect(new URL(`/${role.toLowerCase()}/dashboard`, req.url));
         }
     }
 });

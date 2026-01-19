@@ -3,11 +3,11 @@
 
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, LayoutDashboard, LogIn } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { GradientText } from "../ui/gradient-text";
 import {
-  ClerkProvider,
   SignInButton,
+  SignUpButton,
   SignedIn,
   SignedOut,
 } from "@clerk/nextjs";
@@ -52,7 +52,7 @@ export function HeroSection() {
           className="flex flex-col sm:flex-row gap-4 justify-center items-center"
         >
           <SignedOut>
-            <SignInButton mode="modal" forceRedirectUrl="/check-role">
+            <SignUpButton mode="modal" forceRedirectUrl="/check-role">
               <Button
                 size="lg"
                 className="bg-linear-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3 text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
@@ -60,16 +60,17 @@ export function HeroSection() {
                 Get Started
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
+            </SignUpButton>
+            <SignInButton mode="modal" forceRedirectUrl="/check-role">
+              <Button
+                size="lg"
+                variant="outline"
+                className="border-2 border-slate-300 hover:border-blue-600 text-slate-700 hover:text-blue-600 px-8 py-3 text-lg font-semibold rounded-xl transition-all duration-300"
+              >
+                Log In
+              </Button>
             </SignInButton>
           </SignedOut>
-
-          {/* <Button
-            size="lg"
-            className="bg-linear-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3 text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
-          >
-            Get Started
-            <ArrowRight className="ml-2 h-5 w-5" />
-          </Button> */}
         </motion.div>
       </div>
 

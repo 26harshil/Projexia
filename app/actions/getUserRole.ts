@@ -5,11 +5,17 @@ import { prisma } from "@/lib/prisma";
 import { Role } from "../generated/prisma/enums";
 
 /**
- * Gets user role from Prisma database. 
- * If user doesn't exist in DB, creates them with default STUDENT role
- * and syncs the role to Clerk publicMetadata.
+ * Gets user role from Prisma database with Clerk sync.
+ * 
+ * Flow:
+ * 1. Check if user exists in Prisma DB
+ * 2. If exists, sync role to Clerk metadata if missing
+ * 3. If not exists, create user with default STUDENT role
+ * 4. Sync role to Clerk publicMetadata
+ * 
+ * @returns User's role (ADMIN, FACULTY, or STUDENT) or null if not authenticated
  */
-export async function getUserRole(): Promise<string | null> {
+export async function getUserRole(): Promise<Role | null> {
   const { userId, sessionClaims } = await auth();
 
   if (!userId) {
