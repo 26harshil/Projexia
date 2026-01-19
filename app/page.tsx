@@ -15,6 +15,7 @@ export default function HomePage() {
     <>
       <PublicNavbar />
       <div className="min-h-screen bg-linear-to-br from-slate-50 via-white to-blue-50">
+        <div>Hello</div>
         <HeroSection />
         <AboutSection />
         <FeaturesSection />
