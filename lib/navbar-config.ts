@@ -16,7 +16,7 @@ export const NAVBAR_CONFIG: Record<Role, {
         title: "Faculty Portal",
         links: [
             { name: "Dashboard", href: "/faculty/dashboard" },
-            { name: "My Groups", href: "/faculty/groups" },
+            { name: "My Groups", href: "/faculty/group" },
             { name: "Project Reviews", href: "/faculty/reviews" },
             { name: "Meetings", href: "/faculty/meetings" },
             { name: "Reports", href: "/faculty/reports" },

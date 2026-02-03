@@ -8,21 +8,22 @@ import { NAVBAR_CONFIG } from "@/lib/navbar-config";
 import { useScroll } from "@/hooks/use-scroll";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  LayoutDashboard, 
-  Users, 
-  ClipboardCheck, 
-  Calendar, 
+import {
+  LayoutDashboard,
+  Users,
+  ClipboardCheck,
+  Calendar,
   FileText,
   Menu,
   GraduationCap,
   Bell,
-  Search
+  Search,
+  Sparkles
 } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Badge } from "@/components/ui/badge";
+
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   Dashboard: LayoutDashboard,
@@ -52,7 +53,7 @@ export default function FacultyNavbar() {
     >
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 md:px-6">
         {/* Logo */}
-        <Link href="/faculty" className="flex items-center gap-3 group">
+        <Link href="/faculty/dashboard" className="flex items-center gap-3 group">
           <motion.div
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
@@ -74,11 +75,12 @@ export default function FacultyNavbar() {
         </Link>
 
         {/* Desktop Navigation */}
-        <nav className="hidden lg:flex items-center gap-1">
+        <nav className="hidden md:flex items-center gap-1">
           {links.map((link, index) => {
             const Icon = iconMap[link.name] || LayoutDashboard;
-            const isActive = pathname === link.href;
-            
+            // Handle active state for sub-routes as well
+            const isActive = pathname === link.href || (link.href !== "/faculty/dashboard" && pathname.startsWith(link.href));
+
             return (
               <motion.div
                 key={link.href}
@@ -93,7 +95,7 @@ export default function FacultyNavbar() {
                     className={cn(
                       "relative flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200",
                       isActive
-                        ? "text-purple-700 bg-purple-50"
+                        ? "text-purple-700 bg-purple-50 shadow-sm shadow-purple-100"
                         : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
                     )}
                   >
@@ -105,7 +107,7 @@ export default function FacultyNavbar() {
                     {isActive && (
                       <motion.div
                         layoutId="facultyActiveIndicator"
-                        className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1 h-1 bg-purple-600 rounded-full"
+                        className="absolute bottom-1 left-1/2 -translate-x-1/2 w-4 h-0.5 bg-purple-600 rounded-full"
                         transition={{ type: "spring", stiffness: 400, damping: 30 }}
                       />
                     )}
@@ -124,8 +126,8 @@ export default function FacultyNavbar() {
             whileTap={{ scale: 0.95 }}
             className="hidden md:flex"
           >
-            <Button 
-              variant="ghost" 
+            <Button
+              variant="ghost"
               size="icon"
               className="text-slate-500 hover:text-slate-900 hover:bg-slate-100"
             >
@@ -139,8 +141,8 @@ export default function FacultyNavbar() {
             whileTap={{ scale: 0.95 }}
             className="relative"
           >
-            <Button 
-              variant="ghost" 
+            <Button
+              variant="ghost"
               size="icon"
               className="text-slate-500 hover:text-slate-900 hover:bg-slate-100"
             >
@@ -159,8 +161,8 @@ export default function FacultyNavbar() {
               <span className="text-xs text-slate-500">Professor</span>
             </div>
             <motion.div whileHover={{ scale: 1.05 }}>
-              <UserButton 
-                afterSignOutUrl="/" 
+              <UserButton
+                afterSignOutUrl="/"
                 appearance={{
                   elements: {
                     avatarBox: "h-9 w-9 ring-2 ring-purple-100 ring-offset-2"
@@ -172,7 +174,7 @@ export default function FacultyNavbar() {
 
           {/* Mobile Menu */}
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
-            <SheetTrigger asChild className="lg:hidden">
+            <SheetTrigger asChild className="md:hidden">
               <Button variant="ghost" size="icon" className="ml-2">
                 <Menu className="h-5 w-5 text-slate-600" />
               </Button>
@@ -181,7 +183,7 @@ export default function FacultyNavbar() {
               <div className="flex flex-col h-full">
                 {/* Mobile Header */}
                 <div className="p-6 border-b border-slate-100">
-                  <div className="flex items-center gap-3">
+                  <Link href="/faculty/dashboard" onClick={() => setIsOpen(false)} className="flex items-center gap-3">
                     <div className="bg-purple-600 p-2.5 rounded-xl">
                       <GraduationCap className="h-5 w-5 text-white" />
                     </div>
@@ -189,15 +191,15 @@ export default function FacultyNavbar() {
                       <span className="font-bold text-slate-900">Faculty Portal</span>
                       <p className="text-xs text-slate-500">Management System</p>
                     </div>
-                  </div>
+                  </Link>
                 </div>
 
                 {/* Mobile Navigation */}
                 <nav className="flex-1 p-4 space-y-1">
                   {links.map((link, index) => {
                     const Icon = iconMap[link.name] || LayoutDashboard;
-                    const isActive = pathname === link.href;
-                    
+                    const isActive = pathname === link.href || (link.href !== "/faculty/dashboard" && pathname.startsWith(link.href));
+
                     return (
                       <motion.div
                         key={link.href}
@@ -211,7 +213,7 @@ export default function FacultyNavbar() {
                           className={cn(
                             "flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200",
                             isActive
-                              ? "bg-purple-50 text-purple-700 border border-purple-100"
+                              ? "bg-purple-50 text-purple-700 border border-purple-100 shadow-sm"
                               : "text-slate-600 hover:bg-slate-50"
                           )}
                         >
@@ -221,7 +223,9 @@ export default function FacultyNavbar() {
                           )} />
                           <span className="font-medium">{link.name}</span>
                           {isActive && (
-                            <div className="ml-auto w-1.5 h-1.5 bg-purple-600 rounded-full" />
+                            <div className="ml-auto">
+                              <Sparkles className="h-4 w-4 text-purple-400" />
+                            </div>
                           )}
                         </Link>
                       </motion.div>
