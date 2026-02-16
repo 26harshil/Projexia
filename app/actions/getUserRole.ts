@@ -76,6 +76,21 @@ export async function getUserRole(): Promise<Role | null> {
     });
     console.log("✅ User created in Prisma with ID:", newUser.userid);
 
+    // 4.5 Auto-create student record (since default role is STUDENT)
+    try {
+      await prisma.student.create({
+        data: {
+          studentname: name,
+          email: email,
+          userid: newUser.userid,
+        },
+      });
+      console.log("✅ Student record created for user:", newUser.userid);
+    } catch (studentError) {
+      console.error("⚠️ Failed to create student record:", studentError);
+      // Don't throw - the user itself was created successfully
+    }
+
     // 5. Sync role to Clerk publicMetadata
     console.log("🔄 Setting Clerk publicMetadata.role to:", defaultRole);
     const client = await clerkClient();

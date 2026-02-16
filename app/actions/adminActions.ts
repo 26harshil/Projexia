@@ -72,12 +72,34 @@ export async function getUserStats() {
 }
 
 /**
- * Update user role in Prisma DB and sync to Clerk metadata
+ * Update user role in Prisma DB, sync to Clerk metadata,
+ * and manage student/staff table records accordingly.
+ *
+ * - STUDENT role → ensure student record exists, remove staff if safe
+ * - FACULTY/ADMIN role → ensure staff record exists, remove student if safe
  */
 export async function updateUserRole(targetUserId: number, newRole: Role) {
     await verifyAdmin();
 
-    // 1. Update role in Prisma database
+    // 1. Get current user info (including existing student/staff links)
+    const currentUserData = await prisma.users.findUnique({
+        where: { userid: targetUserId },
+        select: {
+            userid: true,
+            clerkid: true,
+            email: true,
+            name: true,
+            role: true,
+            student: { select: { studentid: true } },
+            staff: { select: { staffid: true } },
+        },
+    });
+
+    if (!currentUserData) throw new Error("User not found");
+
+    const previousRole = currentUserData.role;
+
+    // 2. Update role in Prisma database
     const updatedUser = await prisma.users.update({
         where: { userid: targetUserId },
         data: {
@@ -96,7 +118,7 @@ export async function updateUserRole(targetUserId: number, newRole: Role) {
         },
     });
 
-    // 2. Sync role to Clerk publicMetadata
+    // 3. Sync role to Clerk publicMetadata
     try {
         const client = await clerkClient();
         await client.users.updateUser(updatedUser.clerkid, {
@@ -105,8 +127,77 @@ export async function updateUserRole(targetUserId: number, newRole: Role) {
         console.log(`✅ Synced role "${newRole}" to Clerk for user ${updatedUser.clerkid}`);
     } catch (clerkError) {
         console.error("❌ Failed to sync role to Clerk:", clerkError);
-        // Don't throw here - the DB is already updated
-        // Next time the user signs in, getUserRole will fix the sync
+    }
+
+    // 4. Manage student/staff table records based on new role
+    const userName = currentUserData.name || "Unknown User";
+    const userEmail = currentUserData.email;
+
+    if (newRole === "STUDENT") {
+        // Ensure student record exists
+        if (!currentUserData.student) {
+            await prisma.student.create({
+                data: {
+                    studentname: userName,
+                    email: userEmail,
+                    userid: targetUserId,
+                },
+            });
+            console.log(`✅ Created student record for user ${targetUserId}`);
+        }
+
+        // Remove staff record if it exists and has no dependencies
+        if (currentUserData.staff) {
+            const staffDeps = await prisma.projectmeeting.count({
+                where: { guidestaffid: currentUserData.staff.staffid },
+            });
+            const convenerDeps = await prisma.projectgroup.count({
+                where: { convenerstaffid: currentUserData.staff.staffid },
+            });
+            const expertDeps = await prisma.projectgroup.count({
+                where: { expertstaffid: currentUserData.staff.staffid },
+            });
+
+            if (staffDeps === 0 && convenerDeps === 0 && expertDeps === 0) {
+                await prisma.staff.delete({
+                    where: { staffid: currentUserData.staff.staffid },
+                });
+                console.log(`🗑️ Removed staff record for user ${targetUserId} (no dependencies)`);
+            } else {
+                console.log(`⚠️ Kept staff record for user ${targetUserId} (has ${staffDeps + convenerDeps + expertDeps} dependencies)`);
+            }
+        }
+    } else {
+        // FACULTY or ADMIN → ensure staff record exists
+        if (!currentUserData.staff) {
+            await prisma.staff.create({
+                data: {
+                    staffname: userName,
+                    email: userEmail,
+                    userid: targetUserId,
+                },
+            });
+            console.log(`✅ Created staff record for user ${targetUserId}`);
+        }
+
+        // Remove student record if it exists and has no dependencies
+        if (currentUserData.student) {
+            const memberDeps = await prisma.projectgroupmember.count({
+                where: { studentid: currentUserData.student.studentid },
+            });
+            const attendanceDeps = await prisma.projectmeetingattendance.count({
+                where: { studentid: currentUserData.student.studentid },
+            });
+
+            if (memberDeps === 0 && attendanceDeps === 0) {
+                await prisma.student.delete({
+                    where: { studentid: currentUserData.student.studentid },
+                });
+                console.log(`🗑️ Removed student record for user ${targetUserId} (no dependencies)`);
+            } else {
+                console.log(`⚠️ Kept student record for user ${targetUserId} (has ${memberDeps + attendanceDeps} dependencies)`);
+            }
+        }
     }
 
     return updatedUser;
