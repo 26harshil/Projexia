@@ -18,13 +18,13 @@ const techStack = [
 
 const categoryColors = {
   Frontend: "bg-blue-100 text-blue-800",
-  Framework: "bg-purple-100 text-purple-800",
+  Framework: "bg-emerald-100 text-emerald-800",
   Styling: "bg-green-100 text-green-800",
   Components: "bg-orange-100 text-orange-800",
-  Animation: "bg-pink-100 text-pink-800",
+  Animation: "bg-teal-100 text-teal-800",
   Database: "bg-red-100 text-red-800",
   ORM: "bg-cyan-100 text-cyan-800",
-  Backend: "bg-indigo-100 text-indigo-800",
+  Backend: "bg-cyan-100 text-cyan-800",
 };
 
 export function TechStackSection() {
@@ -40,7 +40,7 @@ export function TechStackSection() {
         >
           <h2 className="text-4xl md:text-5xl font-bold text-slate-800 mb-6">
             Technology{" "}
-            <span className="bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            <span className="bg-linear-to-r from-blue-600 to-emerald-600 bg-clip-text text-transparent">
               Stack
             </span>
           </h2>

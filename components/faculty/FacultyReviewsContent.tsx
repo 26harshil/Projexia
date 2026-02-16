@@ -106,7 +106,7 @@ export function FacultyReviewsContent({ reviews }: FacultyReviewsContentProps) {
         {
             label: "In Progress",
             count: 0,
-            color: "purple",
+            color: "emerald",
             icon: AlertCircle,
         },
         {
@@ -147,24 +147,24 @@ export function FacultyReviewsContent({ reviews }: FacultyReviewsContentProps) {
                             whileHover={{ y: -2 }}
                             className={`bg-white rounded-xl border p-4 flex items-center gap-4 ${stat.color === "amber"
                                 ? "border-amber-100"
-                                : stat.color === "purple"
-                                    ? "border-purple-100"
+                                : stat.color === "emerald"
+                                    ? "border-emerald-100"
                                     : "border-emerald-100"
                                 }`}
                         >
                             <div
                                 className={`p-3 rounded-xl ${stat.color === "amber"
                                     ? "bg-amber-100"
-                                    : stat.color === "purple"
-                                        ? "bg-purple-100"
+                                    : stat.color === "emerald"
+                                        ? "bg-emerald-100"
                                         : "bg-emerald-100"
                                     }`}
                             >
                                 <stat.icon
                                     className={`h-5 w-5 ${stat.color === "amber"
                                         ? "text-amber-600"
-                                        : stat.color === "purple"
-                                            ? "text-purple-600"
+                                        : stat.color === "emerald"
+                                            ? "text-emerald-600"
                                             : "text-emerald-600"
                                         }`}
                                 />
@@ -276,22 +276,22 @@ function PendingReviewCard({ review }: { review: PendingReview }) {
         <motion.div variants={itemVariants}>
             <div
                 className={`bg-white rounded-xl border p-4 hover:shadow-md transition-all ${isUrgent
-                    ? "border-rose-200 bg-gradient-to-r from-rose-50/50 to-white"
+                    ? "border-emerald-200 bg-gradient-to-r from-emerald-50/50 to-white"
                     : "border-amber-200 bg-gradient-to-r from-amber-50/50 to-white"
                     }`}
             >
                 <div className="flex flex-col md:flex-row md:items-center gap-4">
                     {/* Urgency Indicator */}
                     <div
-                        className={`shrink-0 text-center p-3 rounded-xl ${isUrgent ? "bg-rose-100" : "bg-amber-100"
+                        className={`shrink-0 text-center p-3 rounded-xl ${isUrgent ? "bg-emerald-100" : "bg-amber-100"
                             }`}
                     >
                         <Clock
-                            className={`h-6 w-6 mx-auto ${isUrgent ? "text-rose-600" : "text-amber-600"
+                            className={`h-6 w-6 mx-auto ${isUrgent ? "text-emerald-600" : "text-amber-600"
                                 }`}
                         />
                         <p
-                            className={`text-xs font-medium mt-1 ${isUrgent ? "text-rose-600" : "text-amber-600"
+                            className={`text-xs font-medium mt-1 ${isUrgent ? "text-emerald-600" : "text-amber-600"
                                 }`}
                         >
                             {daysSince === 0
@@ -309,10 +309,10 @@ function PendingReviewCard({ review }: { review: PendingReview }) {
                                 {review.purpose || "Meeting Review"}
                             </h3>
                             {isUrgent && (
-                                <Badge className="bg-rose-600 text-white text-xs">Urgent</Badge>
+                                <Badge className="bg-emerald-600 text-white text-xs">Urgent</Badge>
                             )}
                         </div>
-                        <p className="text-sm text-purple-600 font-medium mb-2">
+                        <p className="text-sm text-emerald-600 font-medium mb-2">
                             {review.groupName || review.projectTitle}
                         </p>
                         <div className="flex items-center gap-4 text-sm text-slate-500 flex-wrap">
@@ -369,7 +369,7 @@ function CompletedReviewCard({ review }: { review: CompletedReview }) {
                                 Completed
                             </Badge>
                         </div>
-                        <p className="text-sm text-purple-600 font-medium mb-2">
+                        <p className="text-sm text-emerald-600 font-medium mb-2">
                             {review.groupName || review.projectTitle}
                         </p>
                         <div className="flex items-center gap-4 text-sm text-slate-500 flex-wrap">

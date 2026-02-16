@@ -47,7 +47,7 @@ export function FacultyHeader({ userName, userEmail, role }: FacultyHeaderProps)
       </div>
 
       {/* Decorative Elements */}
-      <div className="absolute top-0 right-0 w-96 h-96 bg-purple-100 rounded-full blur-3xl opacity-20 translate-x-1/2 -translate-y-1/2" />
+      <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-100 rounded-full blur-3xl opacity-20 translate-x-1/2 -translate-y-1/2" />
       <div className="absolute bottom-0 left-0 w-64 h-64 bg-amber-100 rounded-full blur-3xl opacity-30 -translate-x-1/2 translate-y-1/2" />
 
       <div className="relative max-w-7xl mx-auto px-4 md:px-6 py-8">
@@ -61,7 +61,7 @@ export function FacultyHeader({ userName, userEmail, role }: FacultyHeaderProps)
               transition={{ delay: 0.1 }}
             >
               <Badge 
-                className="bg-purple-100 text-purple-700 border-purple-200 hover:bg-purple-100"
+                className="bg-emerald-100 text-emerald-700 border-emerald-200 hover:bg-emerald-100"
               >
                 <Sparkles className="h-3 w-3 mr-1.5" />
                 {role} Dashboard
@@ -98,7 +98,7 @@ export function FacultyHeader({ userName, userEmail, role }: FacultyHeaderProps)
               className="flex flex-wrap gap-3 pt-2"
             >
               <Button 
-                className="bg-purple-600 hover:bg-purple-700 text-white shadow-sm"
+                className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm"
               >
                 Schedule Meeting
                 <ChevronRight className="h-4 w-4 ml-1" />
@@ -122,7 +122,7 @@ export function FacultyHeader({ userName, userEmail, role }: FacultyHeaderProps)
             {/* Date Card */}
             <div className="flex items-center gap-3 bg-slate-50 border border-slate-100 px-4 py-3 rounded-xl">
               <div className="p-2 bg-white rounded-lg shadow-sm">
-                <Calendar className="h-4 w-4 text-purple-600" />
+                <Calendar className="h-4 w-4 text-emerald-600" />
               </div>
               <div>
                 <p className="text-xs text-slate-500">Today</p>

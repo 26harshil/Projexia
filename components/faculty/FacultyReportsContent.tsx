@@ -73,7 +73,7 @@ export function FacultyReportsContent({ reports }: FacultyReportsContentProps) {
             label: "Total Meetings",
             value: totalMeetings,
             icon: FileText,
-            color: "purple",
+            color: "emerald",
         },
         {
             label: "Pending Meetings",
@@ -108,7 +108,7 @@ export function FacultyReportsContent({ reports }: FacultyReportsContentProps) {
                     </div>
                     <Button
                         variant="outline"
-                        className="border-purple-200 text-purple-600 hover:bg-purple-50"
+                        className="border-emerald-200 text-emerald-600 hover:bg-emerald-50"
                         onClick={() => generateFacultyReportPDF(reports)}
                     >
                         <Download className="h-4 w-4 mr-2" />
@@ -131,16 +131,16 @@ export function FacultyReportsContent({ reports }: FacultyReportsContentProps) {
                         >
                             <div className="flex items-center gap-4">
                                 <div
-                                    className={`p-3 rounded-xl ${stat.color === "purple"
-                                        ? "bg-purple-100"
+                                    className={`p-3 rounded-xl ${stat.color === "emerald"
+                                        ? "bg-emerald-100"
                                         : stat.color === "amber"
                                             ? "bg-amber-100"
                                             : "bg-emerald-100"
                                         }`}
                                 >
                                     <stat.icon
-                                        className={`h-5 w-5 ${stat.color === "purple"
-                                            ? "text-purple-600"
+                                        className={`h-5 w-5 ${stat.color === "emerald"
+                                            ? "text-emerald-600"
                                             : stat.color === "amber"
                                                 ? "text-amber-600"
                                                 : "text-emerald-600"
@@ -302,8 +302,8 @@ function GroupReportCard({ report }: { report: GroupReport }) {
             <div className="p-4 hover:bg-slate-50 transition-colors">
                 <div className="flex flex-col md:flex-row md:items-center gap-4">
                     {/* Group Icon */}
-                    <div className="shrink-0 p-3 bg-purple-100 rounded-xl">
-                        <FolderOpen className="h-5 w-5 text-purple-600" />
+                    <div className="shrink-0 p-3 bg-emerald-100 rounded-xl">
+                        <FolderOpen className="h-5 w-5 text-emerald-600" />
                     </div>
 
                     {/* Group Info */}
@@ -313,7 +313,7 @@ function GroupReportCard({ report }: { report: GroupReport }) {
                         </h3>
                         <p className="text-sm text-slate-500">{report.groupName}</p>
                         {report.leaderName && (
-                            <p className="text-xs text-purple-600">Leader: {report.leaderName}</p>
+                            <p className="text-xs text-emerald-600">Leader: {report.leaderName}</p>
                         )}
                     </div>
 
@@ -325,11 +325,11 @@ function GroupReportCard({ report }: { report: GroupReport }) {
                             </p>
                             <p className="text-xs text-blue-500">Members</p>
                         </div>
-                        <div className="text-center px-3 py-1 bg-purple-50 rounded-lg">
-                            <p className="text-lg font-bold text-purple-600">
+                        <div className="text-center px-3 py-1 bg-emerald-50 rounded-lg">
+                            <p className="text-lg font-bold text-emerald-600">
                                 {report.totalMeetings}
                             </p>
-                            <p className="text-xs text-purple-500">Meetings</p>
+                            <p className="text-xs text-emerald-500">Meetings</p>
                         </div>
                         <div className="text-center px-3 py-1 bg-emerald-50 rounded-lg">
                             <p className="text-lg font-bold text-emerald-600">
@@ -348,7 +348,7 @@ function GroupReportCard({ report }: { report: GroupReport }) {
                     )}
 
                     {/* Actions */}
-                    <Button variant="ghost" size="sm" className="text-purple-600 shrink-0">
+                    <Button variant="ghost" size="sm" className="text-emerald-600 shrink-0">
                         View <ChevronRight className="h-4 w-4 ml-1" />
                     </Button>
                 </div>
@@ -366,9 +366,9 @@ function EmptyState() {
                 className="inline-block mb-6"
             >
                 <div className="relative">
-                    <div className="absolute inset-0 bg-purple-200 rounded-2xl blur-xl opacity-40" />
-                    <div className="relative bg-purple-50 border border-purple-100 p-8 rounded-2xl">
-                        <FileText className="h-16 w-16 text-purple-400 mx-auto" />
+                    <div className="absolute inset-0 bg-emerald-200 rounded-2xl blur-xl opacity-40" />
+                    <div className="relative bg-emerald-50 border border-emerald-100 p-8 rounded-2xl">
+                        <FileText className="h-16 w-16 text-emerald-400 mx-auto" />
                     </div>
                 </div>
             </motion.div>

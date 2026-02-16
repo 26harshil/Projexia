@@ -8,18 +8,19 @@ import { NAVBAR_CONFIG } from "@/lib/navbar-config";
 import { useScroll } from "@/hooks/use-scroll";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
-import { 
-  LayoutDashboard, 
-  Settings2, 
-  Users, 
+import {
+  LayoutDashboard,
+  Settings2,
+  Users,
   FolderKanban,
-  Calendar, 
+  Calendar,
   FileText,
   Menu,
   Shield,
   Bell,
   Search,
-  Command
+  Command,
+  UserCog
 } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -28,10 +29,9 @@ import { Badge } from "@/components/ui/badge";
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   Dashboard: LayoutDashboard,
-  "Master Config": Settings2,
+  Users: UserCog,
   Students: Users,
   Projects: FolderKanban,
-  Meetings: Calendar,
   Reports: FileText,
 };
 
@@ -61,8 +61,8 @@ export default function AdminNavbar() {
             whileTap={{ scale: 0.95 }}
             className="relative"
           >
-            <div className="absolute inset-0 bg-gradient-to-br from-violet-600 to-purple-700 rounded-xl blur opacity-30 group-hover:opacity-50 transition-opacity" />
-            <div className="relative bg-gradient-to-br from-violet-600 to-purple-700 p-2.5 rounded-xl">
+            <div className="absolute inset-0 bg-gradient-to-br from-emerald-600 to-emerald-700 rounded-xl blur opacity-30 group-hover:opacity-50 transition-opacity" />
+            <div className="relative bg-gradient-to-br from-emerald-600 to-emerald-700 p-2.5 rounded-xl">
               <Shield className="h-5 w-5 text-white" />
             </div>
           </motion.div>
@@ -70,7 +70,7 @@ export default function AdminNavbar() {
             <span className="text-lg font-bold text-slate-900">
               {title}
             </span>
-            <span className="text-[10px] text-violet-600 font-semibold tracking-wider -mt-0.5">
+            <span className="text-[10px] text-emerald-600 font-semibold tracking-wider -mt-0.5">
               SYSTEM ADMIN
             </span>
           </div>
@@ -81,7 +81,7 @@ export default function AdminNavbar() {
           {links.map((link, index) => {
             const Icon = iconMap[link.name] || LayoutDashboard;
             const isActive = pathname === link.href;
-            
+
             return (
               <motion.div
                 key={link.href}
@@ -96,13 +96,13 @@ export default function AdminNavbar() {
                     className={cn(
                       "relative flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200",
                       isActive
-                        ? "bg-white text-violet-700 shadow-sm"
+                        ? "bg-white text-emerald-700 shadow-sm"
                         : "text-slate-600 hover:text-slate-900 hover:bg-white/50"
                     )}
                   >
                     <Icon className={cn(
                       "h-4 w-4",
-                      isActive ? "text-violet-600" : "text-slate-400"
+                      isActive ? "text-emerald-600" : "text-slate-400"
                     )} />
                     <span className="hidden xl:inline">{link.name}</span>
                   </motion.div>
@@ -120,8 +120,8 @@ export default function AdminNavbar() {
             whileTap={{ scale: 0.98 }}
             className="hidden md:flex"
           >
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               size="sm"
               className="text-slate-500 border-slate-200 hover:bg-slate-50 gap-2"
             >
@@ -139,8 +139,8 @@ export default function AdminNavbar() {
             whileTap={{ scale: 0.95 }}
             className="relative"
           >
-            <Button 
-              variant="ghost" 
+            <Button
+              variant="ghost"
               size="icon"
               className="text-slate-500 hover:text-slate-900 hover:bg-slate-100 relative"
             >
@@ -159,16 +159,16 @@ export default function AdminNavbar() {
           <div className="flex items-center gap-3">
             <div className="hidden md:flex flex-col items-end">
               <span className="text-sm font-semibold text-slate-900">Admin</span>
-              <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-4 border-violet-200 text-violet-600">
+              <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-4 border-emerald-200 text-emerald-600">
                 Super Admin
               </Badge>
             </div>
             <motion.div whileHover={{ scale: 1.05 }}>
-              <UserButton 
-                afterSignOutUrl="/" 
+              <UserButton
+                afterSignOutUrl="/"
                 appearance={{
                   elements: {
-                    avatarBox: "h-9 w-9 ring-2 ring-violet-100 ring-offset-2"
+                    avatarBox: "h-9 w-9 ring-2 ring-emerald-100 ring-offset-2"
                   }
                 }}
               />
@@ -185,14 +185,14 @@ export default function AdminNavbar() {
             <SheetContent side="right" className="w-80 bg-white p-0">
               <div className="flex flex-col h-full">
                 {/* Mobile Header */}
-                <div className="p-6 border-b border-slate-100 bg-gradient-to-r from-violet-50 to-purple-50">
+                <div className="p-6 border-b border-slate-100 bg-gradient-to-r from-emerald-50 to-emerald-50">
                   <div className="flex items-center gap-3">
-                    <div className="bg-gradient-to-br from-violet-600 to-purple-700 p-2.5 rounded-xl">
+                    <div className="bg-gradient-to-br from-emerald-600 to-emerald-700 p-2.5 rounded-xl">
                       <Shield className="h-5 w-5 text-white" />
                     </div>
                     <div>
                       <span className="font-bold text-slate-900">Admin Portal</span>
-                      <p className="text-xs text-violet-600 font-medium">System Administration</p>
+                      <p className="text-xs text-emerald-600 font-medium">System Administration</p>
                     </div>
                   </div>
                 </div>
@@ -202,7 +202,7 @@ export default function AdminNavbar() {
                   {links.map((link, index) => {
                     const Icon = iconMap[link.name] || LayoutDashboard;
                     const isActive = pathname === link.href;
-                    
+
                     return (
                       <motion.div
                         key={link.href}
@@ -216,17 +216,17 @@ export default function AdminNavbar() {
                           className={cn(
                             "flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200",
                             isActive
-                              ? "bg-violet-50 text-violet-700 border border-violet-100"
+                              ? "bg-emerald-50 text-emerald-700 border border-emerald-100"
                               : "text-slate-600 hover:bg-slate-50"
                           )}
                         >
                           <Icon className={cn(
                             "h-5 w-5",
-                            isActive ? "text-violet-600" : "text-slate-400"
+                            isActive ? "text-emerald-600" : "text-slate-400"
                           )} />
                           <span className="font-medium">{link.name}</span>
                           {isActive && (
-                            <div className="ml-auto w-1.5 h-1.5 bg-violet-600 rounded-full" />
+                            <div className="ml-auto w-1.5 h-1.5 bg-emerald-600 rounded-full" />
                           )}
                         </Link>
                       </motion.div>

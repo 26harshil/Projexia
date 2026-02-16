@@ -64,7 +64,7 @@ export function WorkflowSection() {
           className="text-center mb-16"
         >
           <h2 className="text-4xl md:text-5xl font-bold text-slate-800 mb-6">
-            Project <span className="bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Workflow</span>
+            Project <span className="bg-linear-to-r from-blue-600 to-emerald-600 bg-clip-text text-transparent">Workflow</span>
           </h2>
           <p className="text-xl text-slate-600 max-w-3xl mx-auto">
             A streamlined step-by-step process from registration to project completion
@@ -84,12 +84,12 @@ export function WorkflowSection() {
               <Card className="h-full border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-white/80 backdrop-blur-sm group hover:scale-105">
                 <CardContent className="p-6 text-center relative">
                   <span 
-                    className="absolute top-4 right-4 bg-linear-to-r from-blue-500 to-purple-500 text-white px-2 py-1 rounded-md text-sm font-medium"
+                    className="absolute top-4 right-4 bg-linear-to-r from-blue-500 to-emerald-500 text-white px-2 py-1 rounded-md text-sm font-medium"
                   >
                     {step.step}
                   </span>
                   
-                  <div className="mb-4 inline-flex items-center justify-center w-16 h-16 bg-linear-to-br from-blue-500 to-purple-600 rounded-xl group-hover:scale-110 transition-transform duration-300">
+                  <div className="mb-4 inline-flex items-center justify-center w-16 h-16 bg-linear-to-br from-blue-500 to-emerald-600 rounded-xl group-hover:scale-110 transition-transform duration-300">
                     <step.icon className="h-8 w-8 text-white" />
                   </div>
                   
@@ -105,7 +105,7 @@ export function WorkflowSection() {
 
               {/* Connection line for desktop */}
               {index < workflowSteps.length - 1 && (
-                <div className="hidden lg:block absolute top-1/2 -right-4 w-8 h-0.5 bg-linear-to-r from-blue-300 to-purple-300 transform -translate-y-1/2 z-10" />
+                <div className="hidden lg:block absolute top-1/2 -right-4 w-8 h-0.5 bg-linear-to-r from-blue-300 to-emerald-300 transform -translate-y-1/2 z-10" />
               )}
             </motion.div>
           ))}

@@ -7,7 +7,7 @@ import { ArrowRight, LogIn } from 'lucide-react'
 
 export function CTASection() {
   return (
-    <section className="py-20 px-4 bg-linear-to-br from-blue-600 via-purple-600 to-cyan-600 relative overflow-hidden">
+    <section className="py-20 px-4 bg-linear-to-br from-blue-600 via-emerald-600 to-cyan-600 relative overflow-hidden">
       {/* Background pattern */}
       <div className="absolute inset-0 opacity-10">
         <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg%20width=%2260%22%20height=%2260%22%20viewBox=%220%200%2060%2060%22%20xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cg%20fill=%22none%22%20fill-rule=%22evenodd%22%3E%3Cg%20fill=%22%23ffffff%22%20fill-opacity=%221%22%3E%3Ccircle%20cx=%2230%22%20cy=%2230%22%20r=%222%22/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')]" />

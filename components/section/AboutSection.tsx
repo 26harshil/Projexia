@@ -41,7 +41,7 @@ export function AboutSection() {
           className="text-center mb-16"
         >
           <h2 className="text-4xl md:text-5xl font-bold text-slate-800 mb-6">
-            About <span className="bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">SPMS</span>
+            About <span className="bg-linear-to-r from-blue-600 to-emerald-600 bg-clip-text text-transparent">SPMS</span>
           </h2>
           <p className="text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed">
             A comprehensive digital solution designed to revolutionize academic project management, 
@@ -61,7 +61,7 @@ export function AboutSection() {
               <HoverCard className="h-full">
                 <Card className="h-full border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-linear-to-br from-white to-slate-50">
                   <CardContent className="p-6 text-center">
-                    <div className="mb-4 inline-flex items-center justify-center w-12 h-12 bg-linear-to-br from-blue-500 to-purple-600 rounded-xl">
+                    <div className="mb-4 inline-flex items-center justify-center w-12 h-12 bg-linear-to-br from-blue-500 to-emerald-600 rounded-xl">
                       <feature.icon className="h-6 w-6 text-white" />
                     </div>
                     <h3 className="text-lg font-semibold text-slate-800 mb-2">

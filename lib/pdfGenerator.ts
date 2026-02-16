@@ -55,7 +55,7 @@ function addPdfHeader(doc: jsPDF, title: string, subtitle?: string) {
     const pageWidth = doc.internal.pageSize.getWidth();
 
     // Header background
-    doc.setFillColor(124, 58, 237); // Purple
+    doc.setFillColor(6, 78, 59); // Deep Emerald
     doc.rect(0, 0, pageWidth, 45, "F");
 
     // Title
@@ -115,7 +115,7 @@ export function generateGroupReportPDF(group: GroupData): void {
     // Group Info Section
     doc.setFontSize(14);
     doc.setFont("helvetica", "bold");
-    doc.setTextColor(124, 58, 237);
+    doc.setTextColor(6, 78, 59); // Deep Emerald
     doc.text("Group Information", 14, yPos);
     yPos += 8;
 
@@ -148,7 +148,7 @@ export function generateGroupReportPDF(group: GroupData): void {
     if (group.description) {
         doc.setFontSize(14);
         doc.setFont("helvetica", "bold");
-        doc.setTextColor(124, 58, 237);
+        doc.setTextColor(6, 78, 59); // Deep Emerald
         doc.text("Project Description", 14, yPos);
         yPos += 8;
 
@@ -163,7 +163,7 @@ export function generateGroupReportPDF(group: GroupData): void {
     // Team Members Section
     doc.setFontSize(14);
     doc.setFont("helvetica", "bold");
-    doc.setTextColor(124, 58, 237);
+    doc.setTextColor(6, 78, 59); // Deep Emerald
     doc.text("Team Members", 14, yPos);
     yPos += 8;
 
@@ -181,7 +181,7 @@ export function generateGroupReportPDF(group: GroupData): void {
         head: [["#", "Name", "Email", "Phone", "CGPA", "Role"]],
         body: memberData,
         theme: "striped",
-        headStyles: { fillColor: [124, 58, 237], textColor: 255 },
+        headStyles: { fillColor: [6, 78, 59], textColor: 255 },
         styles: { fontSize: 9, cellPadding: 3 },
         columnStyles: {
             0: { cellWidth: 10 },

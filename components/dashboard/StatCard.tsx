@@ -20,16 +20,16 @@ const iconMap: Record<string, LucideIcon> = {
 
 const gradientMap: Record<string, string> = {
   "from-green-500 to-cyan-600": "from-green-500 to-emerald-600",
-  "from-blue-500 to-purple-600": "from-blue-500 to-indigo-600",
-  "from-purple-500 to-pink-600": "from-purple-500 to-pink-600",
-  "from-orange-500 to-red-600": "from-orange-500 to-rose-600",
+  "from-blue-500 to-emerald-600": "from-blue-500 to-cyan-600",
+  "from-emerald-500 to-teal-600": "from-emerald-500 to-teal-600",
+  "from-orange-500 to-red-600": "from-orange-500 to-emerald-600",
 };
 
 const bgGradientMap: Record<string, string> = {
   "from-green-500 to-cyan-600": "from-green-50 to-emerald-50",
-  "from-blue-500 to-purple-600": "from-blue-50 to-indigo-50",
-  "from-purple-500 to-pink-600": "from-purple-50 to-pink-50",
-  "from-orange-500 to-red-600": "from-orange-50 to-rose-50",
+  "from-blue-500 to-emerald-600": "from-blue-50 to-cyan-50",
+  "from-emerald-500 to-teal-600": "from-emerald-50 to-teal-50",
+  "from-orange-500 to-red-600": "from-orange-50 to-emerald-50",
 };
 
 interface StatCardProps {

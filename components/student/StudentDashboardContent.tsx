@@ -156,12 +156,12 @@ export function StudentDashboardContent({
         {
             name: "Development",
             progress: projectProgress >= 66 ? 100 : Math.max(0, Math.min(100, (projectProgress - 33) * 3)),
-            color: "from-blue-500 to-purple-500",
+            color: "from-blue-500 to-emerald-500",
         },
         {
             name: "Final Report",
             progress: Math.max(0, Math.min(100, (projectProgress - 66) * 3)),
-            color: "from-purple-500 to-pink-500",
+            color: "from-emerald-500 to-teal-500",
         },
     ];
 
@@ -177,14 +177,14 @@ export function StudentDashboardContent({
                 {/* My Project Card - Spans 2 columns */}
                 <motion.div variants={itemVariants} className="lg:col-span-2">
                     <div className="relative bg-white rounded-2xl border border-slate-100 p-6 shadow-sm hover:shadow-xl transition-all duration-500 overflow-hidden h-full">
-                        <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-purple-100 to-pink-100 rounded-full blur-3xl opacity-50 -translate-y-1/2 translate-x-1/2" />
+                        <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-emerald-100 to-teal-100 rounded-full blur-3xl opacity-50 -translate-y-1/2 translate-x-1/2" />
 
                         <div className="relative z-10">
                             <div className="flex items-center justify-between mb-6">
                                 <div className="flex items-center gap-3">
                                     <motion.div
                                         whileHover={{ rotate: 15 }}
-                                        className="p-3 bg-gradient-to-r from-purple-600 to-pink-500 rounded-xl shadow-lg shadow-purple-500/25"
+                                        className="p-3 bg-gradient-to-r from-emerald-600 to-teal-500 rounded-xl shadow-lg shadow-emerald-500/25"
                                     >
                                         <FolderKanban className="h-5 w-5 text-white" />
                                     </motion.div>
@@ -195,7 +195,7 @@ export function StudentDashboardContent({
                                 </div>
                                 {projectDetails && (
                                     <Link href="/student/project">
-                                        <Button variant="ghost" size="sm" className="text-purple-600 hover:text-purple-700 hover:bg-purple-50">
+                                        <Button variant="ghost" size="sm" className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50">
                                             View Details
                                             <ArrowRight className="h-4 w-4 ml-1" />
                                         </Button>
@@ -205,7 +205,7 @@ export function StudentDashboardContent({
 
                             {projectDetails ? (
                                 <div className="space-y-4">
-                                    <div className="p-5 bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl border border-purple-100">
+                                    <div className="p-5 bg-gradient-to-br from-emerald-50 to-teal-50 rounded-xl border border-emerald-100">
                                         <div className="flex items-start justify-between mb-3">
                                             <div className="flex-1">
                                                 <h4 className="text-lg font-bold text-slate-900 mb-1">
@@ -219,7 +219,7 @@ export function StudentDashboardContent({
                                                 )}
                                             </div>
                                             {projectDetails.projecttype && (
-                                                <Badge className="bg-purple-600 text-white shrink-0">
+                                                <Badge className="bg-emerald-600 text-white shrink-0">
                                                     {projectDetails.projecttype.projecttypename}
                                                 </Badge>
                                             )}
@@ -234,9 +234,9 @@ export function StudentDashboardContent({
                                         {/* Guide Information */}
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-4">
                                             {projectDetails.convener && (
-                                                <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-purple-100">
-                                                    <div className="p-2 bg-purple-100 rounded-full">
-                                                        <User className="h-4 w-4 text-purple-600" />
+                                                <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-emerald-100">
+                                                    <div className="p-2 bg-emerald-100 rounded-full">
+                                                        <User className="h-4 w-4 text-emerald-600" />
                                                     </div>
                                                     <div className="min-w-0">
                                                         <p className="text-xs text-slate-500">Convener</p>
@@ -247,9 +247,9 @@ export function StudentDashboardContent({
                                                 </div>
                                             )}
                                             {projectDetails.expert && (
-                                                <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-pink-100">
-                                                    <div className="p-2 bg-pink-100 rounded-full">
-                                                        <User className="h-4 w-4 text-pink-600" />
+                                                <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-teal-100">
+                                                    <div className="p-2 bg-teal-100 rounded-full">
+                                                        <User className="h-4 w-4 text-teal-600" />
                                                     </div>
                                                     <div className="min-w-0">
                                                         <p className="text-xs text-slate-500">Expert Guide</p>
@@ -282,16 +282,16 @@ export function StudentDashboardContent({
                                         transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
                                         className="relative"
                                     >
-                                        <div className="absolute inset-0 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full blur-2xl opacity-20" />
-                                        <div className="relative bg-gradient-to-br from-purple-50 to-pink-50 p-6 rounded-2xl">
-                                            <FolderKanban className="h-16 w-16 text-purple-300" />
+                                        <div className="absolute inset-0 bg-gradient-to-r from-emerald-400 to-teal-400 rounded-full blur-2xl opacity-20" />
+                                        <div className="relative bg-gradient-to-br from-emerald-50 to-teal-50 p-6 rounded-2xl">
+                                            <FolderKanban className="h-16 w-16 text-emerald-300" />
                                         </div>
                                     </motion.div>
                                     <p className="text-slate-600 mt-6 font-medium">No projects enrolled yet</p>
                                     <p className="text-sm text-slate-400 mt-1 text-center max-w-xs">
                                         Contact your faculty to get assigned to a project group
                                     </p>
-                                    <Button className="mt-6 bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-700 hover:to-pink-600 text-white shadow-lg shadow-purple-500/25">
+                                    <Button className="mt-6 bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-700 hover:to-teal-600 text-white shadow-lg shadow-emerald-500/25">
                                         <Sparkles className="h-4 w-4 mr-2" />
                                         Explore Projects
                                     </Button>
@@ -364,14 +364,14 @@ export function StudentDashboardContent({
                 {/* Team Members Card */}
                 <motion.div variants={itemVariants}>
                     <div className="relative bg-white rounded-2xl border border-slate-100 p-6 shadow-sm hover:shadow-xl transition-all duration-500 overflow-hidden h-full">
-                        <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-pink-100 to-rose-100 rounded-full blur-2xl opacity-50" />
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-teal-100 to-emerald-100 rounded-full blur-2xl opacity-50" />
 
                         <div className="relative z-10">
                             <div className="flex items-center justify-between mb-6">
                                 <div className="flex items-center gap-3">
                                     <motion.div
                                         whileHover={{ rotate: 15 }}
-                                        className="p-3 bg-gradient-to-r from-pink-600 to-rose-500 rounded-xl shadow-lg shadow-pink-500/25"
+                                        className="p-3 bg-gradient-to-r from-teal-600 to-emerald-500 rounded-xl shadow-lg shadow-teal-500/25"
                                     >
                                         <Users className="h-5 w-5 text-white" />
                                     </motion.div>
@@ -396,10 +396,10 @@ export function StudentDashboardContent({
                                             initial={{ opacity: 0, x: -20 }}
                                             animate={{ opacity: 1, x: 0 }}
                                             transition={{ delay: index * 0.1 }}
-                                            className="p-4 bg-gradient-to-r from-pink-50 to-rose-50 rounded-xl border border-pink-100 hover:border-pink-200 transition-all"
+                                            className="p-4 bg-gradient-to-r from-teal-50 to-emerald-50 rounded-xl border border-teal-100 hover:border-teal-200 transition-all"
                                         >
                                             <div className="flex items-center gap-3">
-                                                <div className="p-2 bg-pink-600 rounded-full shrink-0">
+                                                <div className="p-2 bg-teal-600 rounded-full shrink-0">
                                                     <User className="h-4 w-4 text-white" />
                                                 </div>
                                                 <div className="flex-1 min-w-0">
@@ -435,9 +435,9 @@ export function StudentDashboardContent({
                                     <motion.div
                                         animate={{ rotate: [0, 10, -10, 0] }}
                                         transition={{ duration: 3, repeat: Infinity }}
-                                        className="bg-gradient-to-br from-pink-50 to-rose-50 p-4 rounded-xl"
+                                        className="bg-gradient-to-br from-teal-50 to-emerald-50 p-4 rounded-xl"
                                     >
-                                        <Users className="h-12 w-12 text-pink-300" />
+                                        <Users className="h-12 w-12 text-teal-300" />
                                     </motion.div>
                                     <p className="text-slate-500 mt-4 text-sm">No team assigned yet</p>
                                 </div>
@@ -449,14 +449,14 @@ export function StudentDashboardContent({
                 {/* Upcoming Meetings Card */}
                 <motion.div variants={itemVariants}>
                     <div className="relative bg-white rounded-2xl border border-slate-100 p-6 shadow-sm hover:shadow-xl transition-all duration-500 overflow-hidden h-full">
-                        <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-full blur-2xl opacity-50" />
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-100 to-cyan-100 rounded-full blur-2xl opacity-50" />
 
                         <div className="relative z-10">
                             <div className="flex items-center justify-between mb-6">
                                 <div className="flex items-center gap-3">
                                     <motion.div
                                         whileHover={{ rotate: 15 }}
-                                        className="p-3 bg-gradient-to-r from-blue-600 to-indigo-500 rounded-xl shadow-lg shadow-blue-500/25"
+                                        className="p-3 bg-gradient-to-r from-blue-600 to-cyan-500 rounded-xl shadow-lg shadow-blue-500/25"
                                     >
                                         <Calendar className="h-5 w-5 text-white" />
                                     </motion.div>
@@ -475,7 +475,7 @@ export function StudentDashboardContent({
                                             initial={{ opacity: 0, x: -20 }}
                                             animate={{ opacity: 1, x: 0 }}
                                             transition={{ delay: index * 0.1 }}
-                                            className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-100 hover:border-blue-200 transition-all"
+                                            className="p-4 bg-gradient-to-r from-blue-50 to-cyan-50 rounded-xl border border-blue-100 hover:border-blue-200 transition-all"
                                         >
                                             <div className="flex items-start gap-3">
                                                 <div className="p-2 bg-blue-600 rounded-lg shrink-0">
@@ -523,7 +523,7 @@ export function StudentDashboardContent({
                                     <motion.div
                                         animate={{ scale: [1, 1.1, 1] }}
                                         transition={{ duration: 2, repeat: Infinity }}
-                                        className="bg-gradient-to-br from-blue-50 to-indigo-50 p-4 rounded-xl"
+                                        className="bg-gradient-to-br from-blue-50 to-cyan-50 p-4 rounded-xl"
                                     >
                                         <Calendar className="h-12 w-12 text-blue-300" />
                                     </motion.div>

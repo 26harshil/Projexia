@@ -45,7 +45,7 @@ export default function StudentNavbar() {
       className={cn(
         "fixed top-0 z-50 w-full transition-all duration-500",
         scrolled
-          ? "bg-white/80 backdrop-blur-xl border-b border-purple-100 shadow-lg shadow-purple-500/5"
+          ? "bg-white/80 backdrop-blur-xl border-b border-emerald-100 shadow-lg shadow-emerald-500/5"
           : "bg-white/50 backdrop-blur-sm"
       )}
     >
@@ -57,12 +57,12 @@ export default function StudentNavbar() {
             transition={{ duration: 0.5 }}
             className="relative"
           >
-            <div className="absolute inset-0 bg-gradient-to-r from-purple-600 via-pink-500 to-blue-500 rounded-xl blur-lg opacity-50 group-hover:opacity-75 transition-opacity" />
-            <div className="relative bg-gradient-to-r from-purple-600 via-pink-500 to-blue-500 p-2 rounded-xl">
+            <div className="absolute inset-0 bg-gradient-to-r from-emerald-600 via-teal-500 to-blue-500 rounded-xl blur-lg opacity-50 group-hover:opacity-75 transition-opacity" />
+            <div className="relative bg-gradient-to-r from-emerald-600 via-teal-500 to-blue-500 p-2 rounded-xl">
               <GraduationCap className="h-5 w-5 text-white" />
             </div>
           </motion.div>
-          <span className="text-lg font-bold bg-gradient-to-r from-purple-600 via-pink-500 to-blue-600 bg-clip-text text-transparent">
+          <span className="text-lg font-bold bg-gradient-to-r from-emerald-600 via-teal-500 to-blue-600 bg-clip-text text-transparent">
             {title}
           </span>
         </Link>
@@ -88,13 +88,13 @@ export default function StudentNavbar() {
                       "relative flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300",
                       isActive
                         ? "text-white"
-                        : "text-slate-600 hover:text-purple-600 hover:bg-purple-50"
+                        : "text-slate-600 hover:text-emerald-600 hover:bg-emerald-50"
                     )}
                   >
                     {isActive && (
                       <motion.div
                         layoutId="activeTab"
-                        className="absolute inset-0 bg-gradient-to-r from-purple-600 via-pink-500 to-blue-500 rounded-xl"
+                        className="absolute inset-0 bg-gradient-to-r from-emerald-600 via-teal-500 to-blue-500 rounded-xl"
                         transition={{ type: "spring", stiffness: 400, damping: 30 }}
                       />
                     )}
@@ -117,12 +117,12 @@ export default function StudentNavbar() {
             whileHover={{ scale: 1.05 }}
             className="relative"
           >
-            <div className="absolute inset-0 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full blur opacity-30" />
+            <div className="absolute inset-0 bg-gradient-to-r from-emerald-400 to-teal-400 rounded-full blur opacity-30" />
             <UserButton 
               afterSignOutUrl="/" 
               appearance={{
                 elements: {
-                  avatarBox: "h-9 w-9 ring-2 ring-purple-200 ring-offset-2"
+                  avatarBox: "h-9 w-9 ring-2 ring-emerald-200 ring-offset-2"
                 }
               }}
             />
@@ -138,10 +138,10 @@ export default function StudentNavbar() {
             <SheetContent side="right" className="w-72 bg-white/95 backdrop-blur-xl">
               <div className="flex flex-col gap-4 mt-8">
                 <div className="flex items-center gap-2 px-2 mb-4">
-                  <div className="bg-gradient-to-r from-purple-600 via-pink-500 to-blue-500 p-2 rounded-xl">
+                  <div className="bg-gradient-to-r from-emerald-600 via-teal-500 to-blue-500 p-2 rounded-xl">
                     <GraduationCap className="h-5 w-5 text-white" />
                   </div>
-                  <span className="font-bold bg-gradient-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">
+                  <span className="font-bold bg-gradient-to-r from-emerald-600 to-teal-500 bg-clip-text text-transparent">
                     Student Portal
                   </span>
                 </div>
@@ -162,8 +162,8 @@ export default function StudentNavbar() {
                         className={cn(
                           "flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300",
                           isActive
-                            ? "bg-gradient-to-r from-purple-600 via-pink-500 to-blue-500 text-white shadow-lg shadow-purple-500/25"
-                            : "text-slate-600 hover:bg-purple-50 hover:text-purple-600"
+                            ? "bg-gradient-to-r from-emerald-600 via-teal-500 to-blue-500 text-white shadow-lg shadow-emerald-500/25"
+                            : "text-slate-600 hover:bg-emerald-50 hover:text-emerald-600"
                         )}
                       >
                         <Icon className="h-5 w-5" />

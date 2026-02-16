@@ -150,7 +150,7 @@ export function FacultyGroupsContent({ groups, students, projectTypes, staffList
                         </p>
                     </div>
                     <Button
-                        className="bg-purple-600 hover:bg-purple-700 text-white shadow-sm"
+                        className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm"
                         onClick={() => setShowCreateModal(true)}
                     >
                         <UserPlus className="h-4 w-4 mr-2" />
@@ -212,19 +212,19 @@ export function FacultyGroupsContent({ groups, students, projectTypes, staffList
                         <TabsList className="bg-white border border-slate-200 p-1 mb-6">
                             <TabsTrigger
                                 value="all"
-                                className="data-[state=active]:bg-purple-50 data-[state=active]:text-purple-700"
+                                className="data-[state=active]:bg-emerald-50 data-[state=active]:text-emerald-700"
                             >
                                 All Groups ({filteredGroups.length})
                             </TabsTrigger>
                             <TabsTrigger
                                 value="active"
-                                className="data-[state=active]:bg-purple-50 data-[state=active]:text-purple-700"
+                                className="data-[state=active]:bg-emerald-50 data-[state=active]:text-emerald-700"
                             >
                                 Active ({activeGroups.length})
                             </TabsTrigger>
                             <TabsTrigger
                                 value="completed"
-                                className="data-[state=active]:bg-purple-50 data-[state=active]:text-purple-700"
+                                className="data-[state=active]:bg-emerald-50 data-[state=active]:text-emerald-700"
                             >
                                 Completed ({completedGroups.length})
                             </TabsTrigger>
@@ -345,7 +345,7 @@ function GroupCard({
                                     {group.title || group.name}
                                 </h3>
                                 {group.projectType && (
-                                    <Badge className="bg-purple-100 text-purple-700 text-xs">
+                                    <Badge className="bg-emerald-100 text-emerald-700 text-xs">
                                         {group.projectType}
                                     </Badge>
                                 )}
@@ -366,7 +366,7 @@ function GroupCard({
                         <Button
                             variant="ghost"
                             size="sm"
-                            className="text-purple-600"
+                            className="text-emerald-600"
                             onClick={onViewDetails}
                         >
                             View <ChevronRight className="h-4 w-4 ml-1" />
@@ -386,7 +386,7 @@ function GroupCard({
                         <FolderKanban className="h-5 w-5 text-amber-600" />
                     </div>
                     {group.projectType && (
-                        <Badge className="bg-purple-100 text-purple-700 text-xs">
+                        <Badge className="bg-emerald-100 text-emerald-700 text-xs">
                             {group.projectType}
                         </Badge>
                     )}
@@ -415,7 +415,7 @@ function GroupCard({
                             {group.members.slice(0, 3).map((member, index) => (
                                 <div
                                     key={member.id || index}
-                                    className="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full border-2 border-white flex items-center justify-center"
+                                    className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-full border-2 border-white flex items-center justify-center"
                                 >
                                     <span className="text-white text-xs font-medium">
                                         {member.name?.charAt(0) || "?"}
@@ -466,7 +466,7 @@ function GroupCard({
                 <div className="mt-4 pt-4 border-t border-slate-100">
                     <Button
                         variant="outline"
-                        className="w-full border-purple-200 text-purple-600 hover:bg-purple-50"
+                        className="w-full border-emerald-200 text-emerald-600 hover:bg-emerald-50"
                         onClick={onViewDetails}
                     >
                         View Details
@@ -542,11 +542,11 @@ function GroupDetailsModal({
                 onClick={(e) => e.stopPropagation()}
             >
                 {/* Header */}
-                <div className="p-6 border-b border-slate-100 bg-gradient-to-r from-purple-50 to-amber-50">
+                <div className="p-6 border-b border-slate-100 bg-gradient-to-r from-emerald-50 to-amber-50">
                     <div className="flex items-start justify-between">
                         <div className="flex items-center gap-4">
                             <div className="p-3 bg-white rounded-xl shadow-sm">
-                                <FolderKanban className="h-6 w-6 text-purple-600" />
+                                <FolderKanban className="h-6 w-6 text-emerald-600" />
                             </div>
                             <div>
                                 {isEditing ? (
@@ -562,7 +562,7 @@ function GroupDetailsModal({
                                 )}
                                 <div className="flex items-center gap-2 mt-1">
                                     {group.projectType && (
-                                        <Badge className="bg-purple-100 text-purple-700">
+                                        <Badge className="bg-emerald-100 text-emerald-700">
                                             {group.projectType}
                                         </Badge>
                                     )}
@@ -585,7 +585,7 @@ function GroupDetailsModal({
                 <div className="p-6 overflow-y-auto max-h-[calc(90vh-200px)]">
                     {/* Edit Mode Fields */}
                     {isEditing && (
-                        <div className="space-y-4 mb-6 p-4 bg-purple-50 rounded-xl">
+                        <div className="space-y-4 mb-6 p-4 bg-emerald-50 rounded-xl">
                             <div className="space-y-2">
                                 <Label>Project Title</Label>
                                 <Input
@@ -624,8 +624,8 @@ function GroupDetailsModal({
 
                     {/* Project Info Grid */}
                     <div className="grid grid-cols-2 gap-4 mb-6">
-                        <div className="p-4 bg-purple-50 rounded-xl">
-                            <p className="text-xs text-purple-600 uppercase tracking-wide font-medium mb-1">Group Name</p>
+                        <div className="p-4 bg-emerald-50 rounded-xl">
+                            <p className="text-xs text-emerald-600 uppercase tracking-wide font-medium mb-1">Group Name</p>
                             <p className="font-semibold text-slate-900">{group.name}</p>
                         </div>
                         {group.averageCpi && (
@@ -642,8 +642,8 @@ function GroupDetailsModal({
                             <div className="p-4 bg-slate-50 rounded-xl">
                                 <p className="text-xs text-slate-500 uppercase tracking-wide font-medium mb-2">Convener</p>
                                 <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
-                                        <User className="h-5 w-5 text-purple-600" />
+                                    <div className="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center">
+                                        <User className="h-5 w-5 text-emerald-600" />
                                     </div>
                                     <div>
                                         <p className="font-medium text-slate-900">{group.convener.staffname}</p>
@@ -710,7 +710,7 @@ function GroupDetailsModal({
                                                     </span>
                                                 )}
                                                 {leader.cgpa !== null && (
-                                                    <span className="text-purple-600 font-medium">
+                                                    <span className="text-emerald-600 font-medium">
                                                         CGPA: {leader.cgpa}
                                                     </span>
                                                 )}
@@ -733,7 +733,7 @@ function GroupDetailsModal({
                                             key={member.id || index}
                                             className="p-3 bg-slate-50 rounded-lg flex items-center gap-3"
                                         >
-                                            <div className="w-10 h-10 bg-gradient-to-br from-purple-400 to-pink-500 rounded-full flex items-center justify-center text-white font-medium">
+                                            <div className="w-10 h-10 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-full flex items-center justify-center text-white font-medium">
                                                 {member.name?.charAt(0) || "?"}
                                             </div>
                                             <div className="flex-1">
@@ -746,7 +746,7 @@ function GroupDetailsModal({
                                                         </span>
                                                     )}
                                                     {member.cgpa !== null && (
-                                                        <span className="text-purple-600 font-medium">
+                                                        <span className="text-emerald-600 font-medium">
                                                             CGPA: {member.cgpa}
                                                         </span>
                                                     )}
@@ -829,7 +829,7 @@ function GroupDetailsModal({
                                     Close
                                 </Button>
                                 <Button
-                                    className="bg-purple-600 hover:bg-purple-700 text-white"
+                                    className="bg-emerald-600 hover:bg-emerald-700 text-white"
                                     onClick={() => setIsEditing(true)}
                                 >
                                     <Edit className="h-4 w-4 mr-2" />
@@ -946,11 +946,11 @@ function CreateGroupModal({
                 onClick={(e) => e.stopPropagation()}
             >
                 {/* Header */}
-                <div className="p-6 border-b border-slate-100 bg-gradient-to-r from-purple-50 to-emerald-50">
+                <div className="p-6 border-b border-slate-100 bg-gradient-to-r from-emerald-50 to-emerald-50">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
                             <div className="p-2 bg-white rounded-xl shadow-sm">
-                                <UserPlus className="h-5 w-5 text-purple-600" />
+                                <UserPlus className="h-5 w-5 text-emerald-600" />
                             </div>
                             <div>
                                 <h2 className="text-xl font-bold text-slate-900">Create New Group</h2>
@@ -966,8 +966,8 @@ function CreateGroupModal({
 
                     {/* Step Indicator */}
                     <div className="flex gap-2 mt-4">
-                        <div className={`flex-1 h-1 rounded-full transition-colors ${step >= 1 ? "bg-purple-600" : "bg-slate-200"}`} />
-                        <div className={`flex-1 h-1 rounded-full transition-colors ${step >= 2 ? "bg-purple-600" : "bg-slate-200"}`} />
+                        <div className={`flex-1 h-1 rounded-full transition-colors ${step >= 1 ? "bg-emerald-600" : "bg-slate-200"}`} />
+                        <div className={`flex-1 h-1 rounded-full transition-colors ${step >= 2 ? "bg-emerald-600" : "bg-slate-200"}`} />
                     </div>
                 </div>
 
@@ -1054,8 +1054,8 @@ function CreateGroupModal({
                         <div className="space-y-4">
                             {/* Selected Members */}
                             {selectedMembers.length > 0 && (
-                                <div className="p-4 bg-purple-50 rounded-xl mb-4">
-                                    <p className="text-sm font-medium text-purple-700 mb-2">
+                                <div className="p-4 bg-emerald-50 rounded-xl mb-4">
+                                    <p className="text-sm font-medium text-emerald-700 mb-2">
                                         Selected Members ({selectedMembers.length})
                                     </p>
                                     <div className="flex flex-wrap gap-2">
@@ -1104,14 +1104,14 @@ function CreateGroupModal({
                                         return (
                                             <div
                                                 key={student.id}
-                                                className={`p-3 border-b border-slate-100 last:border-b-0 flex items-center gap-3 hover:bg-slate-50 transition-colors ${isSelected ? "bg-purple-50" : ""
+                                                className={`p-3 border-b border-slate-100 last:border-b-0 flex items-center gap-3 hover:bg-slate-50 transition-colors ${isSelected ? "bg-emerald-50" : ""
                                                     }`}
                                             >
                                                 <Checkbox
                                                     checked={isSelected}
                                                     onCheckedChange={() => toggleMember(student)}
                                                 />
-                                                <div className="w-10 h-10 bg-gradient-to-br from-purple-400 to-pink-500 rounded-full flex items-center justify-center text-white font-medium">
+                                                <div className="w-10 h-10 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-full flex items-center justify-center text-white font-medium">
                                                     {student.name.charAt(0)}
                                                 </div>
                                                 <div className="flex-1">
@@ -1163,7 +1163,7 @@ function CreateGroupModal({
 
                     {step < 2 ? (
                         <Button
-                            className="bg-purple-600 hover:bg-purple-700 text-white"
+                            className="bg-emerald-600 hover:bg-emerald-700 text-white"
                             onClick={() => setStep(2)}
                             disabled={!groupName || !projectTypeId}
                         >
@@ -1218,7 +1218,7 @@ function EmptyState({ onCreateGroup }: { onCreateGroup: () => void }) {
                 assignments.
             </p>
             <Button
-                className="bg-purple-600 hover:bg-purple-700 text-white"
+                className="bg-emerald-600 hover:bg-emerald-700 text-white"
                 onClick={onCreateGroup}
             >
                 <Plus className="h-4 w-4 mr-2" />

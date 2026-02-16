@@ -36,7 +36,7 @@ export function DashboardHeader({ userName, userEmail, role }: DashboardHeaderPr
       className="relative overflow-hidden"
     >
       {/* Background Gradient */}
-      <div className="absolute inset-0 bg-gradient-to-r from-purple-600 via-pink-500 to-blue-500 opacity-5" />
+      <div className="absolute inset-0 bg-gradient-to-r from-emerald-600 via-teal-500 to-blue-500 opacity-5" />
       
       {/* Animated Orbs */}
       <motion.div
@@ -45,7 +45,7 @@ export function DashboardHeader({ userName, userEmail, role }: DashboardHeaderPr
           opacity: [0.3, 0.5, 0.3],
         }}
         transition={{ duration: 4, repeat: Infinity }}
-        className="absolute -top-20 -right-20 w-64 h-64 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full blur-3xl opacity-20"
+        className="absolute -top-20 -right-20 w-64 h-64 bg-gradient-to-r from-emerald-400 to-teal-400 rounded-full blur-3xl opacity-20"
       />
       <motion.div
         animate={{
@@ -67,7 +67,7 @@ export function DashboardHeader({ userName, userEmail, role }: DashboardHeaderPr
             >
               <Badge 
                 variant="secondary" 
-                className="bg-gradient-to-r from-purple-100 to-pink-100 text-purple-700 border-0"
+                className="bg-gradient-to-r from-emerald-100 to-teal-100 text-emerald-700 border-0"
               >
                 <Sparkles className="h-3 w-3 mr-1" />
                 {role}
@@ -81,7 +81,7 @@ export function DashboardHeader({ userName, userEmail, role }: DashboardHeaderPr
               className="text-2xl md:text-3xl font-bold text-slate-900"
             >
               Welcome back,{" "}
-              <span className="bg-gradient-to-r from-purple-600 via-pink-500 to-blue-500 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-emerald-600 via-teal-500 to-blue-500 bg-clip-text text-transparent">
                 {userName}
               </span>
               ! 👋
@@ -103,12 +103,12 @@ export function DashboardHeader({ userName, userEmail, role }: DashboardHeaderPr
             transition={{ delay: 0.5 }}
             className="flex items-center gap-4 text-sm text-slate-500"
           >
-            <div className="flex items-center gap-2 bg-white/80 backdrop-blur-sm px-4 py-2 rounded-xl border border-purple-100 shadow-sm">
-              <Calendar className="h-4 w-4 text-purple-500" />
+            <div className="flex items-center gap-2 bg-white/80 backdrop-blur-sm px-4 py-2 rounded-xl border border-emerald-100 shadow-sm">
+              <Calendar className="h-4 w-4 text-emerald-500" />
               <span>{currentDate}</span>
             </div>
-            <div className="flex items-center gap-2 bg-white/80 backdrop-blur-sm px-4 py-2 rounded-xl border border-pink-100 shadow-sm">
-              <Clock className="h-4 w-4 text-pink-500" />
+            <div className="flex items-center gap-2 bg-white/80 backdrop-blur-sm px-4 py-2 rounded-xl border border-teal-100 shadow-sm">
+              <Clock className="h-4 w-4 text-teal-500" />
               <span>{currentTime}</span>
             </div>
           </motion.div>

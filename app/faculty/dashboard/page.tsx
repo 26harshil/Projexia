@@ -40,7 +40,7 @@ export default async function FacultyDashboard() {
             title="Assigned Courses"
             value={stats?.assignedCourses?.toString() ?? "0"}
             iconName="BookOpen"
-            color="purple"
+            color="emerald"
             description="Active courses"
             index={0}
           />
@@ -67,7 +67,7 @@ export default async function FacultyDashboard() {
             title="Pending Reviews"
             value={stats?.pendingReviews?.toString() ?? "0"}
             iconName="ClipboardCheck"
-            color="rose"
+            color="amber"
             description="Awaiting grading"
             index={3}
           />

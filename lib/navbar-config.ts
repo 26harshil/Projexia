@@ -26,12 +26,10 @@ export const NAVBAR_CONFIG: Record<Role, {
         title: "Admin Portal",
         links: [
             { name: "Dashboard", href: "/admin/dashboard" },
-            { name: "Master Config", href: "/admin/master" },
+            { name: "Users", href: "/admin/users" },
             { name: "Students", href: "/admin/students" },
             { name: "Projects", href: "/admin/projects" },
-            { name: "Meetings", href: "/admin/meetings" },
             { name: "Reports", href: "/admin/reports" },
-
         ]
     }
 }

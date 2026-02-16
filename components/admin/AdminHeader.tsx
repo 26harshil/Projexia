@@ -31,7 +31,7 @@ export function AdminHeader({ userName, userEmail, role }: AdminHeaderProps) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="relative overflow-hidden bg-gradient-to-br from-violet-600 via-purple-600 to-indigo-700"
+      className="relative overflow-hidden bg-gradient-to-br from-emerald-600 via-emerald-600 to-cyan-700"
     >
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-10">
@@ -103,7 +103,7 @@ export function AdminHeader({ userName, userEmail, role }: AdminHeaderProps) {
               className="flex flex-wrap gap-3 pt-2"
             >
               <Button 
-                className="bg-white text-violet-700 hover:bg-white/90 shadow-lg shadow-black/10"
+                className="bg-white text-emerald-700 hover:bg-white/90 shadow-lg shadow-black/10"
               >
                 <Settings className="h-4 w-4 mr-2" />
                 System Settings

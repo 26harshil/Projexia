@@ -65,7 +65,7 @@ export function FeaturesSection() {
           className="text-center mb-16"
         >
           <h2 className="text-4xl md:text-5xl font-bold text-slate-800 mb-6">
-            Key <span className="bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Features</span>
+            Key <span className="bg-linear-to-r from-blue-600 to-emerald-600 bg-clip-text text-transparent">Features</span>
           </h2>
           <p className="text-xl text-slate-600 max-w-3xl mx-auto">
             Powerful tools designed to enhance academic project management and collaboration
@@ -85,7 +85,7 @@ export function FeaturesSection() {
                 <Card className="h-full border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-white/80 backdrop-blur-sm">
                   <CardHeader className="pb-4">
                     <div className="flex items-center justify-between mb-2">
-                      <div className="p-2 bg-linear-to-br from-blue-500 to-purple-600 rounded-lg">
+                      <div className="p-2 bg-linear-to-br from-blue-500 to-emerald-600 rounded-lg">
                         <feature.icon className="h-6 w-6 text-white" />
                       </div>
                       <span className="text-xs px-2 py-1 bg-blue-500 text-white rounded-md font-medium">

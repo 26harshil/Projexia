@@ -2,10 +2,10 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { 
-  Users, 
-  BookOpen, 
-  FolderKanban, 
+import {
+  Users,
+  BookOpen,
+  FolderKanban,
   Activity,
   ArrowUpRight,
   ArrowDownRight,
@@ -24,19 +24,19 @@ interface AdminStatCardProps {
   title: string;
   value: string;
   iconName: string;
-  color: "violet" | "blue" | "emerald" | "amber";
+  color: "emerald" | "blue" | "emerald" | "amber";
   description: string;
   trend?: { value: string; positive: boolean };
   index?: number;
 }
 
 const colorStyles = {
-  violet: {
-    bg: "bg-violet-50",
-    iconBg: "bg-violet-100",
-    icon: "text-violet-600",
-    border: "border-violet-100",
-    accent: "bg-violet-600",
+  emerald: {
+    bg: "bg-emerald-50",
+    iconBg: "bg-emerald-100",
+    icon: "text-emerald-600",
+    border: "border-emerald-100",
+    accent: "bg-emerald-600",
   },
   blue: {
     bg: "bg-blue-50",
@@ -44,13 +44,6 @@ const colorStyles = {
     icon: "text-blue-600",
     border: "border-blue-100",
     accent: "bg-blue-600",
-  },
-  emerald: {
-    bg: "bg-emerald-50",
-    iconBg: "bg-emerald-100",
-    icon: "text-emerald-600",
-    border: "border-emerald-100",
-    accent: "bg-emerald-600",
   },
   amber: {
     bg: "bg-amber-50",
@@ -61,14 +54,14 @@ const colorStyles = {
   },
 };
 
-export function AdminStatCard({ 
-  title, 
-  value, 
-  iconName, 
+export function AdminStatCard({
+  title,
+  value,
+  iconName,
   color,
   description,
   trend,
-  index = 0 
+  index = 0
 }: AdminStatCardProps) {
   const Icon = iconMap[iconName] || Users;
   const styles = colorStyles[color];
@@ -103,7 +96,7 @@ export function AdminStatCard({
             >
               <Icon className={cn("h-5 w-5", styles.icon)} />
             </motion.div>
-            
+
             {trend && (
               <motion.div
                 initial={{ scale: 0 }}
@@ -111,8 +104,8 @@ export function AdminStatCard({
                 transition={{ delay: 0.3 + index * 0.1, type: "spring" }}
                 className={cn(
                   "flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full",
-                  trend.positive 
-                    ? "bg-emerald-50 text-emerald-600" 
+                  trend.positive
+                    ? "bg-emerald-50 text-emerald-600"
                     : "bg-red-50 text-red-600"
                 )}
               >
@@ -135,7 +128,7 @@ export function AdminStatCard({
           >
             {value}
           </motion.h3>
-          
+
           {/* Title & Description */}
           <p className="text-sm font-medium text-slate-700 mb-0.5">{title}</p>
           <p className="text-xs text-slate-500">{description}</p>

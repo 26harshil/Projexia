@@ -120,7 +120,7 @@ export function FacultyMeetingsContent({ meetings, groups }: FacultyMeetingsCont
                 (m) =>
                     new Date(m.datetime) <= new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
             ).length,
-            color: "purple",
+            color: "emerald",
             icon: Clock,
         },
         {
@@ -183,24 +183,24 @@ export function FacultyMeetingsContent({ meetings, groups }: FacultyMeetingsCont
                             whileHover={{ y: -2 }}
                             className={`bg-white rounded-xl border p-4 flex items-center gap-4 ${stat.color === "emerald"
                                 ? "border-emerald-100"
-                                : stat.color === "purple"
-                                    ? "border-purple-100"
+                                : stat.color === "emerald"
+                                    ? "border-emerald-100"
                                     : "border-slate-200"
                                 }`}
                         >
                             <div
                                 className={`p-3 rounded-xl ${stat.color === "emerald"
                                     ? "bg-emerald-100"
-                                    : stat.color === "purple"
-                                        ? "bg-purple-100"
+                                    : stat.color === "emerald"
+                                        ? "bg-emerald-100"
                                         : "bg-slate-100"
                                     }`}
                             >
                                 <stat.icon
                                     className={`h-5 w-5 ${stat.color === "emerald"
                                         ? "text-emerald-600"
-                                        : stat.color === "purple"
-                                            ? "text-purple-600"
+                                        : stat.color === "emerald"
+                                            ? "text-emerald-600"
                                             : "text-slate-600"
                                         }`}
                                 />
@@ -755,9 +755,9 @@ function MeetingDetailsModal({
                     </div>
 
                     {meeting.projectTitle && (
-                        <div className="mb-6 p-4 bg-purple-50 rounded-xl">
-                            <p className="text-xs text-purple-600 uppercase tracking-wide mb-1">Project</p>
-                            <p className="font-semibold text-purple-900">{meeting.projectTitle}</p>
+                        <div className="mb-6 p-4 bg-emerald-50 rounded-xl">
+                            <p className="text-xs text-emerald-600 uppercase tracking-wide mb-1">Project</p>
+                            <p className="font-semibold text-emerald-900">{meeting.projectTitle}</p>
                         </div>
                     )}
 
@@ -776,7 +776,7 @@ function MeetingDetailsModal({
                                         }`}
                                 >
                                     <div className="flex items-center gap-3">
-                                        <div className="w-8 h-8 bg-gradient-to-br from-purple-400 to-pink-500 rounded-full flex items-center justify-center text-white font-medium text-sm">
+                                        <div className="w-8 h-8 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-full flex items-center justify-center text-white font-medium text-sm">
                                             {attendee.name?.charAt(0) || "?"}
                                         </div>
                                         <span className="font-medium text-slate-900">{attendee.name}</span>

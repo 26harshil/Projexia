@@ -21,7 +21,7 @@ const roles = [
   {
     icon: GraduationCap,
     title: "Faculty",
-    color: "from-blue-500 to-purple-500",
+    color: "from-blue-500 to-emerald-500",
     responsibilities: [
       "Guide allocation and management",
       "Schedule and conduct meetings",
@@ -54,7 +54,7 @@ export function RolesSection() {
           className="text-center mb-16"
         >
           <h2 className="text-4xl md:text-5xl font-bold text-slate-800 mb-6">
-            Roles & <span className="bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Responsibilities</span>
+            Roles & <span className="bg-linear-to-r from-blue-600 to-emerald-600 bg-clip-text text-transparent">Responsibilities</span>
           </h2>
           <p className="text-xl text-slate-600 max-w-3xl mx-auto">
             Tailored experiences for each user type with specific permissions and functionalities
@@ -84,7 +84,7 @@ export function RolesSection() {
                     <ul className="space-y-3">
                       {role.responsibilities.map((responsibility, idx) => (
                         <li key={idx} className="flex items-start">
-                          <div className="w-2 h-2 bg-linear-to-br from-blue-500 to-purple-500 rounded-full mt-2 mr-3 shrink-0" />
+                          <div className="w-2 h-2 bg-linear-to-br from-blue-500 to-emerald-500 rounded-full mt-2 mr-3 shrink-0" />
                           <span className="text-slate-600 leading-relaxed">
                             {responsibility}
                           </span>

@@ -2,10 +2,10 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { 
-  BookOpen, 
-  Users, 
-  Calendar, 
+import {
+  BookOpen,
+  Users,
+  Calendar,
   ClipboardCheck,
   TrendingUp,
   ArrowUpRight,
@@ -24,19 +24,19 @@ interface FacultyStatCardProps {
   title: string;
   value: string;
   iconName: string;
-  color: "purple" | "amber" | "emerald" | "rose";
+  color: "emerald" | "amber";
   description: string;
   trend?: string;
   index?: number;
 }
 
 const colorStyles = {
-  purple: {
-    bg: "bg-purple-50",
-    iconBg: "bg-purple-100",
-    icon: "text-purple-600",
-    border: "border-purple-100",
-    trend: "text-purple-600 bg-purple-50",
+  emerald: {
+    bg: "bg-emerald-50",
+    iconBg: "bg-emerald-100",
+    icon: "text-emerald-600",
+    border: "border-emerald-100",
+    trend: "text-emerald-600 bg-emerald-50",
   },
   amber: {
     bg: "bg-amber-50",
@@ -45,30 +45,16 @@ const colorStyles = {
     border: "border-amber-100",
     trend: "text-amber-600 bg-amber-50",
   },
-  emerald: {
-    bg: "bg-emerald-50",
-    iconBg: "bg-emerald-100",
-    icon: "text-emerald-600",
-    border: "border-emerald-100",
-    trend: "text-emerald-600 bg-emerald-50",
-  },
-  rose: {
-    bg: "bg-rose-50",
-    iconBg: "bg-rose-100",
-    icon: "text-rose-600",
-    border: "border-rose-100",
-    trend: "text-rose-600 bg-rose-50",
-  },
 };
 
-export function FacultyStatCard({ 
-  title, 
-  value, 
-  iconName, 
+export function FacultyStatCard({
+  title,
+  value,
+  iconName,
   color,
   description,
   trend,
-  index = 0 
+  index = 0
 }: FacultyStatCardProps) {
   const Icon = iconMap[iconName] || BookOpen;
   const styles = colorStyles[color];
@@ -95,7 +81,7 @@ export function FacultyStatCard({
           >
             <Icon className={cn("h-5 w-5", styles.icon)} />
           </motion.div>
-          
+
           {trend && (
             <motion.div
               initial={{ scale: 0 }}
@@ -121,7 +107,7 @@ export function FacultyStatCard({
         >
           {value}
         </motion.h3>
-        
+
         {/* Title & Description */}
         <p className="text-sm font-medium text-slate-700 mb-0.5">{title}</p>
         <p className="text-xs text-slate-500">{description}</p>
@@ -133,10 +119,10 @@ export function FacultyStatCard({
           transition={{ duration: 0.2 }}
           className={cn(
             "absolute bottom-0 left-0 right-0 h-0.5 origin-left rounded-b-2xl",
-            color === "purple" && "bg-purple-600",
+            color === "emerald" && "bg-emerald-600",
             color === "amber" && "bg-amber-500",
             color === "emerald" && "bg-emerald-500",
-            color === "rose" && "bg-rose-500"
+            color === "emerald" && "bg-emerald-500"
           )}
         />
       </div>

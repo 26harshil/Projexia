@@ -93,8 +93,8 @@ export function FacultyDashboardContent({ firstName, stats }: FacultyDashboardCo
           {/* Card Header */}
           <div className="flex items-center justify-between p-6 border-b border-slate-100">
             <div className="flex items-center gap-3">
-              <div className="p-2.5 bg-purple-100 rounded-xl">
-                <BookOpen className="h-5 w-5 text-purple-600" />
+              <div className="p-2.5 bg-emerald-100 rounded-xl">
+                <BookOpen className="h-5 w-5 text-emerald-600" />
               </div>
               <div>
                 <h3 className="font-semibold text-slate-900">My Courses</h3>
@@ -114,9 +114,9 @@ export function FacultyDashboardContent({ firstName, stats }: FacultyDashboardCo
                 transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
                 className="relative mb-6"
               >
-                <div className="absolute inset-0 bg-purple-200 rounded-2xl blur-xl opacity-40" />
-                <div className="relative bg-purple-50 border border-purple-100 p-6 rounded-2xl">
-                  <BookOpen className="h-12 w-12 text-purple-400" />
+                <div className="absolute inset-0 bg-emerald-200 rounded-2xl blur-xl opacity-40" />
+                <div className="relative bg-emerald-50 border border-emerald-100 p-6 rounded-2xl">
+                  <BookOpen className="h-12 w-12 text-emerald-400" />
                 </div>
               </motion.div>
               <p className="text-slate-600 font-medium mb-1">
@@ -125,7 +125,7 @@ export function FacultyDashboardContent({ firstName, stats }: FacultyDashboardCo
               <p className="text-sm text-slate-400 text-center max-w-xs mb-4">
                 Courses will appear here once assigned by the administrator
               </p>
-              <Button variant="outline" className="border-purple-200 text-purple-600 hover:bg-purple-50">
+              <Button variant="outline" className="border-emerald-200 text-emerald-600 hover:bg-emerald-50">
                 Request Assignment
               </Button>
             </div>
@@ -150,7 +150,7 @@ export function FacultyDashboardContent({ firstName, stats }: FacultyDashboardCo
               </div>
             </div>
             <Link href="/faculty/group">
-              <Button variant="ghost" size="sm" className="text-purple-600 hover:text-purple-700 hover:bg-purple-50">
+              <Button variant="ghost" size="sm" className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50">
                 View All
                 <ArrowRight className="h-4 w-4 ml-1" />
               </Button>
@@ -182,7 +182,7 @@ export function FacultyDashboardContent({ firstName, stats }: FacultyDashboardCo
                           {group.memberCount} members
                         </span>
                         {group.projectType && (
-                          <Badge variant="secondary" className="text-xs bg-purple-50 text-purple-600">
+                          <Badge variant="secondary" className="text-xs bg-emerald-50 text-emerald-600">
                             {group.projectType}
                           </Badge>
                         )}
@@ -279,7 +279,7 @@ export function FacultyDashboardContent({ firstName, stats }: FacultyDashboardCo
                         <p className="font-medium text-slate-900 text-sm truncate">
                           {meeting.purpose || "Project Meeting"}
                         </p>
-                        <p className="text-xs text-purple-600 truncate">
+                        <p className="text-xs text-emerald-600 truncate">
                           {meeting.groupName || meeting.projectTitle}
                         </p>
                         {meeting.location && (
@@ -354,7 +354,7 @@ export function FacultyDashboardContent({ firstName, stats }: FacultyDashboardCo
                   label: "Total Students",
                   value: stats?.totalStudents?.toString() || "0",
                   icon: Users,
-                  color: "purple"
+                  color: "emerald"
                 },
                 {
                   label: "Active Projects",
@@ -372,7 +372,7 @@ export function FacultyDashboardContent({ firstName, stats }: FacultyDashboardCo
                   label: "Pending Reviews",
                   value: stats?.pendingReviews?.toString() || "0",
                   icon: AlertCircle,
-                  color: "rose",
+                  color: "emerald",
                   href: "/faculty/reviews"
                 },
               ].map((stat, index) => {
@@ -388,17 +388,17 @@ export function FacultyDashboardContent({ firstName, stats }: FacultyDashboardCo
                       <div className="flex items-center gap-3">
                         <div className={cn(
                           "p-2 rounded-lg",
-                          stat.color === "purple" && "bg-purple-100",
+                          stat.color === "emerald" && "bg-emerald-100",
                           stat.color === "amber" && "bg-amber-100",
                           stat.color === "emerald" && "bg-emerald-100",
-                          stat.color === "rose" && "bg-rose-100"
+                          stat.color === "emerald" && "bg-emerald-100"
                         )}>
                           <stat.icon className={cn(
                             "h-4 w-4",
-                            stat.color === "purple" && "text-purple-600",
+                            stat.color === "emerald" && "text-emerald-600",
                             stat.color === "amber" && "text-amber-600",
                             stat.color === "emerald" && "text-emerald-600",
-                            stat.color === "rose" && "text-rose-600"
+                            stat.color === "emerald" && "text-emerald-600"
                           )} />
                         </div>
                         <span className="text-sm text-slate-600">{stat.label}</span>
@@ -411,10 +411,10 @@ export function FacultyDashboardContent({ firstName, stats }: FacultyDashboardCo
             </div>
 
             {/* Attendance Rate */}
-            <div className="mt-6 p-4 bg-gradient-to-r from-purple-50 to-amber-50 rounded-xl border border-purple-100">
+            <div className="mt-6 p-4 bg-gradient-to-r from-emerald-50 to-amber-50 rounded-xl border border-emerald-100">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm font-medium text-slate-700">Attendance Rate</span>
-                <span className="text-sm font-bold text-purple-600">
+                <span className="text-sm font-bold text-emerald-600">
                   {stats?.attendanceRate !== undefined ? `${stats.attendanceRate}%` : "N/A"}
                 </span>
               </div>

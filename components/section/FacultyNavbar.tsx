@@ -59,8 +59,8 @@ export default function FacultyNavbar() {
             whileTap={{ scale: 0.95 }}
             className="relative"
           >
-            <div className="absolute inset-0 bg-purple-600 rounded-xl blur opacity-25 group-hover:opacity-40 transition-opacity" />
-            <div className="relative bg-purple-600 p-2.5 rounded-xl">
+            <div className="absolute inset-0 bg-emerald-600 rounded-xl blur opacity-25 group-hover:opacity-40 transition-opacity" />
+            <div className="relative bg-emerald-600 p-2.5 rounded-xl">
               <GraduationCap className="h-5 w-5 text-white" />
             </div>
           </motion.div>
@@ -68,7 +68,7 @@ export default function FacultyNavbar() {
             <span className="text-lg font-bold text-slate-900">
               {title}
             </span>
-            <span className="text-[10px] text-purple-600 font-medium -mt-1">
+            <span className="text-[10px] text-emerald-600 font-medium -mt-1">
               MANAGEMENT SYSTEM
             </span>
           </div>
@@ -95,19 +95,19 @@ export default function FacultyNavbar() {
                     className={cn(
                       "relative flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200",
                       isActive
-                        ? "text-purple-700 bg-purple-50 shadow-sm shadow-purple-100"
+                        ? "text-emerald-700 bg-emerald-50 shadow-sm shadow-emerald-100"
                         : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
                     )}
                   >
                     <Icon className={cn(
                       "h-4 w-4 transition-colors",
-                      isActive ? "text-purple-600" : "text-slate-400"
+                      isActive ? "text-emerald-600" : "text-slate-400"
                     )} />
                     <span>{link.name}</span>
                     {isActive && (
                       <motion.div
                         layoutId="facultyActiveIndicator"
-                        className="absolute bottom-1 left-1/2 -translate-x-1/2 w-4 h-0.5 bg-purple-600 rounded-full"
+                        className="absolute bottom-1 left-1/2 -translate-x-1/2 w-4 h-0.5 bg-emerald-600 rounded-full"
                         transition={{ type: "spring", stiffness: 400, damping: 30 }}
                       />
                     )}
@@ -165,7 +165,7 @@ export default function FacultyNavbar() {
                 afterSignOutUrl="/"
                 appearance={{
                   elements: {
-                    avatarBox: "h-9 w-9 ring-2 ring-purple-100 ring-offset-2"
+                    avatarBox: "h-9 w-9 ring-2 ring-emerald-100 ring-offset-2"
                   }
                 }}
               />
@@ -184,7 +184,7 @@ export default function FacultyNavbar() {
                 {/* Mobile Header */}
                 <div className="p-6 border-b border-slate-100">
                   <Link href="/faculty/dashboard" onClick={() => setIsOpen(false)} className="flex items-center gap-3">
-                    <div className="bg-purple-600 p-2.5 rounded-xl">
+                    <div className="bg-emerald-600 p-2.5 rounded-xl">
                       <GraduationCap className="h-5 w-5 text-white" />
                     </div>
                     <div>
@@ -213,18 +213,18 @@ export default function FacultyNavbar() {
                           className={cn(
                             "flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200",
                             isActive
-                              ? "bg-purple-50 text-purple-700 border border-purple-100 shadow-sm"
+                              ? "bg-emerald-50 text-emerald-700 border border-emerald-100 shadow-sm"
                               : "text-slate-600 hover:bg-slate-50"
                           )}
                         >
                           <Icon className={cn(
                             "h-5 w-5",
-                            isActive ? "text-purple-600" : "text-slate-400"
+                            isActive ? "text-emerald-600" : "text-slate-400"
                           )} />
                           <span className="font-medium">{link.name}</span>
                           {isActive && (
                             <div className="ml-auto">
-                              <Sparkles className="h-4 w-4 text-purple-400" />
+                              <Sparkles className="h-4 w-4 text-emerald-400" />
                             </div>
                           )}
                         </Link>

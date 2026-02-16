@@ -5,6 +5,7 @@ import { currentUser } from "@clerk/nextjs/server";
 import { AdminHeader } from "@/components/admin/AdminHeader";
 import { AdminStatCard } from "@/components/admin/AdminStatCard";
 import { AdminDashboardContent } from "@/components/admin/AdminDashboardContent";
+import { getUserStats, getProjectStats, getStudentStats } from "@/app/actions/adminActions";
 
 export default async function AdminDashboard() {
   const role = await getUserRole();
@@ -18,15 +19,30 @@ export default async function AdminDashboard() {
     redirect(`/${role.toLowerCase()}/dashboard`);
   }
 
+  // Fetch real stats from the database
+  let stats = { totalUsers: 0, adminCount: 0, facultyCount: 0, studentCount: 0, activeCount: 0, inactiveCount: 0 };
+  let projStats = { totalProjects: 0, totalProjectTypes: 0, totalMembers: 0, totalMeetings: 0 };
+  let stuStats = { totalStudents: 0, activeStudents: 0, inactiveStudents: 0, studentsInGroups: 0 };
+
+  try {
+    [stats, projStats, stuStats] = await Promise.all([
+      getUserStats(),
+      getProjectStats(),
+      getStudentStats(),
+    ]);
+  } catch (e) {
+    // Fallback to zeros if stats fetch fails
+  }
+
   const userName = `${user.firstName || ""} ${user.lastName || ""}`.trim() || "Admin User";
   const userEmail = user.emailAddresses[0]?.emailAddress || "";
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <AdminHeader 
-        userName={userName} 
-        userEmail={userEmail} 
-        role={role || "ADMIN"} 
+      <AdminHeader
+        userName={userName}
+        userEmail={userEmail}
+        role={role || "ADMIN"}
       />
 
       <div className="max-w-7xl mx-auto px-4 md:px-6 py-8">
@@ -34,42 +50,46 @@ export default async function AdminDashboard() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
           <AdminStatCard
             title="Total Users"
-            value="0"
+            value={String(stats.totalUsers)}
             iconName="Users"
-            color="violet"
+            color="emerald"
             description="Registered users"
-            trend={{ value: "+0%", positive: true }}
+            trend={{ value: `${stats.activeCount} active`, positive: true }}
             index={0}
           />
           <AdminStatCard
-            title="Total Courses"
-            value="0"
+            title="Students"
+            value={String(stats.studentCount)}
             iconName="BookOpen"
             color="blue"
-            description="Active courses"
-            trend={{ value: "+0%", positive: true }}
+            description="Student accounts"
             index={1}
           />
           <AdminStatCard
-            title="Active Projects"
-            value="0"
+            title="Faculty"
+            value={String(stats.facultyCount)}
             iconName="FolderKanban"
             color="emerald"
-            description="Ongoing projects"
+            description="Faculty members"
             index={2}
           />
           <AdminStatCard
-            title="System Health"
-            value="100%"
+            title="Admins"
+            value={String(stats.adminCount)}
             iconName="Activity"
             color="amber"
-            description="All systems operational"
+            description="Admin accounts"
             index={3}
           />
         </div>
 
-        {/* Dashboard Content */}
-        <AdminDashboardContent firstName={user.firstName || "Admin"} />
+        {/* Dashboard Content - Now with real data */}
+        <AdminDashboardContent
+          firstName={user.firstName || "Admin"}
+          stats={stats}
+          projectStats={projStats}
+          studentStats={stuStats}
+        />
       </div>
     </div>
   );

@@ -17,7 +17,7 @@ export function HeroSection() {
   return (
     <section className="relative min-h-screen flex items-center justify-center px-4 overflow-hidden">
       {/* Background gradient */}
-      <div className="absolute inset-0 bg-linear-to-br from-blue-600/10 via-purple-500/5 to-cyan-400/10" />
+      <div className="absolute inset-0 bg-linear-to-br from-blue-600/10 via-emerald-500/5 to-cyan-400/10" />
 
       <div className="relative z-10 text-center max-w-4xl mx-auto">
         <motion.div
@@ -26,7 +26,7 @@ export function HeroSection() {
           transition={{ duration: 0.8, ease: "easeOut" }}
         >
           <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
-            <GradientText className="bg-linear-to-r from-blue-600 via-purple-600 to-cyan-600">
+            <GradientText className="bg-linear-to-r from-blue-600 via-emerald-600 to-cyan-600">
               Student Project
             </GradientText>
             <br />
@@ -55,7 +55,7 @@ export function HeroSection() {
             <SignUpButton mode="modal" forceRedirectUrl="/check-role">
               <Button
                 size="lg"
-                className="bg-linear-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3 text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
+                className="bg-linear-to-r from-blue-600 to-emerald-600 hover:from-blue-700 hover:to-emerald-700 text-white px-8 py-3 text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
               >
                 Get Started
                 <ArrowRight className="ml-2 h-5 w-5" />
@@ -85,7 +85,7 @@ export function HeroSection() {
           repeat: Infinity,
           ease: "easeInOut",
         }}
-        className="absolute top-20 right-20 w-20 h-20 bg-linear-to-br from-blue-400 to-purple-500 rounded-full opacity-20 blur-xl"
+        className="absolute top-20 right-20 w-20 h-20 bg-linear-to-br from-blue-400 to-emerald-500 rounded-full opacity-20 blur-xl"
       />
 
       <motion.div
