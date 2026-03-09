@@ -30,11 +30,20 @@ export async function getFacultyGroups() {
     const staff = await getStaffId();
     if (!staff) return [];
 
+    // Also find groups where this faculty is a guide (from meetings)
+    const guideGroupIds = await prisma.projectmeeting.findMany({
+        where: { guidestaffid: staff.staffid },
+        select: { projectgroupid: true },
+        distinct: ['projectgroupid'],
+    });
+    const guideGroupIdList = guideGroupIds.map(g => g.projectgroupid);
+
     const groups = await prisma.projectgroup.findMany({
         where: {
             OR: [
                 { convenerstaffid: staff.staffid },
                 { expertstaffid: staff.staffid },
+                ...(guideGroupIdList.length > 0 ? [{ projectgroupid: { in: guideGroupIdList } }] : []),
             ],
         },
         include: {
@@ -497,6 +506,15 @@ export async function createMeeting(data: {
         return { success: false, error: "Unauthorized: Staff not found" };
     }
 
+    // Also check if faculty is guide for any meeting in this group
+    const isGuide = await prisma.projectmeeting.findFirst({
+        where: {
+            projectgroupid: data.groupId,
+            guidestaffid: staff.staffid,
+        },
+        select: { projectmeetingid: true },
+    });
+
     // Verify staff has access to the group
     const group = await prisma.projectgroup.findFirst({
         where: {
@@ -504,6 +522,7 @@ export async function createMeeting(data: {
             OR: [
                 { convenerstaffid: staff.staffid },
                 { expertstaffid: staff.staffid },
+                ...(isGuide ? [{ projectgroupid: data.groupId }] : []),
             ],
         },
         include: {
@@ -511,6 +530,8 @@ export async function createMeeting(data: {
                 include: {
                     student: {
                         select: {
+                            studentid: true,
+                            studentname: true,
                             email: true,
                         },
                     },
@@ -535,6 +556,20 @@ export async function createMeeting(data: {
                 meetingstatus: 'Scheduled',
             },
         });
+
+        // Auto-create attendance records for all group members
+        const groupMembers = group.projectgroupmember;
+        if (groupMembers.length > 0) {
+            await prisma.projectmeetingattendance.createMany({
+                data: groupMembers.map(member => ({
+                    projectmeetingid: meeting.projectmeetingid,
+                    studentid: member.studentid,
+                    ispresent: false,
+                    attendanceremarks: null,
+                })),
+                skipDuplicates: true,
+            });
+        }
 
         // Send email notification to students if requested
         if (data.sendNotification !== false) {
@@ -636,6 +671,65 @@ export async function completeMeetingReview(data: {
     revalidatePath('/faculty/meetings');
 
     return { success: true };
+}
+
+// Save attendance for any meeting (without completing review)
+export async function saveAttendance(data: {
+    meetingId: number;
+    attendance: { studentId: number; present: boolean; remarks?: string }[];
+}) {
+    const staff = await getStaffId();
+    if (!staff) return { success: false, error: "Unauthorized: Staff not found" };
+
+    // Verify staff owns this meeting
+    const meeting = await prisma.projectmeeting.findFirst({
+        where: {
+            projectmeetingid: data.meetingId,
+            guidestaffid: staff.staffid,
+        },
+    });
+
+    if (!meeting) return { success: false, error: "Meeting not found or unauthorized" };
+
+    try {
+        // Update or create attendance records
+        for (const att of data.attendance) {
+            const existingAttendance = await prisma.projectmeetingattendance.findFirst({
+                where: {
+                    projectmeetingid: data.meetingId,
+                    studentid: att.studentId,
+                },
+            });
+
+            if (existingAttendance) {
+                await prisma.projectmeetingattendance.update({
+                    where: { projectmeetingattendanceid: existingAttendance.projectmeetingattendanceid },
+                    data: {
+                        ispresent: att.present,
+                        attendanceremarks: att.remarks || null,
+                        modified: new Date(),
+                    },
+                });
+            } else {
+                await prisma.projectmeetingattendance.create({
+                    data: {
+                        projectmeetingid: data.meetingId,
+                        studentid: att.studentId,
+                        ispresent: att.present,
+                        attendanceremarks: att.remarks || null,
+                    },
+                });
+            }
+        }
+
+        revalidatePath('/faculty/meetings');
+        revalidatePath('/faculty/reviews');
+
+        return { success: true };
+    } catch (error) {
+        console.error("Error saving attendance:", error);
+        return { success: false, error: "Failed to save attendance" };
+    }
 }
 
 // ============== UPDATE FUNCTIONS ==============

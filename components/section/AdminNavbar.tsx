@@ -3,7 +3,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { UserButton } from "@clerk/nextjs";
+import { useUser } from "@clerk/nextjs";
 import { NAVBAR_CONFIG } from "@/lib/navbar-config";
 import { useScroll } from "@/hooks/use-scroll";
 import { cn } from "@/lib/utils";
@@ -34,6 +34,17 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   Projects: FolderKanban,
   Reports: FileText,
 };
+
+function UserProfileAvatar() {
+  const { user } = useUser();
+  if (user?.imageUrl) {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img src={user.imageUrl} alt="Profile" className="h-full w-full object-cover" />
+    );
+  }
+  return <span>{user?.firstName?.charAt(0) || "A"}</span>;
+}
 
 export default function AdminNavbar() {
   const scrolled = useScroll();
@@ -155,25 +166,20 @@ export default function AdminNavbar() {
           {/* Divider */}
           <div className="hidden md:block w-px h-8 bg-slate-200 mx-2" />
 
-          {/* User Section */}
-          <div className="flex items-center gap-3">
+          {/* User Section - Links to custom profile page */}
+          <Link href="/profile" className="flex items-center gap-3 group">
             <div className="hidden md:flex flex-col items-end">
-              <span className="text-sm font-semibold text-slate-900">Admin</span>
+              <span className="text-sm font-semibold text-slate-900 group-hover:text-emerald-600 transition-colors">Admin</span>
               <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-4 border-emerald-200 text-emerald-600">
                 Super Admin
               </Badge>
             </div>
             <motion.div whileHover={{ scale: 1.05 }}>
-              <UserButton
-                afterSignOutUrl="/"
-                appearance={{
-                  elements: {
-                    avatarBox: "h-9 w-9 ring-2 ring-emerald-100 ring-offset-2"
-                  }
-                }}
-              />
+              <div className="h-9 w-9 rounded-full ring-2 ring-emerald-100 ring-offset-2 bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white font-bold text-sm overflow-hidden">
+                <UserProfileAvatar />
+              </div>
             </motion.div>
-          </div>
+          </Link>
 
           {/* Mobile Menu */}
           <Sheet open={isOpen} onOpenChange={setIsOpen}>

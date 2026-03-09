@@ -38,8 +38,12 @@ export async function getFacultyDashboardStats() {
     thisWeekMeetingsCount,
     pendingReviewsCount,
     completedMeetingsCount,
+    totalMeetingsCount,
     recentGroups,
     upcomingMeetings,
+    allGroups,
+    recentMeetings,
+    projectTypes,
   ] = await Promise.all([
     // Count of student groups
     prisma.projectgroup.count({
@@ -100,7 +104,7 @@ export async function getFacultyDashboardStats() {
         meetingdatetime: { lt: now },
         OR: [
           { meetingstatus: null },
-          { meetingstatus: { not: 'Completed' } },
+          { meetingstatus: { not: "Completed" } },
         ],
       },
     }),
@@ -109,7 +113,14 @@ export async function getFacultyDashboardStats() {
     prisma.projectmeeting.count({
       where: {
         guidestaffid: staff.staffid,
-        meetingstatus: 'Completed',
+        meetingstatus: "Completed",
+      },
+    }),
+
+    // Total meetings count (all time)
+    prisma.projectmeeting.count({
+      where: {
+        guidestaffid: staff.staffid,
       },
     }),
 
@@ -134,7 +145,7 @@ export async function getFacultyDashboardStats() {
         },
         projecttype: true,
       },
-      orderBy: { created: 'desc' },
+      orderBy: { created: "desc" },
       take: 3,
     }),
 
@@ -152,8 +163,83 @@ export async function getFacultyDashboardStats() {
           },
         },
       },
-      orderBy: { meetingdatetime: 'asc' },
+      orderBy: { meetingdatetime: "asc" },
       take: 5,
+    }),
+
+    // All groups with full details for project overview
+    prisma.projectgroup.findMany({
+      where: {
+        OR: [
+          { convenerstaffid: staff.staffid },
+          { expertstaffid: staff.staffid },
+        ],
+      },
+      include: {
+        projecttype: true,
+        projectgroupmember: {
+          include: {
+            student: {
+              select: {
+                studentname: true,
+                email: true,
+              },
+            },
+          },
+        },
+        projectmeeting: {
+          orderBy: { meetingdatetime: "desc" },
+          take: 1,
+          select: {
+            meetingdatetime: true,
+            meetingstatus: true,
+            meetingpurpose: true,
+          },
+        },
+      },
+      orderBy: { created: "desc" },
+    }),
+
+    // Recent meetings (completed/past) for activity feed
+    prisma.projectmeeting.findMany({
+      where: {
+        guidestaffid: staff.staffid,
+        meetingdatetime: { lt: now },
+      },
+      include: {
+        projectgroup: {
+          select: {
+            projectgroupname: true,
+            projecttitle: true,
+          },
+        },
+        projectmeetingattendance: {
+          select: {
+            ispresent: true,
+          },
+        },
+      },
+      orderBy: { meetingdatetime: "desc" },
+      take: 5,
+    }),
+
+    // Distinct project types across faculty's groups
+    prisma.projecttype.findMany({
+      where: {
+        projectgroup: {
+          some: {
+            OR: [
+              { convenerstaffid: staff.staffid },
+              { expertstaffid: staff.staffid },
+            ],
+          },
+        },
+      },
+      include: {
+        _count: {
+          select: { projectgroup: true },
+        },
+      },
     }),
   ]);
 
@@ -164,7 +250,7 @@ export async function getFacultyDashboardStats() {
       where: {
         projectmeeting: {
           guidestaffid: staff.staffid,
-          meetingstatus: 'Completed',
+          meetingstatus: "Completed",
         },
       },
     });
@@ -173,14 +259,23 @@ export async function getFacultyDashboardStats() {
       where: {
         projectmeeting: {
           guidestaffid: staff.staffid,
-          meetingstatus: 'Completed',
+          meetingstatus: "Completed",
         },
         ispresent: true,
       },
     });
 
-    attendanceRate = totalAttendance > 0 ? Math.round((presentAttendance / totalAttendance) * 100) : 0;
+    attendanceRate =
+      totalAttendance > 0
+        ? Math.round((presentAttendance / totalAttendance) * 100)
+        : 0;
   }
+
+  // Compute meeting completion rate
+  const meetingCompletionRate =
+    totalMeetingsCount > 0
+      ? Math.round((completedMeetingsCount / totalMeetingsCount) * 100)
+      : 0;
 
   return {
     staffName: staff.staffname,
@@ -192,15 +287,19 @@ export async function getFacultyDashboardStats() {
     thisWeekMeetings: thisWeekMeetingsCount,
     pendingReviews: pendingReviewsCount,
     completedMeetings: completedMeetingsCount,
+    totalMeetings: totalMeetingsCount,
+    meetingCompletionRate,
     attendanceRate,
-    assignedCourses: 0, // Add when course table exists
+    projectTypesCount: projectTypes.length,
     recentGroups: recentGroups.map((group) => ({
       id: group.projectgroupid,
       name: group.projectgroupname,
       title: group.projecttitle,
       projectType: group.projecttype?.projecttypename || null,
       memberCount: group.projectgroupmember.length,
-      leaderName: group.projectgroupmember.find(m => m.isgroupleader)?.student?.studentname || null,
+      leaderName:
+        group.projectgroupmember.find((m) => m.isgroupleader)?.student
+          ?.studentname || null,
     })),
     upcomingMeetingsList: upcomingMeetings.map((meeting) => ({
       id: meeting.projectmeetingid,
@@ -209,6 +308,52 @@ export async function getFacultyDashboardStats() {
       location: meeting.meetinglocation,
       groupName: meeting.projectgroup?.projectgroupname,
       projectTitle: meeting.projectgroup?.projecttitle,
+    })),
+    // All groups with progress data
+    groupsOverview: allGroups.map((group) => {
+      const totalMembers = group.projectgroupmember.length;
+      const leader = group.projectgroupmember.find(
+        (m) => m.isgroupleader
+      );
+      const lastMeeting = group.projectmeeting[0] || null;
+      return {
+        id: group.projectgroupid,
+        name: group.projectgroupname,
+        title: group.projecttitle,
+        area: group.projectarea,
+        description: group.projectdescription,
+        projectType: group.projecttype?.projecttypename || null,
+        memberCount: totalMembers,
+        leaderName: leader?.student?.studentname || null,
+        lastMeetingDate: lastMeeting?.meetingdatetime || null,
+        lastMeetingStatus: lastMeeting?.meetingstatus || null,
+        lastMeetingPurpose: lastMeeting?.meetingpurpose || null,
+        created: group.created,
+      };
+    }),
+    // Recent activity feed
+    recentActivity: recentMeetings.map((meeting) => {
+      const totalAttendees = meeting.projectmeetingattendance.length;
+      const presentCount = meeting.projectmeetingattendance.filter(
+        (a) => a.ispresent
+      ).length;
+      return {
+        id: meeting.projectmeetingid,
+        type: "meeting" as const,
+        datetime: meeting.meetingdatetime,
+        purpose: meeting.meetingpurpose,
+        status: meeting.meetingstatus,
+        groupName: meeting.projectgroup?.projectgroupname,
+        projectTitle: meeting.projectgroup?.projecttitle,
+        totalAttendees,
+        presentCount,
+      };
+    }),
+    // Project type breakdown
+    projectTypeBreakdown: projectTypes.map((pt) => ({
+      id: pt.projecttypeid,
+      name: pt.projecttypename,
+      groupCount: pt._count.projectgroup,
     })),
   };
 }
