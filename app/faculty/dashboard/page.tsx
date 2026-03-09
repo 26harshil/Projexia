@@ -37,11 +37,11 @@ export default async function FacultyDashboard() {
         {/* Statistics Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
           <FacultyStatCard
-            title="Assigned Courses"
-            value={stats?.assignedCourses?.toString() ?? "0"}
+            title="Project Types"
+            value={stats?.projectTypesCount?.toString() ?? "0"}
             iconName="BookOpen"
             color="emerald"
-            description="Active courses"
+            description={`${stats?.studentGroups ?? 0} active groups`}
             index={0}
           />
 
@@ -68,7 +68,7 @@ export default async function FacultyDashboard() {
             value={stats?.pendingReviews?.toString() ?? "0"}
             iconName="ClipboardCheck"
             color="amber"
-            description="Awaiting grading"
+            description={`${stats?.completedMeetings ?? 0} completed`}
             index={3}
           />
         </div>

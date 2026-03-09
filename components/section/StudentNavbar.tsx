@@ -3,16 +3,16 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { UserButton } from "@clerk/nextjs";
+import { useUser } from "@clerk/nextjs";
 import { NAVBAR_CONFIG } from "@/lib/navbar-config";
 import { useScroll } from "@/hooks/use-scroll";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  LayoutDashboard, 
-  FolderKanban, 
-  Users, 
-  Calendar, 
+import {
+  LayoutDashboard,
+  FolderKanban,
+  Users,
+  Calendar,
   FileText,
   Menu,
   X,
@@ -30,6 +30,17 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   Meetings: Calendar,
   Reports: FileText,
 };
+
+function UserProfileAvatar() {
+  const { user } = useUser();
+  if (user?.imageUrl) {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img src={user.imageUrl} alt="Profile" className="h-full w-full object-cover" />
+    );
+  }
+  return <span>{user?.firstName?.charAt(0) || "S"}</span>;
+}
 
 export default function StudentNavbar() {
   const scrolled = useScroll();
@@ -72,7 +83,7 @@ export default function StudentNavbar() {
           {links.map((link, index) => {
             const Icon = iconMap[link.name] || LayoutDashboard;
             const isActive = pathname === link.href;
-            
+
             return (
               <motion.div
                 key={link.href}
@@ -112,21 +123,18 @@ export default function StudentNavbar() {
 
         {/* Right Section */}
         <div className="flex items-center gap-3">
-          {/* User Button */}
-          <motion.div
-            whileHover={{ scale: 1.05 }}
-            className="relative"
-          >
-            <div className="absolute inset-0 bg-gradient-to-r from-emerald-400 to-teal-400 rounded-full blur opacity-30" />
-            <UserButton 
-              afterSignOutUrl="/" 
-              appearance={{
-                elements: {
-                  avatarBox: "h-9 w-9 ring-2 ring-emerald-200 ring-offset-2"
-                }
-              }}
-            />
-          </motion.div>
+          {/* User Button - Links to profile */}
+          <Link href="/profile" className="group">
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              className="relative"
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-emerald-400 to-teal-400 rounded-full blur opacity-30" />
+              <div className="relative h-9 w-9 rounded-full ring-2 ring-emerald-200 ring-offset-2 bg-gradient-to-r from-emerald-600 via-teal-500 to-blue-500 flex items-center justify-center text-white font-bold text-sm overflow-hidden">
+                <UserProfileAvatar />
+              </div>
+            </motion.div>
+          </Link>
 
           {/* Mobile Menu */}
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
@@ -148,7 +156,7 @@ export default function StudentNavbar() {
                 {links.map((link, index) => {
                   const Icon = iconMap[link.name] || LayoutDashboard;
                   const isActive = pathname === link.href;
-                  
+
                   return (
                     <motion.div
                       key={link.href}

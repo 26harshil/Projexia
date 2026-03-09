@@ -15,12 +15,30 @@ import {
     Calendar,
     FileText,
     Edit3,
+    MapPin,
+    Loader2,
+    X,
+    UserCheck,
+    UserX,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useState } from "react";
+import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog";
+import { useState, useTransition } from "react";
+import { completeMeetingReview } from "@/app/actions/getFacultyData";
+import { useRouter } from "next/navigation";
 
 interface ReviewAttendee {
     studentId: number | undefined;
@@ -76,6 +94,11 @@ const itemVariants = {
 
 export function FacultyReviewsContent({ reviews }: FacultyReviewsContentProps) {
     const [searchQuery, setSearchQuery] = useState("");
+    const [selectedReview, setSelectedReview] = useState<PendingReview | null>(null);
+    const [reviewDialogOpen, setReviewDialogOpen] = useState(false);
+    const [detailsReview, setDetailsReview] = useState<CompletedReview | null>(null);
+    const [detailsDialogOpen, setDetailsDialogOpen] = useState(false);
+    const router = useRouter();
 
     const filterPending = (list: PendingReview[]) =>
         list.filter(
@@ -234,7 +257,14 @@ export function FacultyReviewsContent({ reviews }: FacultyReviewsContentProps) {
                                     className="space-y-4"
                                 >
                                     {filteredPending.map((review) => (
-                                        <PendingReviewCard key={review.id} review={review} />
+                                        <PendingReviewCard
+                                            key={review.id}
+                                            review={review}
+                                            onReviewNow={() => {
+                                                setSelectedReview(review);
+                                                setReviewDialogOpen(true);
+                                            }}
+                                        />
                                     ))}
                                 </motion.div>
                             ) : (
@@ -251,7 +281,14 @@ export function FacultyReviewsContent({ reviews }: FacultyReviewsContentProps) {
                                     className="space-y-4"
                                 >
                                     {filteredCompleted.map((review) => (
-                                        <CompletedReviewCard key={review.id} review={review} />
+                                        <CompletedReviewCard
+                                            key={review.id}
+                                            review={review}
+                                            onViewDetails={() => {
+                                                setDetailsReview(review);
+                                                setDetailsDialogOpen(true);
+                                            }}
+                                        />
                                     ))}
                                 </motion.div>
                             ) : (
@@ -261,11 +298,40 @@ export function FacultyReviewsContent({ reviews }: FacultyReviewsContentProps) {
                     </Tabs>
                 </motion.div>
             </div>
+
+            {/* Review Now Dialog */}
+            {selectedReview && (
+                <ReviewDialog
+                    review={selectedReview}
+                    open={reviewDialogOpen}
+                    onOpenChange={(open) => {
+                        setReviewDialogOpen(open);
+                        if (!open) setSelectedReview(null);
+                    }}
+                    onSuccess={() => {
+                        setReviewDialogOpen(false);
+                        setSelectedReview(null);
+                        router.refresh();
+                    }}
+                />
+            )}
+
+            {/* View Details Dialog */}
+            {detailsReview && (
+                <DetailsDialog
+                    review={detailsReview}
+                    open={detailsDialogOpen}
+                    onOpenChange={(open) => {
+                        setDetailsDialogOpen(open);
+                        if (!open) setDetailsReview(null);
+                    }}
+                />
+            )}
         </div>
     );
 }
 
-function PendingReviewCard({ review }: { review: PendingReview }) {
+function PendingReviewCard({ review, onReviewNow }: { review: PendingReview; onReviewNow: () => void }) {
     const reviewDate = new Date(review.datetime);
     const daysSince = Math.floor(
         (Date.now() - reviewDate.getTime()) / (1000 * 60 * 60 * 24)
@@ -336,6 +402,7 @@ function PendingReviewCard({ review }: { review: PendingReview }) {
                         <Button
                             className="bg-amber-600 hover:bg-amber-700 text-white"
                             size="sm"
+                            onClick={onReviewNow}
                         >
                             <Edit3 className="h-4 w-4 mr-1" />
                             Review Now
@@ -347,7 +414,7 @@ function PendingReviewCard({ review }: { review: PendingReview }) {
     );
 }
 
-function CompletedReviewCard({ review }: { review: CompletedReview }) {
+function CompletedReviewCard({ review, onViewDetails }: { review: CompletedReview; onViewDetails: () => void }) {
     const reviewDate = new Date(review.datetime);
 
     return (
@@ -391,7 +458,7 @@ function CompletedReviewCard({ review }: { review: CompletedReview }) {
 
                     {/* Actions */}
                     <div className="flex items-center gap-2 shrink-0">
-                        <Button variant="outline" size="sm" className="border-slate-200">
+                        <Button variant="outline" size="sm" className="border-slate-200" onClick={onViewDetails}>
                             <FileText className="h-4 w-4 mr-1" />
                             View Details
                         </Button>
@@ -437,5 +504,352 @@ function EmptyState({ type }: { type: "pending" | "completed" }) {
                     : "Your completed reviews will appear here."}
             </p>
         </div>
+    );
+}
+
+// ============== Review Dialog (for completing a pending review) ==============
+
+function ReviewDialog({
+    review,
+    open,
+    onOpenChange,
+    onSuccess,
+}: {
+    review: PendingReview;
+    open: boolean;
+    onOpenChange: (open: boolean) => void;
+    onSuccess: () => void;
+}) {
+    const [notes, setNotes] = useState("");
+    const [attendance, setAttendance] = useState<
+        { studentId: number; name: string; present: boolean; remarks: string }[]
+    >(
+        review.attendees.map((a) => ({
+            studentId: a.studentId ?? 0,
+            name: a.name ?? "Unknown",
+            present: a.present ?? true,
+            remarks: a.remarks ?? "",
+        }))
+    );
+    const [isPending, startTransition] = useTransition();
+    const [error, setError] = useState<string | null>(null);
+
+    const toggleAttendance = (index: number) => {
+        setAttendance((prev) =>
+            prev.map((a, i) => (i === index ? { ...a, present: !a.present } : a))
+        );
+    };
+
+    const updateRemarks = (index: number, remarks: string) => {
+        setAttendance((prev) =>
+            prev.map((a, i) => (i === index ? { ...a, remarks } : a))
+        );
+    };
+
+    const handleSubmit = () => {
+        if (!notes.trim()) {
+            setError("Please add review notes before submitting.");
+            return;
+        }
+        setError(null);
+
+        startTransition(async () => {
+            try {
+                const result = await completeMeetingReview({
+                    meetingId: review.id,
+                    notes: notes.trim(),
+                    attendance: attendance.map((a) => ({
+                        studentId: a.studentId,
+                        present: a.present,
+                        remarks: a.remarks || undefined,
+                    })),
+                });
+
+                if (result.success) {
+                    onSuccess();
+                } else {
+                    setError("Failed to submit review. Please try again.");
+                }
+            } catch {
+                setError("An error occurred while submitting the review.");
+            }
+        });
+    };
+
+    const reviewDate = new Date(review.datetime);
+    const presentCount = attendance.filter((a) => a.present).length;
+
+    return (
+        <Dialog open={open} onOpenChange={onOpenChange}>
+            <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
+                <DialogHeader>
+                    <DialogTitle className="flex items-center gap-2">
+                        <Edit3 className="h-5 w-5 text-amber-600" />
+                        Complete Review
+                    </DialogTitle>
+                    <DialogDescription>
+                        Review meeting for{" "}
+                        <span className="font-medium text-slate-900">
+                            {review.groupName}
+                        </span>{" "}
+                        &mdash;{" "}
+                        {reviewDate.toLocaleDateString("en-IN", {
+                            day: "numeric",
+                            month: "long",
+                            year: "numeric",
+                        })}
+                    </DialogDescription>
+                </DialogHeader>
+
+                <div className="space-y-6 py-4">
+                    {/* Meeting Info */}
+                    <div className="bg-slate-50 rounded-lg border border-slate-200 p-4 space-y-2">
+                        <div className="flex items-center gap-2 text-sm">
+                            <FileText className="h-4 w-4 text-slate-500" />
+                            <span className="font-medium text-slate-700">Purpose:</span>
+                            <span className="text-slate-600">{review.purpose || "N/A"}</span>
+                        </div>
+                        {review.location && (
+                            <div className="flex items-center gap-2 text-sm">
+                                <MapPin className="h-4 w-4 text-slate-500" />
+                                <span className="font-medium text-slate-700">Location:</span>
+                                <span className="text-slate-600">{review.location}</span>
+                            </div>
+                        )}
+                        {review.projectTitle && (
+                            <div className="flex items-center gap-2 text-sm">
+                                <ClipboardCheck className="h-4 w-4 text-slate-500" />
+                                <span className="font-medium text-slate-700">Project:</span>
+                                <span className="text-slate-600">{review.projectTitle}</span>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Attendance */}
+                    {attendance.length > 0 && (
+                        <div>
+                            <div className="flex items-center justify-between mb-3">
+                                <h4 className="text-sm font-semibold text-slate-900 flex items-center gap-2">
+                                    <Users className="h-4 w-4" />
+                                    Attendance ({presentCount}/{attendance.length})
+                                </h4>
+                                <div className="flex gap-2">
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        className="text-xs h-7"
+                                        onClick={() =>
+                                            setAttendance((prev) =>
+                                                prev.map((a) => ({ ...a, present: true }))
+                                            )
+                                        }
+                                    >
+                                        <UserCheck className="h-3 w-3 mr-1" />
+                                        All Present
+                                    </Button>
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        className="text-xs h-7"
+                                        onClick={() =>
+                                            setAttendance((prev) =>
+                                                prev.map((a) => ({ ...a, present: false }))
+                                            )
+                                        }
+                                    >
+                                        <UserX className="h-3 w-3 mr-1" />
+                                        All Absent
+                                    </Button>
+                                </div>
+                            </div>
+                            <div className="space-y-3">
+                                {attendance.map((student, index) => (
+                                    <div
+                                        key={student.studentId}
+                                        className={`flex items-center gap-3 p-3 rounded-lg border transition-colors ${
+                                            student.present
+                                                ? "bg-emerald-50/50 border-emerald-200"
+                                                : "bg-red-50/50 border-red-200"
+                                        }`}
+                                    >
+                                        <Switch
+                                            checked={student.present}
+                                            onCheckedChange={() => toggleAttendance(index)}
+                                        />
+                                        <div className="flex-1 min-w-0">
+                                            <p className="text-sm font-medium text-slate-900">
+                                                {student.name}
+                                            </p>
+                                            <Badge
+                                                className={`text-xs mt-1 ${
+                                                    student.present
+                                                        ? "bg-emerald-100 text-emerald-700"
+                                                        : "bg-red-100 text-red-700"
+                                                }`}
+                                            >
+                                                {student.present ? "Present" : "Absent"}
+                                            </Badge>
+                                        </div>
+                                        <Input
+                                            placeholder="Remarks..."
+                                            value={student.remarks}
+                                            onChange={(e) => updateRemarks(index, e.target.value)}
+                                            className="w-40 h-8 text-xs"
+                                        />
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Review Notes */}
+                    <div>
+                        <Label htmlFor="review-notes" className="text-sm font-semibold text-slate-900 mb-2 block">
+                            Review Notes *
+                        </Label>
+                        <Textarea
+                            id="review-notes"
+                            placeholder="Enter your review notes, feedback, and observations..."
+                            value={notes}
+                            onChange={(e) => {
+                                setNotes(e.target.value);
+                                if (error) setError(null);
+                            }}
+                            rows={4}
+                            className="resize-none"
+                        />
+                    </div>
+
+                    {error && (
+                        <div className="flex items-center gap-2 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg p-3">
+                            <AlertCircle className="h-4 w-4 shrink-0" />
+                            {error}
+                        </div>
+                    )}
+                </div>
+
+                <DialogFooter className="gap-2">
+                    <Button
+                        variant="outline"
+                        onClick={() => onOpenChange(false)}
+                        disabled={isPending}
+                    >
+                        Cancel
+                    </Button>
+                    <Button
+                        onClick={handleSubmit}
+                        disabled={isPending}
+                        className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                    >
+                        {isPending ? (
+                            <>
+                                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                Submitting...
+                            </>
+                        ) : (
+                            <>
+                                <CheckCircle2 className="h-4 w-4 mr-2" />
+                                Complete Review
+                            </>
+                        )}
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+    );
+}
+
+// ============== Details Dialog (for viewing completed review) ==============
+
+function DetailsDialog({
+    review,
+    open,
+    onOpenChange,
+}: {
+    review: CompletedReview;
+    open: boolean;
+    onOpenChange: (open: boolean) => void;
+}) {
+    const reviewDate = new Date(review.datetime);
+
+    return (
+        <Dialog open={open} onOpenChange={onOpenChange}>
+            <DialogContent className="sm:max-w-lg">
+                <DialogHeader>
+                    <DialogTitle className="flex items-center gap-2">
+                        <CheckCircle2 className="h-5 w-5 text-emerald-600" />
+                        Review Details
+                    </DialogTitle>
+                    <DialogDescription>
+                        Completed review for{" "}
+                        <span className="font-medium text-slate-900">
+                            {review.groupName}
+                        </span>
+                    </DialogDescription>
+                </DialogHeader>
+
+                <div className="space-y-4 py-4">
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-1">
+                            <p className="text-xs font-medium text-slate-500 uppercase tracking-wider">
+                                Group
+                            </p>
+                            <p className="text-sm font-medium text-slate-900">
+                                {review.groupName || "N/A"}
+                            </p>
+                        </div>
+                        <div className="space-y-1">
+                            <p className="text-xs font-medium text-slate-500 uppercase tracking-wider">
+                                Date
+                            </p>
+                            <p className="text-sm font-medium text-slate-900">
+                                {reviewDate.toLocaleDateString("en-IN", {
+                                    day: "numeric",
+                                    month: "long",
+                                    year: "numeric",
+                                })}
+                            </p>
+                        </div>
+                        <div className="space-y-1">
+                            <p className="text-xs font-medium text-slate-500 uppercase tracking-wider">
+                                Purpose
+                            </p>
+                            <p className="text-sm text-slate-700">
+                                {review.purpose || "N/A"}
+                            </p>
+                        </div>
+                        {review.projectTitle && (
+                            <div className="space-y-1">
+                                <p className="text-xs font-medium text-slate-500 uppercase tracking-wider">
+                                    Project
+                                </p>
+                                <p className="text-sm text-slate-700">
+                                    {review.projectTitle}
+                                </p>
+                            </div>
+                        )}
+                    </div>
+
+                    {review.notes && (
+                        <div className="space-y-1">
+                            <p className="text-xs font-medium text-slate-500 uppercase tracking-wider">
+                                Review Notes
+                            </p>
+                            <div className="bg-slate-50 rounded-lg border border-slate-200 p-4">
+                                <p className="text-sm text-slate-700 whitespace-pre-wrap">
+                                    {review.notes}
+                                </p>
+                            </div>
+                        </div>
+                    )}
+                </div>
+
+                <DialogFooter>
+                    <Button variant="outline" onClick={() => onOpenChange(false)}>
+                        Close
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
     );
 }

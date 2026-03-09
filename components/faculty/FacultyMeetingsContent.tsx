@@ -38,7 +38,7 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { useState, useTransition } from "react";
-import { createMeeting, completeMeetingReview } from "@/app/actions/getFacultyData";
+import { createMeeting, completeMeetingReview, saveAttendance } from "@/app/actions/getFacultyData";
 import { generateMeetingReportPDF, generateMeetingAttendancePDF } from "@/lib/pdfGenerator";
 
 interface Attendee {
@@ -411,6 +411,12 @@ function MeetingCard({
                                     {meeting.location}
                                 </span>
                             )}
+                            {meeting.attendees.length > 0 && (
+                                <span className="flex items-center gap-1">
+                                    <ClipboardCheck className="h-3 w-3" />
+                                    {meeting.attendees.filter(a => a.present).length}/{meeting.attendees.length} present
+                                </span>
+                            )}
                         </div>
                     </div>
 
@@ -637,7 +643,9 @@ function MeetingDetailsModal({
     onClose: () => void;
 }) {
     const [isPending, startTransition] = useTransition();
+    const [isSavingAttendance, startSaveTransition] = useTransition();
     const [notes, setNotes] = useState(meeting.notes || "");
+    const [attendanceSaved, setAttendanceSaved] = useState(false);
     const [attendance, setAttendance] = useState<{ [key: number]: { present: boolean; remarks: string } }>(
         meeting.attendees.reduce((acc, a) => {
             if (a.studentId) {
@@ -653,9 +661,35 @@ function MeetingDetailsModal({
     const meetingDate = new Date(meeting.datetime);
     const isPast = meetingDate < new Date();
     const needsReview = isPast && meeting.status !== "Completed";
+    const isCompleted = meeting.status === "Completed";
+
+    // Attendance stats
+    const totalStudents = meeting.attendees.length;
+    const presentCount = Object.values(attendance).filter(a => a.present).length;
+    const absentCount = totalStudents - presentCount;
 
     const handleDownloadPDF = () => {
         generateMeetingAttendancePDF(meeting);
+    };
+
+    const handleSaveAttendance = () => {
+        startSaveTransition(async () => {
+            const result = await saveAttendance({
+                meetingId: meeting.id,
+                attendance: Object.entries(attendance).map(([studentId, data]) => ({
+                    studentId: parseInt(studentId),
+                    present: data.present,
+                    remarks: data.remarks || undefined,
+                })),
+            });
+
+            if (result.success) {
+                setAttendanceSaved(true);
+                setTimeout(() => setAttendanceSaved(false), 3000);
+            } else {
+                alert(result.error || "Failed to save attendance");
+            }
+        });
     };
 
     const handleSubmitReview = () => {
@@ -686,6 +720,42 @@ function MeetingDetailsModal({
                 present: !prev[studentId]?.present,
             },
         }));
+    };
+
+    const updateRemarks = (studentId: number, remarks: string) => {
+        setAttendance(prev => ({
+            ...prev,
+            [studentId]: {
+                ...prev[studentId],
+                remarks,
+            },
+        }));
+    };
+
+    const markAllPresent = () => {
+        const newAttendance: typeof attendance = {};
+        meeting.attendees.forEach(a => {
+            if (a.studentId) {
+                newAttendance[a.studentId] = {
+                    present: true,
+                    remarks: attendance[a.studentId]?.remarks || "",
+                };
+            }
+        });
+        setAttendance(newAttendance);
+    };
+
+    const markAllAbsent = () => {
+        const newAttendance: typeof attendance = {};
+        meeting.attendees.forEach(a => {
+            if (a.studentId) {
+                newAttendance[a.studentId] = {
+                    present: false,
+                    remarks: attendance[a.studentId]?.remarks || "",
+                };
+            }
+        });
+        setAttendance(newAttendance);
     };
 
     return (
@@ -763,68 +833,167 @@ function MeetingDetailsModal({
 
                     {/* Attendance Section */}
                     <div className="mb-6">
-                        <h3 className="text-sm font-medium text-slate-700 mb-3 flex items-center gap-2">
-                            <Users className="h-4 w-4" />
-                            Attendance ({meeting.attendees.length} members)
-                        </h3>
+                        <div className="flex items-center justify-between mb-3">
+                            <h3 className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                                <Users className="h-4 w-4" />
+                                Attendance ({totalStudents} members)
+                            </h3>
+                            {!isCompleted && (
+                                <div className="flex gap-2">
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        className="text-xs h-7 border-emerald-200 text-emerald-600 hover:bg-emerald-50"
+                                        onClick={markAllPresent}
+                                    >
+                                        <CheckCircle2 className="h-3 w-3 mr-1" />
+                                        All Present
+                                    </Button>
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        className="text-xs h-7 border-red-200 text-red-600 hover:bg-red-50"
+                                        onClick={markAllAbsent}
+                                    >
+                                        <AlertCircle className="h-3 w-3 mr-1" />
+                                        All Absent
+                                    </Button>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Attendance Stats Bar */}
+                        {totalStudents > 0 && (
+                            <div className="mb-3 p-3 bg-slate-50 rounded-lg">
+                                <div className="flex items-center justify-between text-xs text-slate-500 mb-2">
+                                    <span>Present: {presentCount}/{totalStudents}</span>
+                                    <span>Absent: {absentCount}/{totalStudents}</span>
+                                    <span>{totalStudents > 0 ? Math.round((presentCount / totalStudents) * 100) : 0}%</span>
+                                </div>
+                                <div className="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
+                                    <div
+                                        className="h-full bg-emerald-500 rounded-full transition-all duration-300"
+                                        style={{ width: `${totalStudents > 0 ? (presentCount / totalStudents) * 100 : 0}%` }}
+                                    />
+                                </div>
+                            </div>
+                        )}
+
                         <div className="space-y-2">
                             {meeting.attendees.map((attendee, index) => (
                                 <div
                                     key={attendee.studentId || index}
-                                    className={`p-3 rounded-lg flex items-center justify-between ${needsReview ? "bg-slate-50" :
-                                            attendee.present ? "bg-emerald-50" : "bg-red-50"
+                                    className={`p-3 rounded-lg ${isCompleted
+                                            ? attendee.present ? "bg-emerald-50" : "bg-red-50"
+                                            : attendance[attendee.studentId!]?.present ? "bg-emerald-50/70" : "bg-slate-50"
                                         }`}
                                 >
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-8 h-8 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-full flex items-center justify-center text-white font-medium text-sm">
-                                            {attendee.name?.charAt(0) || "?"}
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-8 h-8 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-full flex items-center justify-center text-white font-medium text-sm">
+                                                {attendee.name?.charAt(0) || "?"}
+                                            </div>
+                                            <span className="font-medium text-slate-900">{attendee.name}</span>
                                         </div>
-                                        <span className="font-medium text-slate-900">{attendee.name}</span>
+                                        {!isCompleted && attendee.studentId ? (
+                                            <Button
+                                                variant={attendance[attendee.studentId]?.present ? "default" : "outline"}
+                                                size="sm"
+                                                className={attendance[attendee.studentId]?.present
+                                                    ? "bg-emerald-500 hover:bg-emerald-600"
+                                                    : "border-slate-200 hover:border-red-200 hover:text-red-600"
+                                                }
+                                                onClick={() => toggleAttendance(attendee.studentId!)}
+                                            >
+                                                {attendance[attendee.studentId]?.present ? (
+                                                    <><CheckCircle2 className="h-3 w-3 mr-1" /> Present</>
+                                                ) : (
+                                                    <><AlertCircle className="h-3 w-3 mr-1" /> Absent</>
+                                                )}
+                                            </Button>
+                                        ) : (
+                                            <Badge className={attendee.present ? "bg-emerald-100 text-emerald-700" : "bg-red-100 text-red-700"}>
+                                                {attendee.present ? "Present" : "Absent"}
+                                            </Badge>
+                                        )}
                                     </div>
-                                    {needsReview && attendee.studentId ? (
-                                        <Button
-                                            variant={attendance[attendee.studentId]?.present ? "default" : "outline"}
-                                            size="sm"
-                                            className={attendance[attendee.studentId]?.present
-                                                ? "bg-emerald-500 hover:bg-emerald-600"
-                                                : "border-slate-200"
-                                            }
-                                            onClick={() => toggleAttendance(attendee.studentId!)}
-                                        >
-                                            {attendance[attendee.studentId]?.present ? "Present" : "Absent"}
-                                        </Button>
-                                    ) : (
-                                        <Badge className={attendee.present ? "bg-emerald-100 text-emerald-700" : "bg-red-100 text-red-700"}>
-                                            {attendee.present ? "Present" : "Absent"}
-                                        </Badge>
+                                    {/* Remarks field for non-completed meetings */}
+                                    {!isCompleted && attendee.studentId && (
+                                        <div className="mt-2 ml-11">
+                                            <Input
+                                                placeholder="Add remarks (optional)..."
+                                                className="h-7 text-xs bg-white/70 border-slate-200"
+                                                value={attendance[attendee.studentId]?.remarks || ""}
+                                                onChange={(e) => updateRemarks(attendee.studentId!, e.target.value)}
+                                            />
+                                        </div>
+                                    )}
+                                    {/* Show remarks for completed meetings */}
+                                    {isCompleted && attendee.remarks && (
+                                        <div className="mt-1 ml-11">
+                                            <p className="text-xs text-slate-500 italic">{attendee.remarks}</p>
+                                        </div>
                                     )}
                                 </div>
                             ))}
-                        </div>
-                    </div>
-
-                    {/* Notes Section */}
-                    {(needsReview || meeting.notes) && (
-                        <div>
-                            <Label htmlFor="notes" className="flex items-center gap-2 mb-2">
-                                <FileText className="h-4 w-4" />
-                                Meeting Notes
-                            </Label>
-                            {needsReview ? (
-                                <Textarea
-                                    id="notes"
-                                    placeholder="Add your meeting notes here..."
-                                    rows={4}
-                                    value={notes}
-                                    onChange={(e) => setNotes(e.target.value)}
-                                />
-                            ) : (
-                                <div className="p-4 bg-slate-50 rounded-lg text-slate-700">
-                                    {meeting.notes || "No notes available"}
+                            {meeting.attendees.length === 0 && (
+                                <div className="p-6 text-center text-slate-400">
+                                    <Users className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                                    <p className="text-sm">No students in this group</p>
                                 </div>
                             )}
                         </div>
-                    )}
+
+                        {/* Save Attendance Button (for non-completed meetings) */}
+                        {!isCompleted && meeting.attendees.length > 0 && (
+                            <div className="mt-3">
+                                <Button
+                                    className="w-full bg-emerald-600 hover:bg-emerald-700 text-white"
+                                    onClick={handleSaveAttendance}
+                                    disabled={isSavingAttendance}
+                                    size="sm"
+                                >
+                                    {isSavingAttendance ? (
+                                        <>
+                                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                            Saving Attendance...
+                                        </>
+                                    ) : attendanceSaved ? (
+                                        <>
+                                            <CheckCircle2 className="h-4 w-4 mr-2" />
+                                            Attendance Saved!
+                                        </>
+                                    ) : (
+                                        <>
+                                            <ClipboardCheck className="h-4 w-4 mr-2" />
+                                            Save Attendance
+                                        </>
+                                    )}
+                                </Button>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Notes Section */}
+                    <div>
+                        <Label htmlFor="notes" className="flex items-center gap-2 mb-2">
+                            <FileText className="h-4 w-4" />
+                            Meeting Notes
+                        </Label>
+                        {!isCompleted ? (
+                            <Textarea
+                                id="notes"
+                                placeholder="Add your meeting notes here..."
+                                rows={4}
+                                value={notes}
+                                onChange={(e) => setNotes(e.target.value)}
+                            />
+                        ) : (
+                            <div className="p-4 bg-slate-50 rounded-lg text-slate-700">
+                                {meeting.notes || "No notes available"}
+                            </div>
+                        )}
+                    </div>
                 </div>
 
                 {/* Footer */}
