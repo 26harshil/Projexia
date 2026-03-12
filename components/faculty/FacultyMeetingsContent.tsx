@@ -12,6 +12,7 @@ import {
     Filter,
     ChevronRight,
     CheckCircle2,
+    Star,
     AlertCircle,
     Video,
     FileText,
@@ -61,6 +62,7 @@ interface Meeting {
     location: string | null;
     status: string | null;
     notes: string | null;
+    grade: string | null;
     groupId: number | undefined;
     groupName: string | undefined;
     projectTitle: string | null | undefined;
@@ -679,6 +681,7 @@ function MeetingDetailsModal({
     const [isPending, startTransition] = useTransition();
     const [isSavingAttendance, startSaveTransition] = useTransition();
     const [notes, setNotes] = useState(meeting.notes || "");
+    const [grade, setGrade] = useState(meeting.grade || "");
     const [attendanceSaved, setAttendanceSaved] = useState(false);
     const [attendance, setAttendance] = useState<{ [key: number]: { present: boolean; remarks: string } }>(
         meeting.attendees.reduce((acc, a) => {
@@ -699,6 +702,7 @@ function MeetingDetailsModal({
     
     // Edit state
     const [isEditing, setIsEditing] = useState(false);
+    const [isEditingReview, setIsEditingReview] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
     const [editPurpose, setEditPurpose] = useState(meeting.purpose || "");
     const [editDate, setEditDate] = useState<Date | undefined>(meetingDate);
@@ -777,6 +781,7 @@ function MeetingDetailsModal({
             const result = await completeMeetingReview({
                 meetingId: meeting.id,
                 notes,
+                grade: grade || undefined,
                 attendance: Object.entries(attendance).map(([studentId, data]) => ({
                     studentId: parseInt(studentId),
                     present: data.present,
@@ -785,7 +790,8 @@ function MeetingDetailsModal({
             });
 
             if (result.success) {
-                onClose();
+                if (isEditingReview) setIsEditingReview(false);
+                else onClose();
             } else {
                 alert("Failed to submit review");
             }
@@ -878,8 +884,11 @@ function MeetingDetailsModal({
                             </div>
                         </div>
                         <div className="flex items-center gap-2">
-                            {!isCompleted && !isEditing && (
-                                <Button variant="ghost" size="icon" onClick={() => setIsEditing(true)}>
+                            {!isEditing && !isEditingReview && (
+                                <Button variant="ghost" size="icon" onClick={() => {
+                                    if (isCompleted) setIsEditingReview(true);
+                                    else setIsEditing(true);
+                                }}>
                                     <Pencil className="h-4 w-4 text-slate-500 hover:text-emerald-600" />
                                 </Button>
                             )}
@@ -1050,7 +1059,7 @@ function MeetingDetailsModal({
                                             </div>
                                             <span className="font-medium text-slate-900">{attendee.name}</span>
                                         </div>
-                                        {!isCompleted && attendee.studentId ? (
+                                        {(!isCompleted || isEditingReview) && attendee.studentId ? (
                                             <Button
                                                 variant={attendance[attendee.studentId]?.present ? "default" : "outline"}
                                                 size="sm"
@@ -1072,8 +1081,8 @@ function MeetingDetailsModal({
                                             </Badge>
                                         )}
                                     </div>
-                                    {/* Remarks field for non-completed meetings */}
-                                    {!isCompleted && attendee.studentId && (
+                                    {/* Remarks field */}
+                                    {(!isCompleted || isEditingReview) && attendee.studentId ? (
                                         <div className="mt-2 ml-11">
                                             <Input
                                                 placeholder="Add remarks (optional)..."
@@ -1082,12 +1091,12 @@ function MeetingDetailsModal({
                                                 onChange={(e) => updateRemarks(attendee.studentId!, e.target.value)}
                                             />
                                         </div>
-                                    )}
-                                    {/* Show remarks for completed meetings */}
-                                    {isCompleted && attendee.remarks && (
-                                        <div className="mt-1 ml-11">
-                                            <p className="text-xs text-slate-500 italic">{attendee.remarks}</p>
-                                        </div>
+                                    ) : (
+                                        attendee.remarks && (
+                                            <div className="mt-1 ml-11">
+                                                <p className="text-xs text-slate-500 italic">{attendee.remarks}</p>
+                                            </div>
+                                        )
                                     )}
                                 </div>
                             ))}
@@ -1129,25 +1138,56 @@ function MeetingDetailsModal({
                         )}
                     </div>
 
-                    {/* Notes Section */}
-                    <div>
-                        <Label htmlFor="notes" className="flex items-center gap-2 mb-2">
-                            <FileText className="h-4 w-4" />
+                    {/* Notes and Grade Section */}
+                    <div className="grid grid-cols-1 md:grid-cols-[1fr_200px] gap-4">
+                        <div>
+                            <Label htmlFor="notes" className="flex items-center gap-2 mb-2">
+                                <FileText className="h-4 w-4" />
                             Meeting Notes
                         </Label>
-                        {!isCompleted ? (
+                        {(needsReview || isEditingReview) ? (
                             <Textarea
                                 id="notes"
                                 placeholder="Add your meeting notes here..."
                                 rows={4}
                                 value={notes}
                                 onChange={(e) => setNotes(e.target.value)}
+                                className="resize-none"
                             />
                         ) : (
-                            <div className="p-4 bg-slate-50 rounded-lg text-slate-700">
+                            <div className="p-4 bg-slate-50 rounded-lg text-slate-700 whitespace-pre-wrap border border-slate-100">
                                 {meeting.notes || "No notes available"}
                             </div>
                         )}
+                    </div>
+                    <div>
+                        <Label htmlFor="grade" className="flex items-center gap-2 mb-2 border-slate-700">
+                            <Star className="h-4 w-4 text-amber-500" />
+                            Grade / Score
+                        </Label>
+                        {(needsReview || isEditingReview) ? (
+                            <Select value={grade} onValueChange={setGrade}>
+                                <SelectTrigger id="grade" className="h-10">
+                                    <SelectValue placeholder="Select Grade" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="A">Grade A</SelectItem>
+                                    <SelectItem value="B">Grade B</SelectItem>
+                                    <SelectItem value="C">Grade C</SelectItem>
+                                    <SelectItem value="D">Grade D</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        ) : (
+                            <div className="p-4 bg-emerald-50 rounded-lg border border-emerald-100 flex items-center justify-center font-bold text-emerald-700">
+                                {meeting.grade || "No Grade"}
+                            </div>
+                        )}
+                        {(needsReview || isEditingReview) && (
+                                <p className="text-xs text-slate-500 mt-2">
+                                    Track continuous progress at this review step.
+                                </p>
+                            )}
+                        </div>
                     </div>
                 </div>
 
@@ -1184,27 +1224,54 @@ function MeetingDetailsModal({
                                 Download PDF
                             </Button>
                             <div className="flex gap-3">
-                                <Button variant="outline" onClick={onClose}>
-                                    Close
-                                </Button>
-                                {needsReview && (
-                                    <Button
-                                        className="bg-amber-500 hover:bg-amber-600 text-white"
-                                        onClick={handleSubmitReview}
-                                        disabled={isPending}
-                                    >
-                                        {isPending ? (
-                                            <>
-                                                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                                                Saving...
-                                            </>
-                                        ) : (
-                                            <>
-                                                <ClipboardCheck className="h-4 w-4 mr-2" />
-                                                Complete Review
-                                            </>
+                                {isEditingReview ? (
+                                    <>
+                                        <Button variant="outline" onClick={() => setIsEditingReview(false)}>
+                                            Cancel
+                                        </Button>
+                                        <Button
+                                            className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                                            onClick={handleSubmitReview}
+                                            disabled={isPending}
+                                        >
+                                            {isPending ? (
+                                                <>
+                                                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                                    Updating...
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <ClipboardCheck className="h-4 w-4 mr-2" />
+                                                    Update Review
+                                                </>
+                                            )}
+                                        </Button>
+                                    </>
+                                ) : (
+                                    <>
+                                        <Button variant="outline" onClick={onClose}>
+                                            Close
+                                        </Button>
+                                        {needsReview && (
+                                            <Button
+                                                className="bg-amber-500 hover:bg-amber-600 text-white"
+                                                onClick={handleSubmitReview}
+                                                disabled={isPending}
+                                            >
+                                                {isPending ? (
+                                                    <>
+                                                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                                        Saving...
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <ClipboardCheck className="h-4 w-4 mr-2" />
+                                                        Complete Review
+                                                    </>
+                                                )}
+                                            </Button>
                                         )}
-                                    </Button>
+                                    </>
                                 )}
                             </div>
                         </>

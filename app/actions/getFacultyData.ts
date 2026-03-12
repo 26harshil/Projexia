@@ -272,6 +272,7 @@ export async function getFacultyMeetings() {
             location: meeting.meetinglocation,
             status: meeting.meetingstatus,
             notes: meeting.meetingnotes,
+            grade: meeting.meetinggrade,
             groupId: meeting.projectgroup?.projectgroupid,
             groupName: meeting.projectgroup?.projectgroupname,
             projectTitle: meeting.projectgroup?.projecttitle,
@@ -377,6 +378,7 @@ export async function getFacultyReviews() {
             groupName: review.projectgroup?.projectgroupname,
             projectTitle: review.projectgroup?.projecttitle,
             notes: review.meetingnotes,
+            grade: review.meetinggrade,
         })),
     };
 }
@@ -411,7 +413,13 @@ export async function getFacultyReports() {
                     projectmeetingid: true,
                     meetingstatus: true,
                     meetingpurpose: true,
+                    meetingdatetime: true,
+                    meetinglocation: true,
+                    meetingnotes: true,
                 },
+                orderBy: {
+                    meetingdatetime: 'desc'
+                }
             },
         },
     });
@@ -430,6 +438,14 @@ export async function getFacultyReports() {
             totalMeetings: group.projectmeeting.length,
             completedMeetings,
             pendingMeetings,
+            meetings: group.projectmeeting.map(m => ({
+                id: m.projectmeetingid,
+                status: m.meetingstatus,
+                purpose: m.meetingpurpose,
+                datetime: m.meetingdatetime,
+                location: m.meetinglocation,
+                notes: m.meetingnotes,
+            }))
         };
     });
 }
@@ -609,10 +625,10 @@ export async function createMeeting(data: {
     }
 }
 
-// Complete a meeting review
 export async function completeMeetingReview(data: {
     meetingId: number;
     notes: string;
+    grade?: string;
     attendance: { studentId: number; present: boolean; remarks?: string }[];
 }) {
     const staff = await getStaffId();
@@ -634,6 +650,7 @@ export async function completeMeetingReview(data: {
         data: {
             meetingstatus: 'Completed',
             meetingnotes: data.notes,
+            meetinggrade: data.grade || "D",
             meetingstatusdatetime: new Date(),
             modified: new Date(),
         },
