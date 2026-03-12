@@ -10,6 +10,7 @@ import {
   ChevronRight,
   Sparkles
 } from "lucide-react";
+import Link from "next/link";
 
 interface FacultyHeaderProps {
   userName: string;
@@ -97,18 +98,22 @@ export function FacultyHeader({ userName, userEmail, role }: FacultyHeaderProps)
               transition={{ delay: 0.4 }}
               className="flex flex-wrap gap-3 pt-2"
             >
-              <Button 
-                className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm"
-              >
-                Schedule Meeting
-                <ChevronRight className="h-4 w-4 ml-1" />
-              </Button>
-              <Button 
-                variant="outline" 
-                className="border-slate-200 hover:bg-slate-50"
-              >
-                View All Groups
-              </Button>
+              <Link href="/faculty/meetings">
+                <Button 
+                  className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm"
+                >
+                  Schedule Meeting
+                  <ChevronRight className="h-4 w-4 ml-1" />
+                </Button>
+              </Link>
+              <Link href="/faculty/group">
+                <Button 
+                  variant="outline" 
+                  className="border-slate-200 hover:bg-slate-50"
+                >
+                  View All Groups
+                </Button>
+              </Link>
             </motion.div>
           </div>
 

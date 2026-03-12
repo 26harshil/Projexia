@@ -15,6 +15,9 @@ import {
     FolderOpen,
     AlertCircle,
     ChevronRight,
+    MapPin,
+    Calendar,
+    X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,7 +25,15 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import { useState } from "react";
-import { generateFacultyReportPDF } from "@/lib/pdfGenerator";
+
+interface MeetingInfo {
+    id: number;
+    status: string | null;
+    purpose: string | null;
+    datetime: Date;
+    location: string | null;
+    notes: string | null;
+}
 
 interface GroupReport {
     groupId: number;
@@ -33,6 +44,7 @@ interface GroupReport {
     totalMeetings: number;
     completedMeetings: number;
     pendingMeetings: number;
+    meetings: MeetingInfo[];
 }
 
 interface FacultyReportsContentProps {
@@ -56,6 +68,7 @@ const itemVariants = {
 
 export function FacultyReportsContent({ reports }: FacultyReportsContentProps) {
     const [searchQuery, setSearchQuery] = useState("");
+    const [selectedGroup, setSelectedGroup] = useState<GroupReport | null>(null);
 
     const filteredReports = reports.filter(
         (report) =>
@@ -106,14 +119,6 @@ export function FacultyReportsContent({ reports }: FacultyReportsContentProps) {
                             View and manage student report submissions
                         </p>
                     </div>
-                    <Button
-                        variant="outline"
-                        className="border-emerald-200 text-emerald-600 hover:bg-emerald-50"
-                        onClick={() => generateFacultyReportPDF(reports)}
-                    >
-                        <Download className="h-4 w-4 mr-2" />
-                        Export PDF
-                    </Button>
                 </motion.div>
 
                 {/* Stats Cards */}
@@ -248,7 +253,7 @@ export function FacultyReportsContent({ reports }: FacultyReportsContentProps) {
                                         className="divide-y divide-slate-100"
                                     >
                                         {filteredReports.map((report) => (
-                                            <GroupReportCard key={report.groupId} report={report} />
+                                            <GroupReportCard key={report.groupId} report={report} onView={() => setSelectedGroup(report)} />
                                         ))}
                                     </motion.div>
                                 ) : (
@@ -267,7 +272,7 @@ export function FacultyReportsContent({ reports }: FacultyReportsContentProps) {
                                         className="divide-y divide-slate-100"
                                     >
                                         {filteredReports.filter(r => r.pendingMeetings > 0).map((report) => (
-                                            <GroupReportCard key={report.groupId} report={report} />
+                                            <GroupReportCard key={report.groupId} report={report} onView={() => setSelectedGroup(report)} />
                                         ))}
                                     </motion.div>
                                 ) : (
@@ -292,11 +297,18 @@ export function FacultyReportsContent({ reports }: FacultyReportsContentProps) {
                     </Tabs>
                 </motion.div>
             </div>
+
+            {selectedGroup && (
+                <GroupMeetingsModal 
+                    group={selectedGroup} 
+                    onClose={() => setSelectedGroup(null)} 
+                />
+            )}
         </div>
     );
 }
 
-function GroupReportCard({ report }: { report: GroupReport }) {
+function GroupReportCard({ report, onView }: { report: GroupReport; onView: () => void }) {
     return (
         <motion.div variants={itemVariants}>
             <div className="p-4 hover:bg-slate-50 transition-colors">
@@ -348,7 +360,7 @@ function GroupReportCard({ report }: { report: GroupReport }) {
                     )}
 
                     {/* Actions */}
-                    <Button variant="ghost" size="sm" className="text-emerald-600 shrink-0">
+                    <Button variant="ghost" size="sm" className="text-emerald-600 shrink-0" onClick={onView}>
                         View <ChevronRight className="h-4 w-4 ml-1" />
                     </Button>
                 </div>
@@ -380,5 +392,88 @@ function EmptyState() {
                 review and provide feedback.
             </p>
         </div>
+    );
+}
+
+function GroupMeetingsModal({ group, onClose }: { group: GroupReport; onClose: () => void }) {
+    return (
+        <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+            onClick={onClose}
+        >
+            <motion.div
+                initial={{ scale: 0.95, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.95, opacity: 0 }}
+                className="bg-white rounded-2xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-hidden flex flex-col"
+                onClick={(e) => e.stopPropagation()}
+            >
+                <div className="p-6 border-b border-slate-100 bg-slate-50 flex justify-between items-center shrink-0">
+                    <div>
+                        <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+                            <FolderOpen className="h-5 w-5 text-emerald-600" />
+                            {group.projectTitle || group.groupName}
+                        </h2>
+                        <p className="text-sm text-slate-500 mt-1">{group.groupName} Meetings History</p>
+                    </div>
+                    <Button variant="ghost" size="icon" onClick={onClose}>
+                        <X className="h-5 w-5" />
+                    </Button>
+                </div>
+                
+                <div className="p-6 overflow-y-auto space-y-4">
+                    {group.meetings && group.meetings.length > 0 ? (
+                        group.meetings.map(meeting => (
+                            <div key={meeting.id} className="p-4 border border-slate-200 rounded-xl bg-white hover:border-emerald-200 transition-colors">
+                                <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
+                                    <div className="flex-1 space-y-3">
+                                        <div className="flex items-start justify-between">
+                                            <h3 className="font-semibold text-slate-900 border-b border-slate-100 pb-2 w-full">
+                                                {meeting.purpose || "General Meeting"}
+                                            </h3>
+                                        </div>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                                            <div className="flex items-center gap-2 text-slate-600">
+                                                <Calendar className="h-4 w-4 text-emerald-600" />
+                                                <span>{new Date(meeting.datetime).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })}</span>
+                                            </div>
+                                            <div className="flex items-center gap-2 text-slate-600">
+                                                <MapPin className="h-4 w-4 text-emerald-600" />
+                                                <span>{meeting.location || "Location not specified"}</span>
+                                            </div>
+                                        </div>
+                                        {(meeting.notes) && (
+                                            <div className="mt-4 pt-3 border-t border-slate-100">
+                                                <p className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1">Notes / Remarks</p>
+                                                <p className="text-sm text-slate-700 bg-slate-50 p-3 rounded-lg border border-slate-100">{meeting.notes}</p>
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className="shrink-0 flex items-center justify-end">
+                                        <Badge className={meeting.status === 'Completed' ? "bg-emerald-100 text-emerald-700 hover:bg-emerald-200" : "bg-amber-100 text-amber-700 hover:bg-amber-200"}>
+                                            {meeting.status}
+                                        </Badge>
+                                    </div>
+                                </div>
+                            </div>
+                        ))
+                    ) : (
+                        <div className="p-8 text-center bg-slate-50 rounded-xl border border-slate-100">
+                            <Clock className="h-8 w-8 text-slate-400 mx-auto mb-2" />
+                            <p className="text-slate-500 font-medium">No meetings found for this group.</p>
+                        </div>
+                    )}
+                </div>
+                
+                <div className="p-4 border-t border-slate-100 bg-slate-50 flex justify-end shrink-0">
+                    <Button variant="outline" onClick={onClose}>
+                        Close
+                    </Button>
+                </div>
+            </motion.div>
+        </motion.div>
     );
 }

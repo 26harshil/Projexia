@@ -36,6 +36,13 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 import { useState, useTransition } from "react";
 import { completeMeetingReview } from "@/app/actions/getFacultyData";
 import { useRouter } from "next/navigation";
@@ -68,6 +75,7 @@ interface CompletedReview {
     groupName: string | undefined;
     projectTitle: string | null | undefined;
     notes: string | null;
+    grade: string | null;
 }
 
 interface FacultyReviewsContentProps {
@@ -422,8 +430,13 @@ function CompletedReviewCard({ review, onViewDetails }: { review: CompletedRevie
             <div className="bg-white rounded-xl border border-slate-200 p-4 hover:shadow-md transition-all">
                 <div className="flex flex-col md:flex-row md:items-center gap-4">
                     {/* Completed Indicator */}
-                    <div className="shrink-0 text-center p-3 rounded-xl bg-emerald-100">
-                        <CheckCircle2 className="h-6 w-6 mx-auto text-emerald-600" />
+                    <div className="shrink-0 text-center p-3 rounded-xl bg-emerald-100 flex flex-col items-center justify-center gap-1 min-w-[70px]">
+                        <CheckCircle2 className="h-6 w-6 text-emerald-600" />
+                        {review.grade && (
+                            <span className="text-xs font-bold text-emerald-700 bg-emerald-200/50 px-2 py-0.5 rounded-full mt-1">
+                                {review.grade}
+                            </span>
+                        )}
                     </div>
 
                     {/* Review Info */}
@@ -521,6 +534,7 @@ function ReviewDialog({
     onSuccess: () => void;
 }) {
     const [notes, setNotes] = useState("");
+    const [grade, setGrade] = useState("");
     const [attendance, setAttendance] = useState<
         { studentId: number; name: string; present: boolean; remarks: string }[]
     >(
@@ -558,6 +572,7 @@ function ReviewDialog({
                 const result = await completeMeetingReview({
                     meetingId: review.id,
                     notes: notes.trim(),
+                    grade: grade.trim() || undefined,
                     attendance: attendance.map((a) => ({
                         studentId: a.studentId,
                         present: a.present,
@@ -702,22 +717,43 @@ function ReviewDialog({
                         </div>
                     )}
 
-                    {/* Review Notes */}
-                    <div>
-                        <Label htmlFor="review-notes" className="text-sm font-semibold text-slate-900 mb-2 block">
-                            Review Notes *
-                        </Label>
-                        <Textarea
-                            id="review-notes"
-                            placeholder="Enter your review notes, feedback, and observations..."
-                            value={notes}
-                            onChange={(e) => {
-                                setNotes(e.target.value);
-                                if (error) setError(null);
-                            }}
-                            rows={4}
-                            className="resize-none"
-                        />
+                    {/* Review Notes and Grade */}
+                    <div className="grid grid-cols-1 md:grid-cols-[1fr_200px] gap-4">
+                        <div>
+                            <Label htmlFor="review-notes" className="text-sm font-semibold text-slate-900 mb-2 block">
+                                Review Notes *
+                            </Label>
+                            <Textarea
+                                id="review-notes"
+                                placeholder="Enter your review notes, feedback, and observations..."
+                                value={notes}
+                                onChange={(e) => {
+                                    setNotes(e.target.value);
+                                    if (error) setError(null);
+                                }}
+                                rows={4}
+                                className="resize-none"
+                            />
+                        </div>
+                        <div>
+                            <Label htmlFor="review-grade" className="text-sm font-semibold text-slate-900 mb-2 flex items-center gap-2 block">
+                                <Star className="h-4 w-4 text-amber-500" /> Grade / Score
+                            </Label>
+                            <Select value={grade} onValueChange={setGrade}>
+                                <SelectTrigger id="review-grade" className="h-10">
+                                    <SelectValue placeholder="Select Grade" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="A">Grade A</SelectItem>
+                                    <SelectItem value="B">Grade B</SelectItem>
+                                    <SelectItem value="C">Grade C</SelectItem>
+                                    <SelectItem value="D">Grade D</SelectItem>
+                                </SelectContent>
+                            </Select>
+                            <p className="text-xs text-slate-500 mt-2">
+                                Track continuous progress manually at each review step.
+                            </p>
+                        </div>
                     </div>
 
                     {error && (
@@ -770,22 +806,53 @@ function DetailsDialog({
     open: boolean;
     onOpenChange: (open: boolean) => void;
 }) {
+    const [isEditing, setIsEditing] = useState(false);
+    const [notes, setNotes] = useState(review.notes || "");
+    const [grade, setGrade] = useState(review.grade || "");
+    const [isPending, startTransition] = useTransition();
     const reviewDate = new Date(review.datetime);
+
+    const handleSave = () => {
+        startTransition(async () => {
+            const result = await completeMeetingReview({
+                meetingId: review.id,
+                notes,
+                grade: grade || undefined,
+                attendance: [], // Leave existing attendance untouched
+            });
+
+            if (result.success) {
+                setIsEditing(false);
+                onOpenChange(false);
+            } else {
+                alert("Failed to update review");
+            }
+        });
+    };
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="sm:max-w-lg">
                 <DialogHeader>
-                    <DialogTitle className="flex items-center gap-2">
-                        <CheckCircle2 className="h-5 w-5 text-emerald-600" />
-                        Review Details
-                    </DialogTitle>
-                    <DialogDescription>
-                        Completed review for{" "}
-                        <span className="font-medium text-slate-900">
-                            {review.groupName}
-                        </span>
-                    </DialogDescription>
+                    <div className="flex items-start justify-between">
+                        <div>
+                            <DialogTitle className="flex items-center gap-2">
+                                <CheckCircle2 className="h-5 w-5 text-emerald-600" />
+                                Review Details
+                            </DialogTitle>
+                            <DialogDescription>
+                                Completed review for{" "}
+                                <span className="font-medium text-slate-900">
+                                    {review.groupName}
+                                </span>
+                            </DialogDescription>
+                        </div>
+                        {!isEditing && (
+                            <Button variant="ghost" size="icon" onClick={() => setIsEditing(true)}>
+                                <Edit3 className="h-4 w-4 text-slate-500 hover:text-emerald-600" />
+                            </Button>
+                        )}
+                    </div>
                 </DialogHeader>
 
                 <div className="space-y-4 py-4">
@@ -800,6 +867,14 @@ function DetailsDialog({
                         </div>
                         <div className="space-y-1">
                             <p className="text-xs font-medium text-slate-500 uppercase tracking-wider">
+                                Project
+                            </p>
+                            <p className="text-sm font-medium text-slate-900">
+                                {review.projectTitle || "N/A"}
+                            </p>
+                        </div>
+                        <div className="space-y-1">
+                            <p className="text-xs font-medium text-slate-500 uppercase tracking-wider">
                                 Date
                             </p>
                             <p className="text-sm font-medium text-slate-900">
@@ -809,6 +884,28 @@ function DetailsDialog({
                                     year: "numeric",
                                 })}
                             </p>
+                        </div>
+                        <div className="space-y-1 p-2 bg-emerald-50 rounded-lg border border-emerald-100">
+                            <Label htmlFor="edit-grade" className="text-xs font-medium text-emerald-600 uppercase tracking-wider flex items-center gap-1 mb-1">
+                                <Star className="h-3 w-3" /> Grade
+                            </Label>
+                            {isEditing ? (
+                                <Select value={grade} onValueChange={setGrade}>
+                                    <SelectTrigger id="edit-grade" className="h-8 bg-white text-emerald-800">
+                                        <SelectValue placeholder="Grade" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="A">Grade A</SelectItem>
+                                        <SelectItem value="B">Grade B</SelectItem>
+                                        <SelectItem value="C">Grade C</SelectItem>
+                                        <SelectItem value="D">Grade D</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            ) : (
+                                <p className="text-sm font-bold text-emerald-700">
+                                    {review.grade || "No Grade Assigned"}
+                                </p>
+                            )}
                         </div>
                         <div className="space-y-1">
                             <p className="text-xs font-medium text-slate-500 uppercase tracking-wider">
@@ -830,24 +927,55 @@ function DetailsDialog({
                         )}
                     </div>
 
-                    {review.notes && (
-                        <div className="space-y-1">
-                            <p className="text-xs font-medium text-slate-500 uppercase tracking-wider">
-                                Review Notes
-                            </p>
+                    <div className="space-y-1">
+                        <Label htmlFor="edit-notes" className="text-xs font-medium text-slate-500 uppercase tracking-wider">
+                            Review Notes
+                        </Label>
+                        {isEditing ? (
+                            <Textarea
+                                id="edit-notes"
+                                value={notes}
+                                onChange={(e) => setNotes(e.target.value)}
+                                rows={4}
+                                className="resize-none"
+                            />
+                        ) : review.notes ? (
                             <div className="bg-slate-50 rounded-lg border border-slate-200 p-4">
                                 <p className="text-sm text-slate-700 whitespace-pre-wrap">
                                     {review.notes}
                                 </p>
                             </div>
-                        </div>
-                    )}
+                        ) : (
+                            <p className="text-sm text-slate-500 italic">No notes available.</p>
+                        )}
+                    </div>
                 </div>
 
                 <DialogFooter>
-                    <Button variant="outline" onClick={() => onOpenChange(false)}>
-                        Close
-                    </Button>
+                    {isEditing ? (
+                        <>
+                            <Button variant="outline" onClick={() => setIsEditing(false)}>
+                                Cancel
+                            </Button>
+                            <Button
+                                className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                                onClick={handleSave}
+                                disabled={isPending}
+                            >
+                                {isPending ? (
+                                    <>
+                                        <Loader2 className="h-4 w-4 mr-2 animate-spin" /> Updating...
+                                    </>
+                                ) : (
+                                    "Save Changes"
+                                )}
+                            </Button>
+                        </>
+                    ) : (
+                        <Button variant="outline" onClick={() => onOpenChange(false)}>
+                            Close
+                        </Button>
+                    )}
                 </DialogFooter>
             </DialogContent>
         </Dialog>

@@ -200,11 +200,10 @@ export async function getFacultyDashboardStats() {
       orderBy: { created: "desc" },
     }),
 
-    // Recent meetings (completed/past) for activity feed
+    // Recent meetings (created/updated activity) for activity feed
     prisma.projectmeeting.findMany({
       where: {
         guidestaffid: staff.staffid,
-        meetingdatetime: { lt: now },
       },
       include: {
         projectgroup: {
@@ -219,7 +218,7 @@ export async function getFacultyDashboardStats() {
           },
         },
       },
-      orderBy: { meetingdatetime: "desc" },
+      orderBy: { created: "desc" },
       take: 5,
     }),
 
