@@ -997,7 +997,8 @@ export async function createGroup(data: {
     projectTitle?: string;
     projectArea?: string;
     projectDescription?: string;
-    projectTypeId: number;
+    projectTypeId?: number;
+    projectTypeName?: string;
     expertStaffId?: number;
     members: {
         studentId: number;
@@ -1011,6 +1012,24 @@ export async function createGroup(data: {
     }
 
     try {
+        let finalProjectTypeId = data.projectTypeId;
+        
+        if (!finalProjectTypeId && data.projectTypeName) {
+            let pt = await prisma.projecttype.findFirst({
+                where: { projecttypename: data.projectTypeName }
+            });
+            if (!pt) {
+                pt = await prisma.projecttype.create({
+                    data: { projecttypename: data.projectTypeName }
+                });
+            }
+            finalProjectTypeId = pt.projecttypeid;
+        }
+
+        if (!finalProjectTypeId) {
+            return { success: false, error: "Project type is required" };
+        }
+
         // Create the group with current staff as convener
         const group = await prisma.projectgroup.create({
             data: {
@@ -1018,7 +1037,7 @@ export async function createGroup(data: {
                 projecttitle: data.projectTitle || null,
                 projectarea: data.projectArea || null,
                 projectdescription: data.projectDescription || null,
-                projecttypeid: data.projectTypeId,
+                projecttypeid: finalProjectTypeId,
                 convenerstaffid: staff.staffid,
                 expertstaffid: data.expertStaffId || null,
                 projectgroupmember: {
@@ -1050,6 +1069,7 @@ export async function updateGroup(data: {
     projectArea?: string;
     projectDescription?: string;
     projectTypeId?: number;
+    projectTypeName?: string;
     expertStaffId?: number;
 }) {
     const staff = await getStaffId();
@@ -1070,6 +1090,19 @@ export async function updateGroup(data: {
     }
 
     try {
+        let finalProjectTypeId = data.projectTypeId;
+        if (!finalProjectTypeId && data.projectTypeName) {
+            let pt = await prisma.projecttype.findFirst({
+                where: { projecttypename: data.projectTypeName }
+            });
+            if (!pt) {
+                pt = await prisma.projecttype.create({
+                    data: { projecttypename: data.projectTypeName }
+                });
+            }
+            finalProjectTypeId = pt.projecttypeid;
+        }
+
         await prisma.projectgroup.update({
             where: { projectgroupid: data.groupId },
             data: {
@@ -1077,7 +1110,7 @@ export async function updateGroup(data: {
                 projecttitle: data.projectTitle ?? group.projecttitle,
                 projectarea: data.projectArea ?? group.projectarea,
                 projectdescription: data.projectDescription ?? group.projectdescription,
-                projecttypeid: data.projectTypeId ?? group.projecttypeid,
+                projecttypeid: finalProjectTypeId ?? group.projecttypeid,
                 expertstaffid: data.expertStaffId ?? group.expertstaffid,
                 modified: new Date(),
             },
