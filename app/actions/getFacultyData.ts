@@ -85,7 +85,7 @@ export async function getFacultyGroups() {
             },
         },
         orderBy: {
-            projectgroupname: 'asc',
+            created: 'desc',
         },
     });
 
@@ -96,6 +96,7 @@ export async function getFacultyGroups() {
         area: group.projectarea,
         description: group.projectdescription,
         projectType: group.projecttype?.projecttypename || null,
+        status: group.projectstatus || "Active",
         averageCpi: group.averagecpi ? group.averagecpi.toNumber() : null,
         convener: group.staff_projectgroup_convenerstaffidTostaff,
         expert: group.staff_projectgroup_expertstaffidTostaff,
@@ -169,6 +170,7 @@ export async function getFacultyGroupById(groupId: number) {
         area: group.projectarea,
         description: group.projectdescription,
         projectType: group.projecttype,
+        status: group.projectstatus || "Active",
         averageCpi: group.averagecpi ? group.averagecpi.toNumber() : null,
         convener: group.staff_projectgroup_convenerstaffidTostaff,
         expert: group.staff_projectgroup_expertstaffidTostaff,
@@ -226,7 +228,7 @@ export async function getFacultyMeetings() {
                 },
             },
             orderBy: {
-                meetingdatetime: 'asc',
+                created: 'desc',
             },
         }),
         prisma.projectmeeting.findMany({
@@ -740,44 +742,81 @@ export async function updateMeeting(data: {
     datetime?: Date;
     purpose?: string;
     location?: string;
+    description?: string;
     status?: string;
     notes?: string;
+    sendNotification?: boolean;
 }) {
     const staff = await getStaffId();
-    if (!staff) throw new Error("Unauthorized: Staff not found");
+    if (!staff) return { success: false, error: "Unauthorized: Staff not found" };
 
-    // Verify staff owns this meeting
-    const meeting = await prisma.projectmeeting.findFirst({
-        where: {
-            projectmeetingid: data.meetingId,
-            guidestaffid: staff.staffid,
-        },
-    });
+    try {
+        // Verify staff owns this meeting
+        const meeting = await prisma.projectmeeting.findFirst({
+            where: {
+                projectmeetingid: data.meetingId,
+                guidestaffid: staff.staffid,
+            },
+            include: {
+                projectgroup: {
+                    include: {
+                        projectgroupmember: {
+                            include: {
+                                student: true,
+                            }
+                        }
+                    }
+                }
+            }
+        });
 
-    if (!meeting) throw new Error("Meeting not found or unauthorized");
+        if (!meeting) return { success: false, error: "Meeting not found or unauthorized" };
 
-    const updated = await prisma.projectmeeting.update({
-        where: { projectmeetingid: data.meetingId },
-        data: {
-            ...(data.datetime && { meetingdatetime: data.datetime }),
-            ...(data.purpose && { meetingpurpose: data.purpose }),
-            ...(data.location !== undefined && { meetinglocation: data.location }),
-            ...(data.status && {
-                meetingstatus: data.status,
-                meetingstatusdatetime: new Date(),
-            }),
-            ...(data.notes !== undefined && { meetingnotes: data.notes }),
-            modified: new Date(),
-        },
-    });
+        const updated = await prisma.projectmeeting.update({
+            where: { projectmeetingid: data.meetingId },
+            data: {
+                ...(data.datetime && { meetingdatetime: data.datetime }),
+                ...(data.purpose && { meetingpurpose: data.purpose }),
+                ...(data.location !== undefined && { meetinglocation: data.location }),
+                ...(data.description !== undefined && { description: data.description }),
+                ...(data.status && {
+                    meetingstatus: data.status,
+                    meetingstatusdatetime: new Date(),
+                }),
+                ...(data.notes !== undefined && { meetingnotes: data.notes }),
+                modified: new Date(),
+            },
+        });
 
-    revalidatePath('/faculty/meetings');
-    revalidatePath('/faculty/reviews');
+        if (data.sendNotification && meeting.projectgroup) {
+            const studentEmails = meeting.projectgroup.projectgroupmember
+                .map(m => m.student?.email)
+                .filter((email): email is string => email !== null);
 
-    return {
-        success: true,
-        meeting: updated,
-    };
+            if (studentEmails.length > 0) {
+                const { sendMeetingNotification } = await import("@/lib/email");
+                await sendMeetingNotification({
+                    studentEmails,
+                    meetingDetails: {
+                        datetime: updated.meetingdatetime,
+                        purpose: updated.meetingpurpose || "",
+                        location: updated.meetinglocation || null,
+                        groupName: meeting.projectgroup.projectgroupname,
+                        facultyName: staff.staffname,
+                    },
+                    isUpdate: true,
+                });
+            }
+        }
+
+        revalidatePath('/faculty/meetings');
+        revalidatePath('/faculty/reviews');
+
+        return { success: true, meeting: updated };
+    } catch (error) {
+        console.error("Error updating meeting:", error);
+        return { success: false, error: "Failed to update meeting" };
+    }
 }
 
 // Update group details (for convener only)
@@ -823,31 +862,35 @@ export async function updateGroupDetails(data: {
 // Cancel/Delete a meeting
 export async function deleteMeeting(meetingId: number) {
     const staff = await getStaffId();
-    if (!staff) throw new Error("Unauthorized: Staff not found");
+    if (!staff) return { success: false, error: "Unauthorized: Staff not found" };
 
-    // Verify staff owns this meeting
-    const meeting = await prisma.projectmeeting.findFirst({
-        where: {
-            projectmeetingid: meetingId,
-            guidestaffid: staff.staffid,
-        },
-    });
+    try {
+        // Verify staff owns this meeting
+        const meeting = await prisma.projectmeeting.findFirst({
+            where: {
+                projectmeetingid: meetingId,
+                guidestaffid: staff.staffid,
+            },
+        });
 
-    if (!meeting) throw new Error("Meeting not found or unauthorized");
+        if (!meeting) return { success: false, error: "Meeting not found or unauthorized" };
 
-    // Delete associated attendance records first (cascade should handle this, but being explicit)
-    await prisma.projectmeetingattendance.deleteMany({
-        where: { projectmeetingid: meetingId },
-    });
+        // Delete associated attendance records first (cascade should handle this, but being explicit)
+        await prisma.projectmeetingattendance.deleteMany({
+            where: { projectmeetingid: meetingId },
+        });
 
-    await prisma.projectmeeting.delete({
-        where: { projectmeetingid: meetingId },
-    });
+        await prisma.projectmeeting.delete({
+            where: { projectmeetingid: meetingId },
+        });
 
-    revalidatePath('/faculty/meetings');
-    revalidatePath('/faculty/reviews');
-
-    return { success: true };
+        revalidatePath('/faculty/meetings');
+        revalidatePath('/faculty/reviews');
+        return { success: true };
+    } catch (error) {
+        console.error("Error deleting meeting:", error);
+        return { success: false, error: "Failed to delete meeting" };
+    }
 }
 
 // ============== UTILITY FUNCTIONS ==============
@@ -1234,5 +1277,29 @@ export async function deleteGroup(groupId: number) {
     } catch (error) {
         console.error("Error deleting group:", error);
         return { success: false, error: "Failed to delete group" };
+    }
+}
+
+// Mark group as completed
+export async function markGroupComplete(groupId: number) {
+    const staff = await getStaffId();
+    if (!staff) return { success: false, error: "Unauthorized" };
+
+    const group = await prisma.projectgroup.findFirst({
+        where: { projectgroupid: groupId, convenerstaffid: staff.staffid }
+    });
+
+    if (!group) return { success: false, error: "Unauthorized to mark this group complete" };
+
+    try {
+        await prisma.projectgroup.update({
+            where: { projectgroupid: groupId },
+            data: { projectstatus: "Completed", modified: new Date() }
+        });
+        revalidatePath("/faculty/group");
+        return { success: true };
+    } catch (error) {
+        console.error("Error completing group:", error);
+        return { success: false, error: "Failed to complete group" };
     }
 }

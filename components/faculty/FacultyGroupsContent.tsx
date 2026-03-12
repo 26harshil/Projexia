@@ -32,6 +32,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -42,7 +43,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import { createGroup, updateGroup } from "@/app/actions/getFacultyData";
+import { createGroup, updateGroup, deleteGroup, markGroupComplete, addGroupMember, removeGroupMember } from "@/app/actions/getFacultyData";
 import { generateGroupReportPDF } from "@/lib/pdfGenerator";
 
 interface GroupMember {
@@ -61,6 +62,7 @@ interface Group {
     area: string | null;
     description: string | null;
     projectType: string | null;
+    status: string;
     averageCpi: number | null;
     convener: { staffname: string; email: string | null } | null;
     expert: { staffname: string; email: string | null } | null;
@@ -117,6 +119,7 @@ const itemVariants = {
 };
 
 export function FacultyGroupsContent({ groups, students, projectTypes, staffList }: FacultyGroupsContentProps) {
+    const router = useRouter();
     const [searchQuery, setSearchQuery] = useState("");
     const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
     const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
@@ -129,8 +132,8 @@ export function FacultyGroupsContent({ groups, students, projectTypes, staffList
             group.area?.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
-    const activeGroups = filteredGroups;
-    const completedGroups: Group[] = [];
+    const activeGroups = filteredGroups.filter((g) => g.status !== "Completed");
+    const completedGroups = filteredGroups.filter((g) => g.status === "Completed");
 
     return (
         <div className="min-h-screen bg-slate-50">
@@ -285,9 +288,31 @@ export function FacultyGroupsContent({ groups, students, projectTypes, staffList
                         </TabsContent>
 
                         <TabsContent value="completed">
-                            <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center">
-                                <p className="text-slate-500">No completed groups</p>
-                            </div>
+                            {completedGroups.length > 0 ? (
+                                <motion.div
+                                    variants={containerVariants}
+                                    initial="hidden"
+                                    animate="show"
+                                    className={
+                                        viewMode === "grid"
+                                            ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+                                            : "space-y-4"
+                                    }
+                                >
+                                    {completedGroups.map((group) => (
+                                        <GroupCard
+                                            key={group.id}
+                                            group={group}
+                                            viewMode={viewMode}
+                                            onViewDetails={() => setSelectedGroup(group)}
+                                        />
+                                    ))}
+                                </motion.div>
+                            ) : (
+                                <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center">
+                                    <p className="text-slate-500">No completed groups</p>
+                                </div>
+                            )}
                         </TabsContent>
                     </Tabs>
                 </motion.div>
@@ -298,7 +323,11 @@ export function FacultyGroupsContent({ groups, students, projectTypes, staffList
                 {selectedGroup && (
                     <GroupDetailsModal
                         group={selectedGroup}
-                        onClose={() => setSelectedGroup(null)}
+                        students={students}
+                        onClose={() => {
+                            setSelectedGroup(null);
+                            window.location.reload();
+                        }}
                     />
                 )}
             </AnimatePresence>
@@ -310,7 +339,10 @@ export function FacultyGroupsContent({ groups, students, projectTypes, staffList
                         students={students}
                         projectTypes={projectTypes}
                         staffList={staffList}
-                        onClose={() => setShowCreateModal(false)}
+                        onClose={() => {
+                            setShowCreateModal(false);
+                            window.location.reload();
+                        }}
                     />
                 )}
             </AnimatePresence>
@@ -485,14 +517,18 @@ function GroupDetailsModal({
     onClose,
     projectTypes,
     staffList,
+    students = [],
 }: {
     group: Group;
     onClose: () => void;
     projectTypes?: ProjectType[];
     staffList?: Staff[];
+    students?: Student[];
 }) {
     const [isPending, startTransition] = useTransition();
     const [isEditing, setIsEditing] = useState(false);
+    const [isAddingStudent, setIsAddingStudent] = useState(false);
+    const [newStudentId, setNewStudentId] = useState("");
     const [editData, setEditData] = useState({
         groupName: group.name,
         projectTitle: group.title || "",
@@ -502,6 +538,8 @@ function GroupDetailsModal({
 
     const leader = group.members.find((m) => m.isLeader);
     const regularMembers = group.members.filter((m) => !m.isLeader);
+
+    const availableStudents = students.filter(s => !group.members.some(m => m.id === s.id));
 
     const handleDownloadPDF = () => {
         generateGroupReportPDF(group);
@@ -522,6 +560,57 @@ function GroupDetailsModal({
                 onClose(); // Close to refresh data
             } else {
                 alert(result.error || "Failed to update group");
+            }
+        });
+    };
+
+    const handleCompleteGroup = () => {
+        if (!confirm("Are you sure you want to mark this project as completed?")) return;
+        startTransition(async () => {
+            const result = await markGroupComplete(group.id);
+            if (result.success) {
+                onClose();
+            } else {
+                alert(result.error || "Failed to complete group");
+            }
+        });
+    };
+
+    const handleDeleteGroup = () => {
+        if (!confirm("WARNING: Are you sure you want to delete this group? This action cannot be undone.")) return;
+        startTransition(async () => {
+            const result = await deleteGroup(group.id);
+            if (result.success) {
+                onClose();
+            } else {
+                alert(result.error || "Failed to delete group");
+            }
+        });
+    };
+
+    const handleRemoveMember = (studentId: number | undefined) => {
+        if (!studentId) return;
+        if (!confirm("Are you sure you want to remove this member?")) return;
+        startTransition(async () => {
+            const result = await removeGroupMember({ groupId: group.id, studentId });
+            if (result.success) {
+                onClose();
+            } else {
+                alert(result.error || "Failed to remove member");
+            }
+        });
+    };
+
+    const handleAddMember = () => {
+        if (!newStudentId) return;
+        startTransition(async () => {
+            const result = await addGroupMember({ groupId: group.id, studentId: parseInt(newStudentId) });
+            if (result.success) {
+                setIsAddingStudent(false);
+                setNewStudentId("");
+                onClose();
+            } else {
+                alert(result.error || "Failed to add member");
             }
         });
     };
@@ -674,10 +763,50 @@ function GroupDetailsModal({
 
                     {/* Team Members */}
                     <div>
-                        <h3 className="text-sm font-medium text-slate-700 mb-4 flex items-center gap-2">
-                            <Users className="h-4 w-4" />
-                            Team Members ({group.members.length})
-                        </h3>
+                        <div className="flex items-center justify-between mb-4">
+                            <h3 className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                                <Users className="h-4 w-4" />
+                                Team Members ({group.members.length})
+                            </h3>
+                            {isEditing && (
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="text-emerald-600 border-emerald-200"
+                                    onClick={() => setIsAddingStudent(!isAddingStudent)}
+                                >
+                                    <UserPlus className="h-3 w-3 mr-1" />
+                                    Add Member
+                                </Button>
+                            )}
+                        </div>
+
+                        {isEditing && isAddingStudent && (
+                            <div className="mb-4 p-4 bg-slate-50 border border-slate-200 rounded-xl flex items-end gap-3">
+                                <div className="flex-1 space-y-2">
+                                    <Label>Select Student to Add</Label>
+                                    <Select value={newStudentId} onValueChange={setNewStudentId}>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Search student..." />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {availableStudents.map(student => (
+                                                <SelectItem key={student.id} value={student.id.toString()}>
+                                                    {student.name} ({student.email})
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                <Button 
+                                    className="bg-emerald-600 hover:bg-emerald-700 text-white" 
+                                    onClick={handleAddMember}
+                                    disabled={!newStudentId || isPending}
+                                >
+                                    Add
+                                </Button>
+                            </div>
+                        )}
 
                         {/* Leader */}
                         {leader && (
@@ -752,6 +881,17 @@ function GroupDetailsModal({
                                                     )}
                                                 </div>
                                             </div>
+                                            {isEditing && (
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                                                    onClick={() => handleRemoveMember(member.id)}
+                                                    disabled={isPending}
+                                                >
+                                                    <Trash2 className="h-4 w-4" />
+                                                </Button>
+                                            )}
                                         </div>
                                     ))}
                                 </div>
@@ -795,10 +935,34 @@ function GroupDetailsModal({
 
                 {/* Footer */}
                 <div className="p-4 border-t border-slate-100 bg-slate-50 flex gap-3 justify-between">
-                    <Button variant="outline" onClick={handleDownloadPDF}>
-                        <Download className="h-4 w-4 mr-2" />
-                        Download PDF
-                    </Button>
+                    <div className="flex gap-2">
+                        <Button variant="outline" onClick={handleDownloadPDF}>
+                            <Download className="h-4 w-4 mr-2" />
+                            PDF
+                        </Button>
+                        {isEditing && (
+                            <Button 
+                                variant="destructive" 
+                                className="bg-red-50 text-red-600 hover:bg-red-100 border-red-200"
+                                onClick={handleDeleteGroup} 
+                                disabled={isPending}
+                            >
+                                <Trash2 className="h-4 w-4 mr-2" />
+                                Delete Group
+                            </Button>
+                        )}
+                        {!isEditing && group.status !== "Completed" && (
+                            <Button 
+                                variant="outline" 
+                                className="bg-emerald-50 text-emerald-600 hover:bg-emerald-100 border-emerald-200"
+                                onClick={handleCompleteGroup} 
+                                disabled={isPending}
+                            >
+                                <Check className="h-4 w-4 mr-2" />
+                                Complete Project
+                            </Button>
+                        )}
+                    </div>
                     <div className="flex gap-3">
                         {isEditing ? (
                             <>
