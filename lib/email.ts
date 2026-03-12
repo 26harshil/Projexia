@@ -1,57 +1,11 @@
-// /lib/email.ts
-"use server";
+import { Resend } from 'resend';
 
-import nodemailer from "nodemailer";
+const resend = new Resend('re_HLPSbYti_C9yDdpNRnaPJerNLH36E3mUw');
 
-// Configure transporter - using environment variables
-const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST || "smtp.gmail.com",
-    port: parseInt(process.env.SMTP_PORT || "587"),
-    secure: false,
-    auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASSWORD,
-    },
-});
-
-interface EmailOptions {
-    to: string | string[];
-    subject: string;
-    text?: string;
-    html?: string;
-}
-
-export async function sendEmail(options: EmailOptions) {
-    try {
-        // Skip email sending if SMTP is not configured
-        if (!process.env.SMTP_USER || !process.env.SMTP_PASSWORD) {
-            console.log("[Email] SMTP not configured, skipping email send");
-            console.log("[Email] Would have sent to:", options.to);
-            console.log("[Email] Subject:", options.subject);
-            return { success: true, skipped: true };
-        }
-
-        const mailOptions = {
-            from: process.env.SMTP_FROM || process.env.SMTP_USER,
-            to: Array.isArray(options.to) ? options.to.join(", ") : options.to,
-            subject: options.subject,
-            text: options.text,
-            html: options.html,
-        };
-
-        await transporter.sendMail(mailOptions);
-        console.log("[Email] Sent successfully to:", options.to);
-        return { success: true };
-    } catch (error) {
-        console.error("[Email] Error sending email:", error);
-        return { success: false, error: String(error) };
-    }
-}
-
-// Meeting notification email template
 export async function sendMeetingNotification({
     studentEmails,
     meetingDetails,
+    isUpdate,
 }: {
     studentEmails: string[];
     meetingDetails: {
@@ -61,92 +15,134 @@ export async function sendMeetingNotification({
         groupName: string;
         facultyName: string;
     };
+    isUpdate?: boolean;
 }) {
-    const dateStr = new Date(meetingDetails.datetime).toLocaleString("en-IN", {
-        dateStyle: "full",
-        timeStyle: "short",
+    const formattedDate = meetingDetails.datetime.toLocaleString('en-US', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
     });
 
     const html = `
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <meta charset="utf-8">
-            <style>
-                body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #333; }
-                .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-                .header { background: linear-gradient(135deg, #7c3aed, #a855f7); color: white; padding: 30px; text-align: center; border-radius: 12px 12px 0 0; }
-                .content { background: #f8fafc; padding: 30px; border-radius: 0 0 12px 12px; }
-                .meeting-card { background: white; border-radius: 12px; padding: 20px; margin: 20px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-                .detail-row { display: flex; padding: 10px 0; border-bottom: 1px solid #e2e8f0; }
-                .detail-label { font-weight: 600; color: #64748b; width: 100px; }
-                .detail-value { color: #1e293b; flex: 1; }
-                .footer { text-align: center; padding: 20px; color: #64748b; font-size: 12px; }
-            </style>
-        </head>
-        <body>
-            <div class="container">
-                <div class="header">
-                    <h1 style="margin: 0;">📅 New Meeting Scheduled</h1>
-                    <p style="margin: 10px 0 0 0; opacity: 0.9;">Student Project Management System</p>
-                </div>
-                <div class="content">
-                    <p>Dear Student,</p>
-                    <p>A new meeting has been scheduled for your project group. Please find the details below:</p>
-                    
-                    <div class="meeting-card">
-                        <div class="detail-row">
-                            <span class="detail-label">📁 Group</span>
-                            <span class="detail-value">${meetingDetails.groupName}</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">📋 Purpose</span>
-                            <span class="detail-value">${meetingDetails.purpose}</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">🗓️ Date & Time</span>
-                            <span class="detail-value">${dateStr}</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">📍 Location</span>
-                            <span class="detail-value">${meetingDetails.location || "To be announced"}</span>
-                        </div>
-                        <div class="detail-row" style="border: none;">
-                            <span class="detail-label">👤 Faculty</span>
-                            <span class="detail-value">${meetingDetails.facultyName}</span>
-                        </div>
-                    </div>
-                    
-                    <p>Please ensure your attendance and come prepared with your project updates.</p>
-                    <p>Best regards,<br><strong>SPMS Team</strong></p>
-                </div>
-                <div class="footer">
-                    <p>This is an automated notification from SPMS. Please do not reply to this email.</p>
-                </div>
-            </div>
-        </body>
-        </html>
-    `;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Meeting Notification</title>
+</head>
+<body style="margin:0;padding:0;background:#f4f6f9;font-family:'Helvetica Neue',Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f6f9;padding:32px 16px;">
+    <tr>
+      <td align="center">
+        <table width="600" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:12px;overflow:hidden;border:1px solid #e2e4e8;max-width:600px;width:100%;">
 
-    const text = `
-New Meeting Scheduled
+          <!-- Header -->
+          <tr>
+            <td style="background:#1a2744;padding:28px 36px;">
+              <table cellpadding="0" cellspacing="0">
+                <tr>
+                  <td style="padding-right:14px;">
+                    <img src="https://via.placeholder.com/40/4F8EF7/ffffff?text=AC" width="40" height="40" style="border-radius:10px;display:block;" alt="Logo" />
+                  </td>
+                  <td>
+                    <div style="color:#ffffff;font-size:20px;font-weight:700;letter-spacing:0.5px;">AcademiaConnect</div>
+                    <div style="color:#a0b4d8;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;margin-top:2px;">Faculty · Student Portal</div>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
 
-Group: ${meetingDetails.groupName}
-Purpose: ${meetingDetails.purpose}
-Date & Time: ${dateStr}
-Location: ${meetingDetails.location || "To be announced"}
-Faculty: ${meetingDetails.facultyName}
+          <!-- Banner -->
+          <tr>
+            <td style="background:#4F8EF7;padding:10px 36px;">
+              <span style="color:#ffffff;font-size:11px;letter-spacing:2px;text-transform:uppercase;font-weight:600;">Meeting Notification</span>
+            </td>
+          </tr>
 
-Please ensure your attendance and come prepared with your project updates.
+          <!-- Body -->
+          <tr>
+            <td style="padding:36px 36px 28px;">
+              <p style="font-size:15px;color:#4a5568;margin:0 0 24px;line-height:1.7;">
+                Hello, ${isUpdate ? 'an existing meeting has been <strong>updated</strong>' : 'a new meeting has been scheduled'} for your group
+                <strong style="color:#1a2744;">${meetingDetails.groupName}</strong> by
+                <strong style="color:#1a2744;">${meetingDetails.facultyName}</strong>.
+                Please review the details below and mark your calendar.
+              </p>
 
-Best regards,
-SPMS Team
-    `;
+              <!-- Meeting Details Card -->
+              <table width="100%" cellpadding="0" cellspacing="0" style="background:#f8fafd;border-radius:10px;border:1px solid #dce5f2;overflow:hidden;margin-bottom:28px;">
+                <tr>
+                  <td colspan="2" style="background:#eef3fc;padding:12px 20px;border-bottom:1px solid #dce5f2;">
+                    <span style="font-size:11px;font-weight:700;color:#2d4a8a;letter-spacing:1px;text-transform:uppercase;">Meeting Details</span>
+                  </td>
+                </tr>
+                <tr style="border-bottom:1px solid #eef1f6;">
+                  <td style="padding:14px 20px;width:36%;color:#7b8ea8;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;vertical-align:top;">📅 Date &amp; Time</td>
+                  <td style="padding:14px 20px;color:#1a2744;font-size:14px;font-weight:600;">${formattedDate}</td>
+                </tr>
+                <tr style="border-bottom:1px solid #eef1f6;">
+                  <td style="padding:14px 20px;color:#7b8ea8;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;vertical-align:top;">💬 Purpose</td>
+                  <td style="padding:14px 20px;color:#2d4878;font-size:14px;">${meetingDetails.purpose}</td>
+                </tr>
+                <tr>
+                  <td style="padding:14px 20px;color:#7b8ea8;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;vertical-align:top;">📍 Location</td>
+                  <td style="padding:14px 20px;color:#2d4878;font-size:14px;">${meetingDetails.location || 'To Be Announced'}</td>
+                </tr>
+              </table>
 
-    return sendEmail({
-        to: studentEmails,
-        subject: `📅 Meeting Scheduled: ${meetingDetails.purpose} - ${meetingDetails.groupName}`,
-        html,
-        text,
-    });
+              <!-- CTA Button -->
+              <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:28px;">
+                <tr>
+                  <td align="center">
+                    <a href="#" style="display:inline-block;background:#4F8EF7;color:#ffffff;text-decoration:none;padding:13px 36px;border-radius:8px;font-size:14px;font-weight:600;letter-spacing:0.3px;">View Meeting Details</a>
+                  </td>
+                </tr>
+              </table>
+
+              <p style="font-size:13px;color:#9aabbf;line-height:1.7;margin:0;border-top:1px solid #edf1f7;padding-top:20px;">
+                If you have questions or cannot attend, please contact your faculty coordinator directly.
+                This is an automated notification — please do not reply to this email.
+              </p>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="background:#f1f5fb;padding:18px 36px;border-top:1px solid #dce5f2;">
+              <table width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td style="font-size:12px;color:#9aabbf;">© ${new Date().getFullYear()} AcademiaConnect</td>
+                  <td align="right">
+                    <a href="#" style="font-size:12px;color:#7b8ea8;text-decoration:none;margin-left:16px;">Unsubscribe</a>
+                    <a href="#" style="font-size:12px;color:#7b8ea8;text-decoration:none;margin-left:16px;">Privacy Policy</a>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
+
+    try {
+        await resend.emails.send({
+            from: 'onboarding@resend.dev',
+            // Resend testing keys only allow sending to the verified developer email.
+            // When going to production with a real domain, revert this back to `to: studentEmails`.
+            to: 'harshilsolanki26102005@gmail.com',
+            subject: `📅 ${isUpdate ? 'Meeting Updated' : 'New Meeting Scheduled'}: ${meetingDetails.groupName}`,
+            html,
+        });
+    } catch (e) {
+        console.error("Failed to send meeting notification email:", e);
+    }
 }

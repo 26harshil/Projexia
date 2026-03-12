@@ -22,6 +22,8 @@ import {
     Send,
     ClipboardCheck,
     User,
+    Pencil,
+    Trash2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -38,8 +40,12 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { useState, useTransition } from "react";
-import { createMeeting, completeMeetingReview, saveAttendance } from "@/app/actions/getFacultyData";
+import { createMeeting, completeMeetingReview, saveAttendance, updateMeeting, deleteMeeting } from "@/app/actions/getFacultyData";
 import { generateMeetingReportPDF, generateMeetingAttendancePDF } from "@/lib/pdfGenerator";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar as CalendarComponent } from "@/components/ui/calendar";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 
 interface Attendee {
     studentId: number | undefined;
@@ -313,7 +319,10 @@ export function FacultyMeetingsContent({ meetings, groups }: FacultyMeetingsCont
                 {showScheduleModal && (
                     <ScheduleMeetingModal
                         groups={groups}
-                        onClose={() => setShowScheduleModal(false)}
+                        onClose={() => {
+                            setShowScheduleModal(false);
+                            window.location.reload();
+                        }}
                     />
                 )}
             </AnimatePresence>
@@ -323,7 +332,10 @@ export function FacultyMeetingsContent({ meetings, groups }: FacultyMeetingsCont
                 {selectedMeeting && (
                     <MeetingDetailsModal
                         meeting={selectedMeeting}
-                        onClose={() => setSelectedMeeting(null)}
+                        onClose={() => {
+                            setSelectedMeeting(null);
+                            window.location.reload();
+                        }}
                     />
                 )}
             </AnimatePresence>
@@ -450,7 +462,7 @@ function ScheduleMeetingModal({
     const [isPending, startTransition] = useTransition();
     const [selectedGroup, setSelectedGroup] = useState("");
     const [purpose, setPurpose] = useState("");
-    const [date, setDate] = useState("");
+    const [date, setDate] = useState<Date>();
     const [time, setTime] = useState("");
     const [location, setLocation] = useState("");
     const [description, setDescription] = useState("");
@@ -462,7 +474,8 @@ function ScheduleMeetingModal({
             return;
         }
 
-        const datetime = new Date(`${date}T${time}`);
+        const dateString = format(date, "yyyy-MM-dd");
+        const datetime = new Date(`${dateString}T${time}`);
 
         startTransition(async () => {
             const result = await createMeeting({
@@ -546,23 +559,44 @@ function ScheduleMeetingModal({
 
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-2">
-                                <Label htmlFor="date">Date *</Label>
-                                <Input
-                                    id="date"
-                                    type="date"
-                                    value={date}
-                                    onChange={(e) => setDate(e.target.value)}
-                                    min={new Date().toISOString().split("T")[0]}
-                                />
+                                <Label>Date *</Label>
+                                <Popover>
+                                    <PopoverTrigger asChild>
+                                        <Button
+                                            variant={"outline"}
+                                            className={cn(
+                                                "w-full justify-start text-left font-normal border-slate-200",
+                                                !date && "text-muted-foreground"
+                                            )}
+                                        >
+                                            <Calendar className="mr-2 h-4 w-4" />
+                                            {date ? format(date, "PPP") : <span>Select Date</span>}
+                                        </Button>
+                                    </PopoverTrigger>
+                                    <PopoverContent className="w-auto p-0" align="start">
+                                        <CalendarComponent
+                                            mode="single"
+                                            selected={date}
+                                            onSelect={setDate}
+                                            initialFocus
+                                            disabled={(date) => date < new Date(new Date().setHours(0,0,0,0))}
+                                            className="border-none rounded-xl"
+                                        />
+                                    </PopoverContent>
+                                </Popover>
                             </div>
                             <div className="space-y-2">
                                 <Label htmlFor="time">Time *</Label>
-                                <Input
-                                    id="time"
-                                    type="time"
-                                    value={time}
-                                    onChange={(e) => setTime(e.target.value)}
-                                />
+                                <div className="relative">
+                                    <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-emerald-600 pointer-events-none" />
+                                    <Input
+                                        id="time"
+                                        type="time"
+                                        value={time}
+                                        onChange={(e) => setTime(e.target.value)}
+                                        className="pl-10 cursor-pointer text-slate-700 bg-white border-slate-200 focus:bg-white focus:ring-emerald-500"
+                                    />
+                                </div>
                             </div>
                         </div>
 
@@ -662,6 +696,52 @@ function MeetingDetailsModal({
     const isPast = meetingDate < new Date();
     const needsReview = isPast && meeting.status !== "Completed";
     const isCompleted = meeting.status === "Completed";
+    
+    // Edit state
+    const [isEditing, setIsEditing] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
+    const [editPurpose, setEditPurpose] = useState(meeting.purpose || "");
+    const [editDate, setEditDate] = useState<Date | undefined>(meetingDate);
+    const [editTime, setEditTime] = useState(
+        meetingDate.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })
+    );
+    const [editLocation, setEditLocation] = useState(meeting.location || "");
+    const [sendNotification, setSendNotification] = useState(true);
+
+    const handleSaveEdits = () => {
+        if (!editDate || !editTime || !editPurpose) return;
+        const dateString = format(editDate, "yyyy-MM-dd");
+        const datetime = new Date(`${dateString}T${editTime}`);
+
+        startTransition(async () => {
+            const result = await updateMeeting({
+                meetingId: meeting.id,
+                datetime,
+                purpose: editPurpose,
+                location: editLocation,
+                sendNotification,
+            });
+            if (result.success) {
+                onClose();
+            } else {
+                alert(result.error);
+            }
+        });
+    };
+
+    const handleDelete = () => {
+        if (!confirm("Are you sure you want to delete this meeting?")) return;
+        setIsDeleting(true);
+        startTransition(async () => {
+             const result = await deleteMeeting(meeting.id);
+             setIsDeleting(false);
+             if (result.success) {
+                 onClose();
+             } else {
+                 alert(result.error);
+             }
+        });
+    };
 
     // Attendance stats
     const totalStudents = meeting.attendees.length;
@@ -797,32 +877,107 @@ function MeetingDetailsModal({
                                 </div>
                             </div>
                         </div>
-                        <Button variant="ghost" size="icon" onClick={onClose}>
-                            <X className="h-5 w-5" />
-                        </Button>
+                        <div className="flex items-center gap-2">
+                            {!isCompleted && !isEditing && (
+                                <Button variant="ghost" size="icon" onClick={() => setIsEditing(true)}>
+                                    <Pencil className="h-4 w-4 text-slate-500 hover:text-emerald-600" />
+                                </Button>
+                            )}
+                            <Button variant="ghost" size="icon" onClick={onClose}>
+                                <X className="h-5 w-5" />
+                            </Button>
+                        </div>
                     </div>
                 </div>
 
                 {/* Content */}
                 <div className="p-6 overflow-y-auto max-h-[calc(90vh-200px)]">
                     {/* Meeting Info */}
-                    <div className="grid grid-cols-2 gap-4 mb-6">
-                        <div className="p-4 bg-slate-50 rounded-xl">
-                            <p className="text-xs text-slate-500 uppercase tracking-wide mb-1">Date & Time</p>
-                            <p className="font-semibold text-slate-900">
-                                {meetingDate.toLocaleDateString("en-IN", { dateStyle: "full" })}
-                            </p>
-                            <p className="text-sm text-slate-600">
-                                {meetingDate.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}
-                            </p>
+                    {isEditing ? (
+                        <div className="space-y-4 mb-6">
+                            <div className="space-y-2">
+                                <Label>Purpose *</Label>
+                                <Input value={editPurpose} onChange={e => setEditPurpose(e.target.value)} />
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                    <Label>Date *</Label>
+                                    <Popover>
+                                        <PopoverTrigger asChild>
+                                            <Button
+                                                variant={"outline"}
+                                                className={cn(
+                                                    "w-full justify-start text-left font-normal border-slate-200",
+                                                    !editDate && "text-muted-foreground"
+                                                )}
+                                            >
+                                                <Calendar className="mr-2 h-4 w-4" />
+                                                {editDate ? format(editDate, "PPP") : <span>Select Date</span>}
+                                            </Button>
+                                        </PopoverTrigger>
+                                        <PopoverContent className="w-auto p-0" align="start">
+                                            <CalendarComponent
+                                                mode="single"
+                                                selected={editDate}
+                                                onSelect={setEditDate}
+                                                initialFocus
+                                                className="border-none rounded-xl"
+                                            />
+                                        </PopoverContent>
+                                    </Popover>
+                                </div>
+                                <div className="space-y-2">
+                                    <Label>Time *</Label>
+                                    <div className="relative">
+                                        <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-emerald-600 pointer-events-none" />
+                                        <Input
+                                            type="time"
+                                            value={editTime}
+                                            onChange={(e) => setEditTime(e.target.value)}
+                                            className="pl-10 cursor-pointer text-slate-700 bg-white border-slate-200 focus:bg-white focus:ring-emerald-500"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="space-y-2">
+                                <Label>Location</Label>
+                                <Input value={editLocation} onChange={e => setEditLocation(e.target.value)} />
+                            </div>
+                             <div className="flex items-center gap-3 p-3 bg-emerald-50 rounded-lg">
+                                <Checkbox
+                                    id="edit-notification"
+                                    checked={sendNotification}
+                                    onCheckedChange={(checked) => setSendNotification(checked === true)}
+                                />
+                                <div>
+                                    <Label htmlFor="edit-notification" className="font-medium text-emerald-700 cursor-pointer">
+                                        Send Update Email
+                                    </Label>
+                                    <p className="text-xs text-emerald-600">
+                                        Notify students about the updated details
+                                    </p>
+                                </div>
+                            </div>
                         </div>
-                        <div className="p-4 bg-slate-50 rounded-xl">
-                            <p className="text-xs text-slate-500 uppercase tracking-wide mb-1">Location</p>
-                            <p className="font-semibold text-slate-900">
-                                {meeting.location || "Not specified"}
-                            </p>
+                    ) : (
+                        <div className="grid grid-cols-2 gap-4 mb-6">
+                            <div className="p-4 bg-slate-50 rounded-xl">
+                                <p className="text-xs text-slate-500 uppercase tracking-wide mb-1">Date & Time</p>
+                                <p className="font-semibold text-slate-900">
+                                    {meetingDate.toLocaleDateString("en-IN", { dateStyle: "full" })}
+                                </p>
+                                <p className="text-sm text-slate-600">
+                                    {meetingDate.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}
+                                </p>
+                            </div>
+                            <div className="p-4 bg-slate-50 rounded-xl">
+                                <p className="text-xs text-slate-500 uppercase tracking-wide mb-1">Location</p>
+                                <p className="font-semibold text-slate-900">
+                                    {meeting.location || "Not specified"}
+                                </p>
+                            </div>
                         </div>
-                    </div>
+                    )}
 
                     {meeting.projectTitle && (
                         <div className="mb-6 p-4 bg-emerald-50 rounded-xl">
@@ -997,35 +1152,63 @@ function MeetingDetailsModal({
                 </div>
 
                 {/* Footer */}
-                <div className="p-4 border-t border-slate-100 bg-slate-50 flex gap-3 justify-between">
-                    <Button variant="outline" onClick={handleDownloadPDF}>
-                        <Download className="h-4 w-4 mr-2" />
-                        Download PDF
-                    </Button>
-                    <div className="flex gap-3">
-                        <Button variant="outline" onClick={onClose}>
-                            Close
-                        </Button>
-                        {needsReview && (
-                            <Button
-                                className="bg-amber-500 hover:bg-amber-600 text-white"
-                                onClick={handleSubmitReview}
-                                disabled={isPending}
-                            >
-                                {isPending ? (
-                                    <>
-                                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                                        Saving...
-                                    </>
-                                ) : (
-                                    <>
-                                        <ClipboardCheck className="h-4 w-4 mr-2" />
-                                        Complete Review
-                                    </>
-                                )}
+                <div className="p-4 border-t border-slate-100 bg-slate-50 flex gap-3 justify-between flex-wrap">
+                    {isEditing ? (
+                        <>
+                            <div className="flex gap-2">
+                                <Button variant="destructive" onClick={handleDelete} disabled={isDeleting || isPending}>
+                                    {isDeleting ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Trash2 className="h-4 w-4 mr-2" />}
+                                    Delete Meeting
+                                </Button>
+                            </div>
+                            <div className="flex gap-3">
+                                <Button variant="outline" onClick={() => setIsEditing(false)}>
+                                    Cancel
+                                </Button>
+                                <Button className="bg-emerald-600 hover:bg-emerald-700 text-white" onClick={handleSaveEdits} disabled={isPending}>
+                                    {isPending ? (
+                                        <>
+                                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                            Saving...
+                                        </>
+                                    ) : (
+                                        "Save Changes"
+                                    )}
+                                </Button>
+                            </div>
+                        </>
+                    ) : (
+                        <>
+                            <Button variant="outline" onClick={handleDownloadPDF}>
+                                <Download className="h-4 w-4 mr-2" />
+                                Download PDF
                             </Button>
-                        )}
-                    </div>
+                            <div className="flex gap-3">
+                                <Button variant="outline" onClick={onClose}>
+                                    Close
+                                </Button>
+                                {needsReview && (
+                                    <Button
+                                        className="bg-amber-500 hover:bg-amber-600 text-white"
+                                        onClick={handleSubmitReview}
+                                        disabled={isPending}
+                                    >
+                                        {isPending ? (
+                                            <>
+                                                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                                Saving...
+                                            </>
+                                        ) : (
+                                            <>
+                                                <ClipboardCheck className="h-4 w-4 mr-2" />
+                                                Complete Review
+                                            </>
+                                        )}
+                                    </Button>
+                                )}
+                            </div>
+                        </>
+                    )}
                 </div>
             </motion.div>
         </motion.div>

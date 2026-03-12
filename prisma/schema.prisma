@@ -18,6 +18,7 @@ model projectgroup {
   averagecpi                                Decimal?             @db.Decimal(4, 2)
   convenerstaffid                           Int?
   expertstaffid                             Int?
+  projectstatus                             String?              @default("Active") @db.VarChar(50)
   description                               String?
   created                                   DateTime             @default(now()) @db.Timestamp(6)
   modified                                  DateTime?            @db.Timestamp(6)
