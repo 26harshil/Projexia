@@ -845,6 +845,19 @@ function GroupDetailsModal({
 }
 
 
+const STATIC_PROJECT_TYPES = [
+    "Capstone Project",
+    "Mini Project",
+    "Research Thesis",
+    "Industrial Internship",
+    "Software Development",
+    "Hardware Prototype",
+    "Data Analytics Study",
+    "Machine Learning Model",
+    "Cybersecurity Audit",
+    "Open Source Contribution"
+];
+
 // ===================== CREATE GROUP MODAL =====================
 
 function CreateGroupModal({
@@ -909,13 +922,15 @@ function CreateGroupModal({
         }
 
         startTransition(async () => {
+            const isNumeric = !isNaN(parseInt(projectTypeId, 10)) && /^\d+$/.test(projectTypeId);
             const result = await createGroup({
                 groupName,
                 projectTitle: projectTitle || undefined,
                 projectArea: projectArea || undefined,
                 projectDescription: projectDescription || undefined,
-                projectTypeId: parseInt(projectTypeId),
-                expertStaffId: expertStaffId ? parseInt(expertStaffId) : undefined,
+                projectTypeId: isNumeric ? parseInt(projectTypeId, 10) : undefined,
+                projectTypeName: !isNumeric ? projectTypeId : undefined,
+                expertStaffId: expertStaffId && expertStaffId !== "none" ? parseInt(expertStaffId) : undefined,
                 members: selectedMembers.map((m) => ({
                     studentId: m.id,
                     isLeader: m.isLeader,
@@ -988,13 +1003,13 @@ function CreateGroupModal({
                                 <div className="space-y-2">
                                     <Label htmlFor="projectType">Project Type *</Label>
                                     <Select value={projectTypeId} onValueChange={setProjectTypeId}>
-                                        <SelectTrigger>
+                                        <SelectTrigger className="w-full">
                                             <SelectValue placeholder="Select type" />
                                         </SelectTrigger>
-                                        <SelectContent>
-                                            {projectTypes.map((type) => (
-                                                <SelectItem key={type.id} value={type.id.toString()}>
-                                                    {type.name}
+                                        <SelectContent position="popper" className="z-[60]">
+                                            {STATIC_PROJECT_TYPES.map((type) => (
+                                                <SelectItem key={type} value={type}>
+                                                    {type}
                                                 </SelectItem>
                                             ))}
                                         </SelectContent>
@@ -1036,10 +1051,10 @@ function CreateGroupModal({
                             <div className="space-y-2">
                                 <Label htmlFor="expertStaff">Expert (Optional)</Label>
                                 <Select value={expertStaffId} onValueChange={setExpertStaffId}>
-                                    <SelectTrigger>
+                                    <SelectTrigger className="w-full">
                                         <SelectValue placeholder="Select expert faculty" />
                                     </SelectTrigger>
-                                    <SelectContent>
+                                    <SelectContent position="popper" className="z-[60]">
                                         <SelectItem value="none">No Expert</SelectItem>
                                         {staffList.map((staff) => (
                                             <SelectItem key={staff.id} value={staff.id.toString()}>
