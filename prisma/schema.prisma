@@ -27,6 +27,8 @@ model projectgroup {
   projecttype                               projecttype          @relation(fields: [projecttypeid], references: [projecttypeid], onDelete: NoAction, onUpdate: NoAction, map: "fk_projecttype")
   projectgroupmember                        projectgroupmember[]
   projectmeeting                            projectmeeting[]
+  projectfile                               projectfile[]
+  projectreport                             projectreport[]
 }
 
 model projectgroupmember {
@@ -89,6 +91,49 @@ model projecttype {
   projectgroup    projectgroup[]
 }
 
+model projectfile {
+  fileid         Int           @id @default(autoincrement())
+  filename       String        @db.VarChar(255)
+  fileurl        String
+  filetype       String        @db.VarChar(50)
+  filesize       Int?
+  description    String?
+  studentid      Int
+  projectgroupid Int?
+  created        DateTime      @default(now()) @db.Timestamp(6)
+  modified       DateTime?     @db.Timestamp(6)
+
+  student       student       @relation(fields: [studentid], references: [studentid], onDelete: Cascade, onUpdate: NoAction, map: "fk_file_student")
+  projectgroup  projectgroup? @relation(fields: [projectgroupid], references: [projectgroupid], onDelete: Cascade, onUpdate: NoAction, map: "fk_file_group")
+  projectreport projectreport?
+}
+
+model projectreport {
+  reportid       Int        @id @default(autoincrement())
+  fileid         Int?       @unique
+  projectgroupid Int
+  studentid      Int
+  reporttitle    String     @db.VarChar(255)
+  reporttype     String     @db.VarChar(50) // proposal, midterm, final
+  status         ReportStatus @default(PENDING) // PENDING, ACCEPTED, DECLINED
+  reviewcomments String?
+  reviewedby     Int?
+  reviewedat     DateTime?
+  created        DateTime   @default(now()) @db.Timestamp(6)
+  modified       DateTime?  @db.Timestamp(6)
+
+  projectfile    projectfile?   @relation(fields: [fileid], references: [fileid], onDelete: SetNull, onUpdate: NoAction, map: "fk_report_file")
+  projectgroup   projectgroup   @relation(fields: [projectgroupid], references: [projectgroupid], onDelete: Cascade, onUpdate: NoAction, map: "fk_report_group")
+  student        student        @relation(fields: [studentid], references: [studentid], onDelete: Cascade, onUpdate: NoAction, map: "fk_report_student")
+  staff          staff?         @relation(fields: [reviewedby], references: [staffid], onDelete: NoAction, onUpdate: NoAction, map: "fk_report_reviewed")
+}
+
+enum ReportStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+}
+
 model staff {
   staffid     Int      @id @default(autoincrement())
   staffname   String   @db.VarChar(150)
@@ -104,11 +149,13 @@ model staff {
   projectgroup_projectgroup_convenerstaffidTostaff projectgroup[] @relation("projectgroup_convenerstaffidTostaff")
   projectgroup_projectgroup_expertstaffidTostaff   projectgroup[] @relation("projectgroup_expertstaffidTostaff")
   projectmeeting                                   projectmeeting[]
+  projectreport                                    projectreport[]
 }
 model student {
   studentid   Int      @id @default(autoincrement())
   studentname String   @db.VarChar(150)
   phone       String?  @db.VarChar(20)
+  enrollment  String?  @unique @db.VarChar(50)
   email       String?  @unique @db.VarChar(150)
   description String?
   created     DateTime @default(now()) @db.Timestamp(6)
@@ -119,6 +166,8 @@ model student {
 
   projectgroupmember       projectgroupmember[]
   projectmeetingattendance projectmeetingattendance[]
+  projectfile              projectfile[]
+  projectreport            projectreport[]
 }
 
 

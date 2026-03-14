@@ -98,7 +98,7 @@ function addPdfFooter(doc: jsPDF) {
             { align: "center" }
         );
         doc.text(
-            "Student Project Management System",
+            "Projexia",
             14,
             pageHeight - 10
         );

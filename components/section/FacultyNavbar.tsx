@@ -1,6 +1,7 @@
 // /components/section/FacultyNavbar.tsx
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
@@ -65,16 +66,14 @@ export default function FacultyNavbar() {
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 md:px-6">
         {/* Logo */}
         <Link href="/faculty/dashboard" className="flex items-center gap-3 group">
-          <motion.div
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="relative"
-          >
-            <div className="absolute inset-0 bg-emerald-600 rounded-xl blur opacity-25 group-hover:opacity-40 transition-opacity" />
-            <div className="relative bg-emerald-600 p-2.5 rounded-xl">
-              <GraduationCap className="h-5 w-5 text-white" />
-            </div>
-          </motion.div>
+          <Image
+            src="/Logo.png"
+            alt="Faculty Portal Logo"
+            width={40}
+            height={40}
+            className="h-10 w-auto"
+            priority
+          />
           <div className="flex flex-col">
             <span className="text-lg font-bold text-slate-900">
               {title}

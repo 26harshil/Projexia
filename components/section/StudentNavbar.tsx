@@ -1,6 +1,7 @@
 // /components/section/StudentNavbar.tsx
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
@@ -63,16 +64,14 @@ export default function StudentNavbar() {
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 md:px-6">
         {/* Logo */}
         <Link href="/student" className="flex items-center gap-2 group">
-          <motion.div
-            whileHover={{ rotate: 360, scale: 1.1 }}
-            transition={{ duration: 0.5 }}
-            className="relative"
-          >
-            <div className="absolute inset-0 bg-gradient-to-r from-emerald-600 via-teal-500 to-blue-500 rounded-xl blur-lg opacity-50 group-hover:opacity-75 transition-opacity" />
-            <div className="relative bg-gradient-to-r from-emerald-600 via-teal-500 to-blue-500 p-2 rounded-xl">
-              <GraduationCap className="h-5 w-5 text-white" />
-            </div>
-          </motion.div>
+          <Image
+            src="/Logo.png"
+            alt="Student Portal Logo"
+            width={40}
+            height={40}
+            className="h-10 w-auto"
+            priority
+          />
           <span className="text-lg font-bold bg-gradient-to-r from-emerald-600 via-teal-500 to-blue-600 bg-clip-text text-transparent">
             {title}
           </span>

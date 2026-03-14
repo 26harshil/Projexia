@@ -46,11 +46,11 @@ export async function sendMeetingNotification({
               <table cellpadding="0" cellspacing="0">
                 <tr>
                   <td style="padding-right:14px;">
-                    <img src="https://via.placeholder.com/40/4F8EF7/ffffff?text=AC" width="40" height="40" style="border-radius:10px;display:block;" alt="Logo" />
+                    <img src="https://yourdomainname.com/Logo.png" width="40" height="40" style="border-radius:10px;display:block;" alt="Logo" />
                   </td>
                   <td>
-                    <div style="color:#ffffff;font-size:20px;font-weight:700;letter-spacing:0.5px;">AcademiaConnect</div>
-                    <div style="color:#a0b4d8;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;margin-top:2px;">Faculty · Student Portal</div>
+                    <div style="color:#ffffff;font-size:20px;font-weight:700;letter-spacing:0.5px;">Projexia</div>
+                    <div style="color:#a0b4d8;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;margin-top:2px;">Project Management System</div>
                   </td>
                 </tr>
               </table>
@@ -116,7 +116,7 @@ export async function sendMeetingNotification({
             <td style="background:#f1f5fb;padding:18px 36px;border-top:1px solid #dce5f2;">
               <table width="100%" cellpadding="0" cellspacing="0">
                 <tr>
-                  <td style="font-size:12px;color:#9aabbf;">© ${new Date().getFullYear()} AcademiaConnect</td>
+                  <td style="font-size:12px;color:#9aabbf;">© ${new Date().getFullYear()} Projexia</td>
                   <td align="right">
                     <a href="#" style="font-size:12px;color:#7b8ea8;text-decoration:none;margin-left:16px;">Unsubscribe</a>
                     <a href="#" style="font-size:12px;color:#7b8ea8;text-decoration:none;margin-left:16px;">Privacy Policy</a>
