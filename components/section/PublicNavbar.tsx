@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { SignInButton, SignUpButton, SignedOut, SignedIn, UserButton } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
@@ -20,8 +21,15 @@ export default function PublicNavbar() {
     >
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
         <div className="flex items-center gap-8">
-          <Link href="/" className="text-xl font-bold bg-linear-to-r from-blue-600 to-emerald-600 bg-clip-text text-transparent">
-            ProjectHub
+          <Link href="/" className="flex items-center gap-3">
+            <Image
+              src="/Logo.png"
+              alt="Projexia Logo"
+              width={40}
+              height={40}
+              className="h-10 w-auto"
+              priority
+            />
           </Link>
           <nav className="hidden md:flex gap-6">
             <Link href="#features" className="text-sm font-medium text-slate-600 hover:text-blue-600 transition">Features</Link>

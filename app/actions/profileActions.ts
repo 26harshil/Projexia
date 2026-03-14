@@ -73,6 +73,7 @@ export async function getProfileData() {
             studentid: serializedUser.student.studentid,
             studentname: serializedUser.student.studentname,
             phone: serializedUser.student.phone,
+            enrollment: serializedUser.student.enrollment,
             email: serializedUser.student.email,
             description: serializedUser.student.description,
             projectGroups: serializedUser.student.projectgroupmember?.map((m: any) => ({
@@ -92,4 +93,88 @@ export async function getProfileData() {
             description: serializedUser.staff.description,
         } : null,
     };
+}
+
+/**
+ * Update the display name stored in users.name
+ */
+export async function updateProfileName(name: string) {
+    const { userId } = await auth();
+    if (!userId) throw new Error("Not authenticated");
+
+    const trimmedName = name.trim();
+    if (!trimmedName) throw new Error("Name is required");
+
+    const updated = await prisma.users.update({
+        where: { clerkid: userId },
+        data: { name: trimmedName },
+    });
+
+    return updated;
+}
+
+/**
+ * Update student phone number
+ */
+export async function updateStudentPhone(phone: string) {
+    const { userId } = await auth();
+    if (!userId) throw new Error("Not authenticated");
+
+    const dbUser = await prisma.users.findUnique({
+        where: { clerkid: userId },
+        include: { student: true },
+    });
+
+    if (!dbUser || !dbUser.student) throw new Error("Student not found");
+
+    const updated = await prisma.student.update({
+        where: { studentid: dbUser.student.studentid },
+        data: { phone },
+    });
+
+    return updated;
+}
+
+/**
+ * Update student enrollment number.
+ * Enrollment is a dedicated field and is independent from users.userid.
+ */
+export async function updateStudentEnrollmentNumber(enrollmentNumber: string) {
+    const { userId } = await auth();
+    if (!userId) throw new Error("Not authenticated");
+    const dbUser = await prisma.users.findUnique({
+        where: { clerkid: userId },
+        include: { student: true },
+    });
+
+    if (!dbUser || !dbUser.student) throw new Error("Student not found");
+
+    const updated = await prisma.student.update({
+        where: { studentid: dbUser.student.studentid },
+        data: { enrollment: enrollmentNumber },
+    });
+
+    return updated;
+}
+
+/**
+ * Update faculty phone number
+ */
+export async function updateFacultyPhone(phone: string) {
+    const { userId } = await auth();
+    if (!userId) throw new Error("Not authenticated");
+
+    const dbUser = await prisma.users.findUnique({
+        where: { clerkid: userId },
+        include: { staff: true },
+    });
+
+    if (!dbUser || !dbUser.staff) throw new Error("Faculty not found");
+
+    const updated = await prisma.staff.update({
+        where: { staffid: dbUser.staff.staffid },
+        data: { phone },
+    });
+
+    return updated;
 }

@@ -421,6 +421,38 @@ export async function getFacultyReports() {
                     meetingdatetime: 'desc'
                 }
             },
+            projectreport: {
+                where: {
+                    reporttype: 'proposal',
+                },
+                include: {
+                    student: {
+                        select: {
+                            studentid: true,
+                            studentname: true,
+                            email: true,
+                        },
+                    },
+                    projectfile: {
+                        select: {
+                            fileid: true,
+                            filename: true,
+                            fileurl: true,
+                            filetype: true,
+                            filesize: true,
+                        },
+                    },
+                    staff: {
+                        select: {
+                            staffid: true,
+                            staffname: true,
+                        },
+                    },
+                },
+                orderBy: {
+                    created: 'desc',
+                },
+            },
         },
     });
 
@@ -445,9 +477,121 @@ export async function getFacultyReports() {
                 datetime: m.meetingdatetime,
                 location: m.meetinglocation,
                 notes: m.meetingnotes,
-            }))
+            })),
+            proposalReports: group.projectreport.map((report) => ({
+                reportId: report.reportid,
+                reportTitle: report.reporttitle,
+                reportType: report.reporttype,
+                status: report.status,
+                reviewComments: report.reviewcomments,
+                reviewedAt: report.reviewedat,
+                reviewedByName: report.staff?.staffname || null,
+                created: report.created,
+                studentId: report.student.studentid,
+                studentName: report.student.studentname,
+                studentEmail: report.student.email,
+                file: report.projectfile
+                    ? {
+                        fileId: report.projectfile.fileid,
+                        fileName: report.projectfile.filename,
+                        fileUrl: report.projectfile.fileurl,
+                        fileType: report.projectfile.filetype,
+                        fileSize: report.projectfile.filesize,
+                    }
+                    : null,
+            })),
         };
     });
+}
+
+export async function reviewFacultyProposalReport(data: {
+    reportId: number;
+    status: 'ACCEPTED' | 'DECLINED';
+    feedback?: string;
+}) {
+    const staff = await getStaffId();
+    if (!staff) {
+        return { success: false, error: "Unauthorized: Staff not found" };
+    }
+
+    const trimmedFeedback = data.feedback?.trim() || "";
+    if (data.status === 'DECLINED' && !trimmedFeedback) {
+        return { success: false, error: "Feedback is required when rejecting a proposal" };
+    }
+
+    const report = await prisma.projectreport.findUnique({
+        where: { reportid: data.reportId },
+        select: {
+            reportid: true,
+            reporttype: true,
+            projectgroupid: true,
+        },
+    });
+
+    if (!report) {
+        return { success: false, error: "Report not found" };
+    }
+
+    const isAssignedFaculty = await prisma.projectgroup.findFirst({
+        where: {
+            projectgroupid: report.projectgroupid,
+            OR: [
+                { convenerstaffid: staff.staffid },
+                { expertstaffid: staff.staffid },
+                {
+                    projectmeeting: {
+                        some: {
+                            guidestaffid: staff.staffid,
+                        },
+                    },
+                },
+            ],
+        },
+        select: { projectgroupid: true },
+    });
+
+    if (!isAssignedFaculty) {
+        return { success: false, error: "Unauthorized: You are not assigned to this project group" };
+    }
+
+    if (report.reporttype.toLowerCase() !== 'proposal') {
+        return { success: false, error: "Only proposal reports can be reviewed from this section" };
+    }
+
+    try {
+        const updated = await prisma.projectreport.update({
+            where: { reportid: data.reportId },
+            data: {
+                status: data.status,
+                reviewcomments: trimmedFeedback || null,
+                reviewedby: staff.staffid,
+                reviewedat: new Date(),
+                modified: new Date(),
+            },
+            include: {
+                student: {
+                    select: {
+                        studentid: true,
+                        studentname: true,
+                    },
+                },
+                staff: {
+                    select: {
+                        staffid: true,
+                        staffname: true,
+                    },
+                },
+            },
+        });
+
+        revalidatePath('/faculty/reports');
+        revalidatePath('/student/reports');
+
+        return { success: true, report: updated };
+    } catch (error) {
+        console.error("Error reviewing proposal report:", error);
+        return { success: false, error: "Failed to review proposal report" };
+    }
 }
 
 // Get dashboard stats for faculty

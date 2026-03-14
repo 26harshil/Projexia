@@ -7,7 +7,7 @@ export function Footer() {
       <div className="max-w-6xl mx-auto">
         <div className="text-center">
           <h3 className="text-2xl font-bold mb-4">
-            Student Project Management System
+            Projexia
           </h3>
 
           <p className="text-slate-400 mb-6 max-w-2xl mx-auto">
@@ -17,7 +17,7 @@ export function Footer() {
 
           <div className="border-t border-slate-800 pt-6">
             <p className="text-slate-500 text-sm">
-              © {new Date().getFullYear()} Student Project Management System.
+              © {new Date().getFullYear()} Projexia.
               Developed for academic evaluation and learning purposes.
             </p>
           </div>

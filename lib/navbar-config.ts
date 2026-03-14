@@ -4,7 +4,7 @@ export const NAVBAR_CONFIG: Record<Role, {
     links: { name: string, href: string }[];
 }> = {
     STUDENT: {
-        title: "Student Portal",
+        title: "Projexia - Student",
         links: [
             { name: "Dashboard", href: "/student/dashboard" },
             { name: "My Project", href: "/student/project" },
@@ -13,7 +13,7 @@ export const NAVBAR_CONFIG: Record<Role, {
             { name: "Reports", href: "/student/reports" },
         ]
     }, FACULTY: {
-        title: "Faculty Portal",
+        title: "Projexia - Faculty",
         links: [
             { name: "Dashboard", href: "/faculty/dashboard" },
             { name: "My Groups", href: "/faculty/group" },
@@ -23,7 +23,7 @@ export const NAVBAR_CONFIG: Record<Role, {
 
         ]
     }, ADMIN: {
-        title: "Admin Portal",
+        title: "Projexia - Admin",
         links: [
             { name: "Dashboard", href: "/admin/dashboard" },
             { name: "Users", href: "/admin/users" },
