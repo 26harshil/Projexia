@@ -15,7 +15,7 @@ export default function PublicNavbar() {
       className={cn(
         "fixed top-0 z-50 w-full transition-all duration-300",
         scrolled
-          ? "bg-white/70 backdrop-blur-md border-b shadow-sm"
+          ? "bg-[#050A14]/90 backdrop-blur-xl border-b border-blue-500/20 shadow-lg shadow-blue-900/20"
           : "bg-transparent"
       )}
     >
@@ -32,8 +32,8 @@ export default function PublicNavbar() {
             />
           </Link>
           <nav className="hidden md:flex gap-6">
-            <Link href="#features" className="text-sm font-medium text-slate-600 hover:text-blue-600 transition">Features</Link>
-            <Link href="#about" className="text-sm font-medium text-slate-600 hover:text-blue-600 transition">About</Link>
+            <Link href="#features" className="text-sm font-medium text-slate-300 hover:text-cyan-400 transition">Features</Link>
+            <Link href="#about" className="text-sm font-medium text-slate-300 hover:text-cyan-400 transition">About</Link>
           </nav>
         </div>
 

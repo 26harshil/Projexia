@@ -258,14 +258,14 @@ export function FacultyReportsContent({ reports }: FacultyReportsContentProps) {
                           proposal.file.fileUrl
                         )}&filename=${encodeURIComponent(proposal.file.fileName)}`;
                         return (
-                      <a
-                        href={downloadHref}
-                        download={proposal.file.fileName}
-                        className="inline-flex items-center gap-2 text-sm font-medium text-blue-700 hover:text-blue-800"
-                      >
-                        <Download className="h-4 w-4" />
-                        {proposal.file.fileName}
-                      </a>
+                          <a
+                            href={downloadHref}
+                            download={proposal.file.fileName}
+                            className="inline-flex items-center gap-2 text-sm font-medium text-blue-700 hover:text-blue-800"
+                          >
+                            <Download className="h-4 w-4" />
+                            {proposal.file.fileName}
+                          </a>
                         );
                       })()}
                     </div>

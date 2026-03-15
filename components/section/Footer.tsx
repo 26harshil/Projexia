@@ -3,10 +3,10 @@
 
 export function Footer() {
   return (
-    <footer className="bg-slate-900 text-white py-12 px-4">
+    <footer className="bg-[#050A14] border-t border-blue-500/15 text-white py-12 px-4">
       <div className="max-w-6xl mx-auto">
         <div className="text-center">
-          <h3 className="text-2xl font-bold mb-4">
+          <h3 className="text-2xl font-bold mb-4 bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
             Projexia
           </h3>
 
@@ -15,7 +15,7 @@ export function Footer() {
             practices and project management solutions for educational institutions.
           </p>
 
-          <div className="border-t border-slate-800 pt-6">
+          <div className="border-t border-blue-500/15 pt-6">
             <p className="text-slate-500 text-sm">
               © {new Date().getFullYear()} Projexia.
               Developed for academic evaluation and learning purposes.

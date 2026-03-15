@@ -53,13 +53,13 @@ export default function ProjectContent({ projectGroups, error }: ProjectContentP
   const getStatusColor = (status: string) => {
     switch (status?.toLowerCase()) {
       case 'active':
-        return 'bg-green-100 text-green-700';
+        return 'bg-blue-500/15 text-cyan-400';
       case 'completed':
-        return 'bg-blue-100 text-blue-700';
+        return 'bg-blue-500/15 text-blue-700';
       case 'on hold':
         return 'bg-yellow-100 text-yellow-700';
       default:
-        return 'bg-slate-100 text-slate-700';
+        return 'bg-white/5 text-slate-200';
     }
   };
 
@@ -72,8 +72,8 @@ export default function ProjectContent({ projectGroups, error }: ProjectContentP
   };
 
   return (
-    <div className="min-h-screen bg-white">
-      <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top,var(--tw-gradient-stops))] from-purple-100/40 via-white to-white pointer-events-none" />
+    <div className="min-h-screen bg-[#050A14]">
+      <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top,var(--tw-gradient-stops))] from-blue-900/20 via-[#050A14] to-[#050A14] pointer-events-none" />
       
       <div className="relative z-10 max-w-7xl mx-auto px-4 md:px-6 py-8">
         <motion.div
@@ -81,7 +81,7 @@ export default function ProjectContent({ projectGroups, error }: ProjectContentP
           animate={{ opacity: 1, y: 0 }}
           className="mb-8"
         >
-          <h1 className="text-3xl font-bold text-slate-900 mb-2">
+          <h1 className="text-3xl font-bold text-white mb-2">
             My{" "}
             <span className="bg-linear-to-r from-purple-600 to-pink-500 bg-clip-text text-transparent">
               Projects
@@ -101,18 +101,18 @@ export default function ProjectContent({ projectGroups, error }: ProjectContentP
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
             <Input 
               placeholder="Search projects..." 
-              className="pl-10 bg-white border-slate-200 focus:border-purple-500 focus:ring-purple-500"
+              className="pl-10 bg-white border-blue-500/20 focus:border-blue-400 focus:ring-blue-400"
             />
           </div>
           <div className="flex gap-2">
-            <Button variant="outline" className="border-slate-200">
+            <Button variant="outline" className="border-blue-500/20">
               <Filter className="h-4 w-4 mr-2" />
               Filter
             </Button>
-            <Button variant="outline" size="icon" className="border-slate-200">
+            <Button variant="outline" size="icon" className="border-blue-500/20">
               <LayoutGrid className="h-4 w-4" />
             </Button>
-            <Button variant="outline" size="icon" className="border-slate-200">
+            <Button variant="outline" size="icon" className="border-blue-500/20">
               <List className="h-4 w-4" />
             </Button>
           </div>
@@ -123,7 +123,7 @@ export default function ProjectContent({ projectGroups, error }: ProjectContentP
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-red-50 rounded-2xl border border-red-100 p-6 text-center mb-8"
+            className="bg-red-500/10 rounded-2xl border border-red-500/20 p-6 text-center mb-8"
           >
             <p className="text-red-700">{error}</p>
           </motion.div>
@@ -135,7 +135,7 @@ export default function ProjectContent({ projectGroups, error }: ProjectContentP
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.2 }}
-            className="bg-white rounded-2xl border border-slate-100 p-12 shadow-sm text-center"
+            className="bg-white/5 backdrop-blur-md rounded-2xl border border-blue-500/20 p-12 shadow-sm text-center"
           >
             <motion.div
               animate={{ 
@@ -149,7 +149,7 @@ export default function ProjectContent({ projectGroups, error }: ProjectContentP
                 <FolderKanban className="h-20 w-20 text-purple-300 mx-auto" />
               </div>
             </motion.div>
-            <h3 className="text-xl font-semibold text-slate-900 mb-2">No Projects Yet</h3>
+            <h3 className="text-xl font-semibold text-white mb-2">No Projects Yet</h3>
             <p className="text-slate-500 mb-6 max-w-md mx-auto">
               You haven&apos;t been assigned to any projects yet. Contact your faculty or wait for project assignments.
             </p>
@@ -163,12 +163,12 @@ export default function ProjectContent({ projectGroups, error }: ProjectContentP
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 }}
               >
-                <Card className="p-6 hover:shadow-lg transition-shadow border-slate-100">
+                <Card className="p-6 hover:shadow-lg transition-shadow border-blue-500/15">
                   {/* Header */}
                   <div className="flex items-start justify-between mb-6">
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-2">
-                        <h2 className="text-2xl font-bold text-slate-900">
+                        <h2 className="text-2xl font-bold text-white">
                           {group.projectGroup.projectTitle}
                         </h2>
                         <Badge className={getStatusColor(group.projectGroup.projectStatus)}>
@@ -181,10 +181,10 @@ export default function ProjectContent({ projectGroups, error }: ProjectContentP
                           </Badge>
                         )}
                       </div>
-                      <p className="text-slate-600 mb-3">{group.projectGroup.projectDescription}</p>
+                      <p className="text-slate-300 mb-3">{group.projectGroup.projectDescription}</p>
                       
                       {/* Project Details */}
-                      <div className="flex flex-wrap gap-4 text-sm text-slate-600">
+                      <div className="flex flex-wrap gap-4 text-sm text-slate-300">
                         {group.projectGroup.projectArea && (
                           <div className="flex items-center gap-1">
                             <MapPin className="h-4 w-4 text-purple-600" />
@@ -213,8 +213,8 @@ export default function ProjectContent({ projectGroups, error }: ProjectContentP
 
                   {/* Guide Faculty */}
                   {group.projectGroup.guideFaculty && (
-                    <div className="mb-6 pb-6 border-b border-slate-200">
-                      <h3 className="text-sm font-semibold text-slate-700 mb-2">Guide Faculty</h3>
+                    <div className="mb-6 pb-6 border-b border-blue-500/20">
+                      <h3 className="text-sm font-semibold text-slate-200 mb-2">Guide Faculty</h3>
                       <div className="flex items-center gap-2">
                         <Avatar className="h-8 w-8">
                           <AvatarFallback className="bg-purple-100 text-purple-700 text-xs">
@@ -222,7 +222,7 @@ export default function ProjectContent({ projectGroups, error }: ProjectContentP
                           </AvatarFallback>
                         </Avatar>
                         <div>
-                          <p className="text-sm font-medium text-slate-900">{group.projectGroup.guideFaculty}</p>
+                          <p className="text-sm font-medium text-white">{group.projectGroup.guideFaculty}</p>
                           {group.projectGroup.guideFacultyEmail && (
                             <p className="text-xs text-slate-500 flex items-center gap-1">
                               <Mail className="h-3 w-3" />
@@ -236,7 +236,7 @@ export default function ProjectContent({ projectGroups, error }: ProjectContentP
 
                   {/* Team Members */}
                   <div>
-                    <h3 className="text-sm font-semibold text-slate-700 mb-4 flex items-center gap-2">
+                    <h3 className="text-sm font-semibold text-slate-200 mb-4 flex items-center gap-2">
                       <Users className="h-4 w-4" />
                       Team Members ({group.projectGroup.members.length})
                     </h3>
@@ -244,16 +244,16 @@ export default function ProjectContent({ projectGroups, error }: ProjectContentP
                       {group.projectGroup.members.map((member: any) => (
                         <div 
                           key={member.memberId}
-                          className="flex items-center justify-between p-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors"
+                          className="flex items-center justify-between p-3 bg-white/5 rounded-lg hover:bg-white/5 transition-colors"
                         >
                           <div className="flex items-center gap-3 flex-1">
                             <Avatar className="h-10 w-10">
-                              <AvatarFallback className="bg-linear-to-br from-purple-100 to-pink-100 text-slate-700 text-sm font-medium">
+                              <AvatarFallback className="bg-linear-to-br from-purple-100 to-pink-100 text-slate-200 text-sm font-medium">
                                 {getInitials(member.studentName)}
                               </AvatarFallback>
                             </Avatar>
                             <div className="flex-1 min-w-0">
-                              <p className="text-sm font-medium text-slate-900 truncate">
+                              <p className="text-sm font-medium text-white truncate">
                                 {member.studentName}
                                 {member.isLeader && <span className="ml-2 text-xs font-semibold text-yellow-600">(Leader)</span>}
                               </p>

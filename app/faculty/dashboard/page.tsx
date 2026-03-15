@@ -26,7 +26,7 @@ export default async function FacultyDashboard() {
   const userEmail = user.emailAddresses[0]?.emailAddress || "";
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-[#050A14]">
       <FacultyHeader
         userName={userName}
         userEmail={userEmail}

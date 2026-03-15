@@ -4,7 +4,7 @@
 import { motion } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { 
+import {
   Calendar,
   Clock,
   ChevronRight,
@@ -38,18 +38,14 @@ export function FacultyHeader({ userName, userEmail, role }: FacultyHeaderProps)
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="relative overflow-hidden bg-white border-b border-slate-100"
+      className="relative overflow-hidden bg-[#050A14] border-b border-blue-500/15"
     >
       {/* Subtle Background Pattern */}
-      <div className="absolute inset-0 opacity-[0.02]">
-        <div className="absolute inset-0" style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-        }} />
-      </div>
+      <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg%20width%3D%2260%22%20height%3D%2260%22%20viewBox%3D%220%200%2060%2060%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cg%20fill%3D%22none%22%20stroke%3D%22%233B9EFF%22%20stroke-opacity%3D%220.04%22%3E%3Ccircle%20cx%3D%2230%22%20cy%3D%2230%22%20r%3D%221%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E')] opacity-80 pointer-events-none" />
 
-      {/* Decorative Elements */}
-      <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-100 rounded-full blur-3xl opacity-20 translate-x-1/2 -translate-y-1/2" />
-      <div className="absolute bottom-0 left-0 w-64 h-64 bg-amber-100 rounded-full blur-3xl opacity-30 -translate-x-1/2 translate-y-1/2" />
+      {/* Decorative orbs */}
+      <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-blue-600 to-cyan-500 rounded-full blur-3xl opacity-10 translate-x-1/2 -translate-y-1/2 pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-64 h-64 bg-gradient-to-br from-indigo-600 to-blue-500 rounded-full blur-3xl opacity-8 -translate-x-1/2 translate-y-1/2 pointer-events-none" />
 
       <div className="relative max-w-7xl mx-auto px-4 md:px-6 py-8">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
@@ -61,32 +57,30 @@ export function FacultyHeader({ userName, userEmail, role }: FacultyHeaderProps)
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.1 }}
             >
-              <Badge 
-                className="bg-emerald-100 text-emerald-700 border-emerald-200 hover:bg-emerald-100"
-              >
+              <Badge className="bg-blue-500/15 text-blue-300 border border-blue-500/25 hover:bg-blue-500/20">
                 <Sparkles className="h-3 w-3 mr-1.5" />
                 {role} Dashboard
               </Badge>
             </motion.div>
-            
+
             {/* Greeting */}
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.2 }}
             >
-              <p className="text-sm text-slate-500 mb-1">{getGreeting()},</p>
-              <h1 className="text-2xl md:text-3xl font-bold text-slate-900">
-                {userName}! 👋
+              <p className="text-sm text-slate-400 mb-1">{getGreeting()},</p>
+              <h1 className="text-2xl md:text-3xl font-bold text-white">
+                <span className="bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">{userName}</span>! 👋
               </h1>
             </motion.div>
-            
+
             {/* Description */}
             <motion.p
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.3 }}
-              className="text-slate-500 max-w-md"
+              className="text-slate-400 max-w-md"
             >
               Manage your courses, student groups, and upcoming meetings from your dashboard.
             </motion.p>
@@ -99,17 +93,15 @@ export function FacultyHeader({ userName, userEmail, role }: FacultyHeaderProps)
               className="flex flex-wrap gap-3 pt-2"
             >
               <Link href="/faculty/meetings">
-                <Button 
-                  className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm"
-                >
+                <Button className="bg-gradient-to-r from-blue-600 to-cyan-500 text-white hover:from-blue-700 hover:to-cyan-600 shadow-lg shadow-blue-500/25 border-0">
                   Schedule Meeting
                   <ChevronRight className="h-4 w-4 ml-1" />
                 </Button>
               </Link>
               <Link href="/faculty/group">
-                <Button 
-                  variant="outline" 
-                  className="border-slate-200 hover:bg-slate-50"
+                <Button
+                  variant="outline"
+                  className="border-blue-500/30 text-slate-300 hover:bg-blue-500/10 hover:text-white hover:border-blue-400/50 backdrop-blur-sm"
                 >
                   View All Groups
                 </Button>
@@ -117,7 +109,7 @@ export function FacultyHeader({ userName, userEmail, role }: FacultyHeaderProps)
             </motion.div>
           </div>
 
-          {/* Right Section - Stats Cards */}
+          {/* Right Section - Info Cards */}
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -125,24 +117,24 @@ export function FacultyHeader({ userName, userEmail, role }: FacultyHeaderProps)
             className="flex flex-col sm:flex-row gap-3"
           >
             {/* Date Card */}
-            <div className="flex items-center gap-3 bg-slate-50 border border-slate-100 px-4 py-3 rounded-xl">
-              <div className="p-2 bg-white rounded-lg shadow-sm">
-                <Calendar className="h-4 w-4 text-emerald-600" />
+            <div className="flex items-center gap-3 bg-white/5 backdrop-blur-sm border border-blue-500/20 px-4 py-3 rounded-xl">
+              <div className="p-2 bg-blue-500/20 rounded-lg">
+                <Calendar className="h-4 w-4 text-blue-400" />
               </div>
               <div>
-                <p className="text-xs text-slate-500">Today</p>
-                <p className="text-sm font-medium text-slate-900">{currentDate}</p>
+                <p className="text-xs text-slate-400">Today</p>
+                <p className="text-sm font-medium text-white">{currentDate}</p>
               </div>
             </div>
 
-            {/* Time Card */}
-            <div className="flex items-center gap-3 bg-amber-50 border border-amber-100 px-4 py-3 rounded-xl">
-              <div className="p-2 bg-white rounded-lg shadow-sm">
-                <Clock className="h-4 w-4 text-amber-600" />
+            {/* Session Card */}
+            <div className="flex items-center gap-3 bg-white/5 backdrop-blur-sm border border-cyan-500/20 px-4 py-3 rounded-xl">
+              <div className="p-2 bg-cyan-500/20 rounded-lg">
+                <Clock className="h-4 w-4 text-cyan-400" />
               </div>
               <div>
-                <p className="text-xs text-amber-600">Current Session</p>
-                <p className="text-sm font-medium text-amber-700">Academic 2024-25</p>
+                <p className="text-xs text-cyan-400">Current Session</p>
+                <p className="text-sm font-medium text-white">Academic 2024-25</p>
               </div>
             </div>
           </motion.div>

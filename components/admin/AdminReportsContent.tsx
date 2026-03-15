@@ -79,7 +79,7 @@ export function AdminReportsContent({ stats }: AdminReportsContentProps) {
         : "0";
 
     return (
-        <div className="min-h-screen bg-slate-50">
+        <div className="min-h-screen bg-[#050A14]">
             <div className="max-w-7xl mx-auto px-4 md:px-6 py-8">
                 {/* Page Header */}
                 <motion.div
@@ -88,7 +88,7 @@ export function AdminReportsContent({ stats }: AdminReportsContentProps) {
                     className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8"
                 >
                     <div>
-                        <h1 className="text-2xl md:text-3xl font-bold text-slate-900 mb-1">
+                        <h1 className="text-2xl md:text-3xl font-bold text-white mb-1">
                             Reports & Analytics
                         </h1>
                         <p className="text-slate-500">System-wide reports powered by live data</p>
@@ -109,24 +109,24 @@ export function AdminReportsContent({ stats }: AdminReportsContentProps) {
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: 0.1 + index * 0.05 }}
                                 whileHover={{ y: -4 }}
-                                className="bg-white rounded-xl border border-slate-200 p-5 cursor-pointer hover:shadow-lg hover:border-violet-200 transition-all group h-full"
+                                className="bg-white/5 backdrop-blur-md rounded-xl border border-blue-500/20 p-5 cursor-pointer hover:shadow-lg hover:border-violet-200 transition-all group h-full"
                             >
                                 <div className={cn(
                                     "p-3 rounded-xl w-fit mb-4",
                                     report.color === "violet" && "bg-violet-100",
-                                    report.color === "blue" && "bg-blue-100",
-                                    report.color === "emerald" && "bg-emerald-100",
-                                    report.color === "amber" && "bg-amber-100"
+                                    report.color === "blue" && "bg-blue-500/15",
+                                    report.color === "emerald" && "bg-blue-500/15",
+                                    report.color === "amber" && "bg-amber-500/15"
                                 )}>
                                     <report.icon className={cn(
                                         "h-5 w-5",
                                         report.color === "violet" && "text-violet-600",
-                                        report.color === "blue" && "text-blue-600",
-                                        report.color === "emerald" && "text-emerald-600",
-                                        report.color === "amber" && "text-amber-600"
+                                        report.color === "blue" && "text-blue-400",
+                                        report.color === "emerald" && "text-cyan-400",
+                                        report.color === "amber" && "text-amber-400"
                                     )} />
                                 </div>
-                                <h3 className="font-semibold text-slate-900 mb-1 group-hover:text-violet-600 transition-colors flex items-center gap-1">
+                                <h3 className="font-semibold text-white mb-1 group-hover:text-violet-600 transition-colors flex items-center gap-1">
                                     {report.name}
                                     <ArrowRight className="h-3.5 w-3.5 opacity-0 group-hover:opacity-100 transition-opacity" />
                                 </h3>
@@ -143,7 +143,7 @@ export function AdminReportsContent({ stats }: AdminReportsContentProps) {
                     transition={{ delay: 0.2 }}
                 >
                     <Tabs defaultValue="overview" className="w-full">
-                        <TabsList className="bg-white border border-slate-200 p-1 mb-6">
+                        <TabsList className="bg-white/5 border border-blue-500/20 p-1 mb-6">
                             <TabsTrigger value="overview" className="data-[state=active]:bg-violet-50 data-[state=active]:text-violet-700">
                                 <BarChart3 className="h-4 w-4 mr-2" />
                                 Overview
@@ -162,9 +162,9 @@ export function AdminReportsContent({ stats }: AdminReportsContentProps) {
                         <TabsContent value="overview">
                             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                                 {/* System Summary - DYNAMIC */}
-                                <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
-                                    <div className="p-6 border-b border-slate-100">
-                                        <h3 className="font-semibold text-slate-900">System Summary</h3>
+                                <div className="bg-white/5 backdrop-blur-md rounded-2xl border border-blue-500/20 overflow-hidden">
+                                    <div className="p-6 border-b border-blue-500/15">
+                                        <h3 className="font-semibold text-white">System Summary</h3>
                                         <p className="text-sm text-slate-500">Overview of all metrics</p>
                                     </div>
                                     <div className="p-6 space-y-5">
@@ -187,16 +187,16 @@ export function AdminReportsContent({ stats }: AdminReportsContentProps) {
                                                             "h-3.5 w-3.5",
                                                             item.color === "violet" && "text-violet-500",
                                                             item.color === "blue" && "text-blue-500",
-                                                            item.color === "emerald" && "text-emerald-500",
-                                                            item.color === "amber" && "text-amber-500",
+                                                            item.color === "emerald" && "text-cyan-400",
+                                                            item.color === "amber" && "text-amber-400",
                                                         )} />
-                                                        <span className="text-sm text-slate-600">{item.label}</span>
+                                                        <span className="text-sm text-slate-300">{item.label}</span>
                                                     </div>
                                                     <motion.span
                                                         key={item.value}
                                                         initial={{ scale: 0.5, opacity: 0 }}
                                                         animate={{ scale: 1, opacity: 1 }}
-                                                        className="text-sm font-bold text-slate-900"
+                                                        className="text-sm font-bold text-white"
                                                     >
                                                         {item.value}
                                                     </motion.span>
@@ -208,9 +208,9 @@ export function AdminReportsContent({ stats }: AdminReportsContentProps) {
                                 </div>
 
                                 {/* Breakdown Chart (visual) */}
-                                <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
-                                    <div className="p-6 border-b border-slate-100">
-                                        <h3 className="font-semibold text-slate-900">Distribution</h3>
+                                <div className="bg-white/5 backdrop-blur-md rounded-2xl border border-blue-500/20 overflow-hidden">
+                                    <div className="p-6 border-b border-blue-500/15">
+                                        <h3 className="font-semibold text-white">Distribution</h3>
                                         <p className="text-sm text-slate-500">Data breakdown</p>
                                     </div>
                                     <div className="p-6">
@@ -219,7 +219,7 @@ export function AdminReportsContent({ stats }: AdminReportsContentProps) {
                                             {[
                                                 { label: "Users", value: stats.totalUsers, color: "bg-violet-500" },
                                                 { label: "Students", value: stats.totalStudents, color: "bg-blue-500" },
-                                                { label: "Staff", value: stats.totalStaff, color: "bg-emerald-500" },
+                                                { label: "Staff", value: stats.totalStaff, color: "bg-blue-500" },
                                                 { label: "Projects", value: stats.totalProjects, color: "bg-amber-500" },
                                                 { label: "Meetings", value: stats.totalMeetings, color: "bg-rose-500" },
                                                 { label: "Group Members", value: stats.totalGroupMembers, color: "bg-indigo-500" },
@@ -237,10 +237,10 @@ export function AdminReportsContent({ stats }: AdminReportsContentProps) {
                                                         transition={{ delay: 0.3 + index * 0.05 }}
                                                     >
                                                         <div className="flex items-center justify-between mb-1.5">
-                                                            <span className="text-sm text-slate-600">{item.label}</span>
-                                                            <span className="text-sm font-bold text-slate-900">{item.value}</span>
+                                                            <span className="text-sm text-slate-300">{item.label}</span>
+                                                            <span className="text-sm font-bold text-white">{item.value}</span>
                                                         </div>
-                                                        <div className="w-full bg-slate-100 rounded-full h-4 overflow-hidden">
+                                                        <div className="w-full bg-white/5 rounded-full h-4 overflow-hidden">
                                                             <motion.div
                                                                 initial={{ width: 0 }}
                                                                 animate={{ width: `${Math.max((item.value / maxVal) * 100, 2)}%` }}
@@ -262,10 +262,10 @@ export function AdminReportsContent({ stats }: AdminReportsContentProps) {
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: 0.4 }}
-                                    className="bg-white rounded-xl border border-slate-200 p-5"
+                                    className="bg-white/5 backdrop-blur-md rounded-xl border border-blue-500/20 p-5"
                                 >
                                     <p className="text-xs font-medium text-slate-400 uppercase mb-1">Avg Members / Project</p>
-                                    <p className="text-3xl font-bold text-slate-900">{avgMembersPerProject}</p>
+                                    <p className="text-3xl font-bold text-white">{avgMembersPerProject}</p>
                                     <p className="text-xs text-slate-500 mt-1">
                                         Across {stats.totalProjects} project{stats.totalProjects !== 1 ? "s" : ""}
                                     </p>
@@ -274,10 +274,10 @@ export function AdminReportsContent({ stats }: AdminReportsContentProps) {
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: 0.45 }}
-                                    className="bg-white rounded-xl border border-slate-200 p-5"
+                                    className="bg-white/5 backdrop-blur-md rounded-xl border border-blue-500/20 p-5"
                                 >
                                     <p className="text-xs font-medium text-slate-400 uppercase mb-1">Avg Meetings / Project</p>
-                                    <p className="text-3xl font-bold text-slate-900">{avgMeetingsPerProject}</p>
+                                    <p className="text-3xl font-bold text-white">{avgMeetingsPerProject}</p>
                                     <p className="text-xs text-slate-500 mt-1">
                                         {stats.totalMeetings} total meeting{stats.totalMeetings !== 1 ? "s" : ""}
                                     </p>
@@ -286,10 +286,10 @@ export function AdminReportsContent({ stats }: AdminReportsContentProps) {
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: 0.5 }}
-                                    className="bg-white rounded-xl border border-slate-200 p-5"
+                                    className="bg-white/5 backdrop-blur-md rounded-xl border border-blue-500/20 p-5"
                                 >
                                     <p className="text-xs font-medium text-slate-400 uppercase mb-1">Project Types</p>
-                                    <p className="text-3xl font-bold text-slate-900">{stats.totalProjectTypes}</p>
+                                    <p className="text-3xl font-bold text-white">{stats.totalProjectTypes}</p>
                                     <p className="text-xs text-slate-500 mt-1">Active categories</p>
                                 </motion.div>
                             </div>
@@ -297,14 +297,14 @@ export function AdminReportsContent({ stats }: AdminReportsContentProps) {
 
                         {/* USERS TAB */}
                         <TabsContent value="users">
-                            <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
-                                <div className="p-6 border-b border-slate-100 flex items-center justify-between">
+                            <div className="bg-white/5 backdrop-blur-md rounded-2xl border border-blue-500/20 overflow-hidden">
+                                <div className="p-6 border-b border-blue-500/15 flex items-center justify-between">
                                     <div>
-                                        <h3 className="font-semibold text-slate-900">User Report</h3>
+                                        <h3 className="font-semibold text-white">User Report</h3>
                                         <p className="text-sm text-slate-500">Breakdown of registered users</p>
                                     </div>
                                     <Link href="/admin/users">
-                                        <Button variant="outline" size="sm" className="border-slate-200">
+                                        <Button variant="outline" size="sm" className="border-blue-500/20">
                                             Manage Users
                                             <ArrowRight className="h-4 w-4 ml-1" />
                                         </Button>
@@ -314,17 +314,17 @@ export function AdminReportsContent({ stats }: AdminReportsContentProps) {
                                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                                         <div className="text-center p-6 bg-violet-50 rounded-xl">
                                             <Users className="h-8 w-8 text-violet-500 mx-auto mb-2" />
-                                            <p className="text-3xl font-bold text-slate-900">{stats.totalUsers}</p>
+                                            <p className="text-3xl font-bold text-white">{stats.totalUsers}</p>
                                             <p className="text-sm text-slate-500">Total Users</p>
                                         </div>
-                                        <div className="text-center p-6 bg-blue-50 rounded-xl">
+                                        <div className="text-center p-6 bg-blue-500/10 rounded-xl">
                                             <GraduationCap className="h-8 w-8 text-blue-500 mx-auto mb-2" />
-                                            <p className="text-3xl font-bold text-slate-900">{stats.totalStudents}</p>
+                                            <p className="text-3xl font-bold text-white">{stats.totalStudents}</p>
                                             <p className="text-sm text-slate-500">Students</p>
                                         </div>
-                                        <div className="text-center p-6 bg-emerald-50 rounded-xl">
-                                            <Briefcase className="h-8 w-8 text-emerald-500 mx-auto mb-2" />
-                                            <p className="text-3xl font-bold text-slate-900">{stats.totalStaff}</p>
+                                        <div className="text-center p-6 bg-blue-500/10 rounded-xl">
+                                            <Briefcase className="h-8 w-8 text-cyan-400 mx-auto mb-2" />
+                                            <p className="text-3xl font-bold text-white">{stats.totalStaff}</p>
                                             <p className="text-sm text-slate-500">Staff Members</p>
                                         </div>
                                     </div>
@@ -334,14 +334,14 @@ export function AdminReportsContent({ stats }: AdminReportsContentProps) {
 
                         {/* PROJECTS TAB */}
                         <TabsContent value="projects">
-                            <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
-                                <div className="p-6 border-b border-slate-100 flex items-center justify-between">
+                            <div className="bg-white/5 backdrop-blur-md rounded-2xl border border-blue-500/20 overflow-hidden">
+                                <div className="p-6 border-b border-blue-500/15 flex items-center justify-between">
                                     <div>
-                                        <h3 className="font-semibold text-slate-900">Project Report</h3>
+                                        <h3 className="font-semibold text-white">Project Report</h3>
                                         <p className="text-sm text-slate-500">Breakdown of project groups</p>
                                     </div>
                                     <Link href="/admin/projects">
-                                        <Button variant="outline" size="sm" className="border-slate-200">
+                                        <Button variant="outline" size="sm" className="border-blue-500/20">
                                             View Projects
                                             <ArrowRight className="h-4 w-4 ml-1" />
                                         </Button>
@@ -349,37 +349,37 @@ export function AdminReportsContent({ stats }: AdminReportsContentProps) {
                                 </div>
                                 <div className="p-6">
                                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                                        <div className="text-center p-5 bg-blue-50 rounded-xl">
+                                        <div className="text-center p-5 bg-blue-500/10 rounded-xl">
                                             <FolderKanban className="h-7 w-7 text-blue-500 mx-auto mb-2" />
-                                            <p className="text-2xl font-bold text-slate-900">{stats.totalProjects}</p>
+                                            <p className="text-2xl font-bold text-white">{stats.totalProjects}</p>
                                             <p className="text-xs text-slate-500">Projects</p>
                                         </div>
                                         <div className="text-center p-5 bg-violet-50 rounded-xl">
                                             <PieChart className="h-7 w-7 text-violet-500 mx-auto mb-2" />
-                                            <p className="text-2xl font-bold text-slate-900">{stats.totalProjectTypes}</p>
+                                            <p className="text-2xl font-bold text-white">{stats.totalProjectTypes}</p>
                                             <p className="text-xs text-slate-500">Types</p>
                                         </div>
-                                        <div className="text-center p-5 bg-emerald-50 rounded-xl">
-                                            <Users className="h-7 w-7 text-emerald-500 mx-auto mb-2" />
-                                            <p className="text-2xl font-bold text-slate-900">{stats.totalGroupMembers}</p>
+                                        <div className="text-center p-5 bg-blue-500/10 rounded-xl">
+                                            <Users className="h-7 w-7 text-cyan-400 mx-auto mb-2" />
+                                            <p className="text-2xl font-bold text-white">{stats.totalGroupMembers}</p>
                                             <p className="text-xs text-slate-500">Members</p>
                                         </div>
-                                        <div className="text-center p-5 bg-amber-50 rounded-xl">
-                                            <Clock className="h-7 w-7 text-amber-500 mx-auto mb-2" />
-                                            <p className="text-2xl font-bold text-slate-900">{stats.totalMeetings}</p>
+                                        <div className="text-center p-5 bg-amber-500/10 rounded-xl">
+                                            <Clock className="h-7 w-7 text-amber-400 mx-auto mb-2" />
+                                            <p className="text-2xl font-bold text-white">{stats.totalMeetings}</p>
                                             <p className="text-xs text-slate-500">Meetings</p>
                                         </div>
                                     </div>
 
                                     {/* Insights */}
                                     <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                        <div className="p-4 bg-slate-50 rounded-xl">
+                                        <div className="p-4 bg-white/5 rounded-xl">
                                             <p className="text-xs text-slate-400 uppercase mb-1">Avg Members / Project</p>
-                                            <p className="text-xl font-bold text-slate-900">{avgMembersPerProject}</p>
+                                            <p className="text-xl font-bold text-white">{avgMembersPerProject}</p>
                                         </div>
-                                        <div className="p-4 bg-slate-50 rounded-xl">
+                                        <div className="p-4 bg-white/5 rounded-xl">
                                             <p className="text-xs text-slate-400 uppercase mb-1">Avg Meetings / Project</p>
-                                            <p className="text-xl font-bold text-slate-900">{avgMeetingsPerProject}</p>
+                                            <p className="text-xl font-bold text-white">{avgMeetingsPerProject}</p>
                                         </div>
                                     </div>
                                 </div>

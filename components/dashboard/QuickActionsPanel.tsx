@@ -22,7 +22,7 @@ interface QuickActionsPanelProps {
 export function QuickActionsPanel({ actions }: QuickActionsPanelProps) {
   return (
     <Card className="p-6">
-      <h3 className="text-lg font-semibold text-slate-900 mb-4">Quick Actions</h3>
+      <h3 className="text-lg font-semibold text-white mb-4">Quick Actions</h3>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {actions.map((action, index) => (
           <Button
