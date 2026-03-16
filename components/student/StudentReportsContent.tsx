@@ -170,26 +170,24 @@ export function StudentReportsContent() {
               <CardContent className="space-y-4">
                 {/* Report Type */}
                 <div>
-                  <p className="text-sm font-medium text-gray-600 mb-1">Type</p>
-                  <p className="text-sm capitalize">{report.reporttype}</p>
+                  <p className="text-sm font-medium text-slate-400 mb-1">Type</p>
+                  <p className="text-sm capitalize text-white">{report.reporttype}</p>
                 </div>
 
                 {/* Attached File */}
                 {report.projectfile && (
                   <div>
-                    <p className="text-sm font-medium text-gray-600 mb-2">Shared File</p>
+                    <p className="text-sm font-medium text-slate-400 mb-2">Shared File</p>
                     <a
-                      href={report.projectfile.fileurl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-2 p-2 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                      href={`/api/download?url=${encodeURIComponent(report.projectfile.fileurl)}&filename=${encodeURIComponent(report.projectfile.filename)}`}
+                      className="flex items-center gap-2 p-2 bg-white/5 rounded-lg hover:bg-white/10 transition-colors"
                     >
                       <span className="text-xl">{getFileIcon(report.projectfile.filetype)}</span>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium truncate">
+                        <p className="text-sm font-medium truncate text-white">
                           {report.projectfile.filename}
                         </p>
-                        <p className="text-xs text-gray-500">
+                        <p className="text-xs text-slate-400">
                           {report.projectfile.filesize
                             ? `${(report.projectfile.filesize / 1024).toFixed(2)} KB`
                             : 'No size'}
@@ -201,19 +199,19 @@ export function StudentReportsContent() {
                       <img
                         src={report.projectfile.fileurl}
                         alt={report.projectfile.filename}
-                        className="mt-2 h-32 w-full object-cover rounded-lg border"
+                        className="mt-2 h-32 w-full object-cover rounded-lg border border-blue-500/20 bg-white/5"
                       />
                     )}
                     {report.projectfile.filetype.includes('pdf') && (
-                      <p className="mt-2 text-xs text-blue-700 bg-blue-50 border border-blue-200 rounded px-2 py-1">
-                        PDF shared. Click the file card above to open.
+                      <p className="mt-2 text-xs text-blue-400 bg-blue-500/10 border border-blue-500/20 rounded px-2 py-1">
+                        PDF shared. Click the file card above to download.
                       </p>
                     )}
                   </div>
                 )}
 
                 {!report.projectfile && (
-                  <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded px-2 py-1">
+                  <p className="text-xs text-amber-400 bg-amber-500/10 border border-amber-500/20 rounded px-2 py-1">
                     No file shared with this report.
                   </p>
                 )}
@@ -221,8 +219,8 @@ export function StudentReportsContent() {
                 {/* Reviewer Comments */}
                 {report.reviewcomments && (
                   <div>
-                    <p className="text-sm font-medium text-gray-600 mb-1">Feedback</p>
-                    <p className="text-sm bg-blue-50 p-2 rounded border-l-2 border-blue-300">
+                    <p className="text-sm font-medium text-slate-400 mb-1">Feedback</p>
+                    <p className="text-sm bg-blue-500/10 p-2 rounded border-l-2 border-blue-500/50 text-white">
                       {report.reviewcomments}
                     </p>
                   </div>
@@ -231,23 +229,23 @@ export function StudentReportsContent() {
                 {/* Reviewed By */}
                 {report.staff && (
                   <div>
-                    <p className="text-sm font-medium text-gray-600 mb-1">Reviewed By</p>
-                    <p className="text-sm">{report.staff.staffname}</p>
+                    <p className="text-sm font-medium text-slate-400 mb-1">Reviewed By</p>
+                    <p className="text-sm text-white">{report.staff.staffname}</p>
                   </div>
                 )}
 
                 {/* Dates */}
                 <div className="border-t pt-3 space-y-2">
                   <div className="flex justify-between text-xs">
-                    <span className="text-gray-500">Submitted</span>
-                    <span className="font-medium">
+                    <span className="text-slate-400">Submitted</span>
+                    <span className="font-medium text-white">
                       {new Date(report.created).toLocaleDateString()}
                     </span>
                   </div>
                   {report.modified && (
                     <div className="flex justify-between text-xs">
-                      <span className="text-gray-500">Last Updated</span>
-                      <span className="font-medium">
+                      <span className="text-slate-400">Last Updated</span>
+                      <span className="font-medium text-white">
                         {new Date(report.modified).toLocaleDateString()}
                       </span>
                     </div>

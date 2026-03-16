@@ -79,9 +79,9 @@ const roleConfig = {
         label: "Faculty",
         icon: BookOpen,
         gradient: "from-blue-500 to-indigo-500",
-        bg: "bg-blue-50",
+        bg: "bg-blue-500/10",
         text: "text-blue-700",
-        border: "border-blue-200",
+        border: "border-blue-500/25",
         dot: "bg-blue-500",
         iconBg: "bg-gradient-to-br from-blue-500 to-indigo-500",
     },
@@ -89,10 +89,10 @@ const roleConfig = {
         label: "Student",
         icon: GraduationCap,
         gradient: "from-emerald-500 to-teal-500",
-        bg: "bg-emerald-50",
-        text: "text-emerald-700",
-        border: "border-emerald-200",
-        dot: "bg-emerald-500",
+        bg: "bg-blue-500/10",
+        text: "text-cyan-400",
+        border: "border-cyan-500/25",
+        dot: "bg-blue-500",
         iconBg: "bg-gradient-to-br from-emerald-500 to-teal-500",
     },
 };
@@ -213,7 +213,7 @@ export function AdminUserManagement({ initialUsers, initialStats }: AdminUserMan
             value: stats.totalUsers,
             icon: Users,
             gradient: "from-emerald-500 to-teal-600",
-            bg: "bg-emerald-50",
+            bg: "bg-blue-500/10",
             iconColor: "text-white",
         },
         {
@@ -229,7 +229,7 @@ export function AdminUserManagement({ initialUsers, initialStats }: AdminUserMan
             value: stats.facultyCount,
             icon: BookOpen,
             gradient: "from-blue-500 to-indigo-500",
-            bg: "bg-blue-50",
+            bg: "bg-blue-500/10",
             iconColor: "text-white",
         },
         {
@@ -245,7 +245,7 @@ export function AdminUserManagement({ initialUsers, initialStats }: AdminUserMan
             value: stats.activeCount,
             icon: UserCheck,
             gradient: "from-green-500 to-emerald-500",
-            bg: "bg-green-50",
+            bg: "bg-blue-500/10",
             iconColor: "text-white",
         },
         {
@@ -253,13 +253,13 @@ export function AdminUserManagement({ initialUsers, initialStats }: AdminUserMan
             value: stats.inactiveCount,
             icon: UserX,
             gradient: "from-slate-400 to-slate-500",
-            bg: "bg-slate-50",
+            bg: "bg-white/5",
             iconColor: "text-white",
         },
     ];
 
     return (
-        <div className="min-h-screen bg-slate-50">
+        <div className="min-h-screen bg-[#050A14]">
             {/* Toast Notifications */}
             <AnimatePresence>
                 {successMessage && (
@@ -267,7 +267,7 @@ export function AdminUserManagement({ initialUsers, initialStats }: AdminUserMan
                         initial={{ opacity: 0, y: -50, x: "-50%" }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -50 }}
-                        className="fixed top-20 left-1/2 z-[100] flex items-center gap-3 bg-emerald-600 text-white px-6 py-3.5 rounded-xl shadow-2xl shadow-emerald-500/30"
+                        className="fixed top-20 left-1/2 z-[100] flex items-center gap-3 bg-blue-600 text-white px-6 py-3.5 rounded-xl shadow-2xl shadow-emerald-500/30"
                     >
                         <CheckCircle2 className="h-5 w-5 flex-shrink-0" />
                         <span className="text-sm font-medium">{successMessage}</span>
@@ -300,7 +300,7 @@ export function AdminUserManagement({ initialUsers, initialStats }: AdminUserMan
                                     <UserCog className="h-6 w-6 text-white" />
                                 </div>
                                 <div>
-                                    <h1 className="text-2xl md:text-3xl font-bold text-slate-900">
+                                    <h1 className="text-2xl md:text-3xl font-bold text-white">
                                         User Management
                                     </h1>
                                     <p className="text-slate-500 text-sm">
@@ -314,7 +314,7 @@ export function AdminUserManagement({ initialUsers, initialStats }: AdminUserMan
                                 variant="outline"
                                 onClick={handleRefresh}
                                 disabled={isPending}
-                                className="border-slate-200 hover:bg-slate-50"
+                                className="border-blue-500/20 hover:bg-white/5"
                             >
                                 <RefreshCw
                                     className={cn("h-4 w-4 mr-2", isPending && "animate-spin")}
@@ -339,7 +339,7 @@ export function AdminUserManagement({ initialUsers, initialStats }: AdminUserMan
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.05 * index }}
                             whileHover={{ y: -3, transition: { duration: 0.2 } }}
-                            className="group relative bg-white rounded-2xl border border-slate-200 p-4 overflow-hidden hover:shadow-lg hover:shadow-slate-200/50 transition-all duration-300"
+                            className="group relative bg-white/5 backdrop-blur-md rounded-2xl border border-blue-500/20 p-4 overflow-hidden hover:shadow-lg hover:shadow-blue-900/20 transition-all duration-300"
                         >
                             {/* Subtle glow on hover */}
                             <div
@@ -361,7 +361,7 @@ export function AdminUserManagement({ initialUsers, initialStats }: AdminUserMan
                                     key={stat.value}
                                     initial={{ scale: 0.5, opacity: 0 }}
                                     animate={{ scale: 1, opacity: 1 }}
-                                    className="text-2xl font-bold text-slate-900"
+                                    className="text-2xl font-bold text-white"
                                 >
                                     {stat.value}
                                 </motion.span>
@@ -378,7 +378,7 @@ export function AdminUserManagement({ initialUsers, initialStats }: AdminUserMan
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.2 }}
-                    className="bg-white rounded-2xl border border-slate-200 p-4 mb-6 shadow-sm"
+                    className="bg-white/5 backdrop-blur-md rounded-2xl border border-blue-500/20 p-4 mb-6 shadow-sm"
                 >
                     <div className="flex flex-col sm:flex-row gap-3">
                         <div className="relative flex-1">
@@ -387,7 +387,7 @@ export function AdminUserManagement({ initialUsers, initialStats }: AdminUserMan
                                 placeholder="Search users by name, email, or Clerk ID..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="pl-10 bg-slate-50 border-slate-200 focus:bg-white h-10"
+                                className="pl-10 bg-white/5 border-blue-500/20 focus:bg-white/10 h-10"
                             />
                         </div>
                         <div className="flex gap-2">
@@ -395,7 +395,7 @@ export function AdminUserManagement({ initialUsers, initialStats }: AdminUserMan
                                 value={roleFilter}
                                 onValueChange={(v) => setRoleFilter(v as RoleFilter)}
                             >
-                                <SelectTrigger className="w-[160px] bg-slate-50 border-slate-200">
+                                <SelectTrigger className="w-[160px] bg-white/5 border-blue-500/20">
                                     <Filter className="h-4 w-4 mr-2 text-slate-400" />
                                     <SelectValue placeholder="Filter Role" />
                                 </SelectTrigger>
@@ -415,7 +415,7 @@ export function AdminUserManagement({ initialUsers, initialStats }: AdminUserMan
                                     </SelectItem>
                                     <SelectItem value="STUDENT">
                                         <div className="flex items-center gap-2">
-                                            <div className="w-2 h-2 rounded-full bg-emerald-500" />
+                                            <div className="w-2 h-2 rounded-full bg-blue-500" />
                                             Student
                                         </div>
                                     </SelectItem>
@@ -428,13 +428,13 @@ export function AdminUserManagement({ initialUsers, initialStats }: AdminUserMan
                         <motion.div
                             initial={{ opacity: 0, height: 0 }}
                             animate={{ opacity: 1, height: "auto" }}
-                            className="flex items-center gap-2 mt-3 pt-3 border-t border-slate-100"
+                            className="flex items-center gap-2 mt-3 pt-3 border-t border-blue-500/15"
                         >
                             <span className="text-xs text-slate-500">Filters:</span>
                             {searchQuery && (
                                 <Badge
                                     variant="outline"
-                                    className="text-xs cursor-pointer hover:bg-red-50"
+                                    className="text-xs cursor-pointer hover:bg-red-500/10"
                                     onClick={() => setSearchQuery("")}
                                 >
                                     Search: &quot;{searchQuery}&quot; ✕
@@ -444,7 +444,7 @@ export function AdminUserManagement({ initialUsers, initialStats }: AdminUserMan
                                 <Badge
                                     variant="outline"
                                     className={cn(
-                                        "text-xs cursor-pointer hover:bg-red-50",
+                                        "text-xs cursor-pointer hover:bg-red-500/10",
                                         roleConfig[roleFilter].border,
                                         roleConfig[roleFilter].text
                                     )}
@@ -477,11 +477,11 @@ export function AdminUserManagement({ initialUsers, initialStats }: AdminUserMan
                 >
                     <p className="text-sm text-slate-500">
                         Showing{" "}
-                        <span className="font-semibold text-slate-700">
+                        <span className="font-semibold text-slate-200">
                             {filteredUsers.length}
                         </span>{" "}
                         of{" "}
-                        <span className="font-semibold text-slate-700">
+                        <span className="font-semibold text-slate-200">
                             {users.length}
                         </span>{" "}
                         users
@@ -500,7 +500,7 @@ export function AdminUserManagement({ initialUsers, initialStats }: AdminUserMan
                             <motion.div
                                 initial={{ opacity: 0, scale: 0.95 }}
                                 animate={{ opacity: 1, scale: 1 }}
-                                className="bg-white rounded-2xl border border-slate-200 p-16 text-center"
+                                className="bg-white/5 backdrop-blur-md rounded-2xl border border-blue-500/20 p-16 text-center"
                             >
                                 <motion.div
                                     animate={{ y: [0, -8, 0] }}
@@ -509,12 +509,12 @@ export function AdminUserManagement({ initialUsers, initialStats }: AdminUserMan
                                 >
                                     <div className="relative">
                                         <div className="absolute inset-0 bg-emerald-200 rounded-2xl blur-xl opacity-40" />
-                                        <div className="relative bg-emerald-50 border border-emerald-100 p-8 rounded-2xl">
-                                            <Users className="h-16 w-16 text-emerald-400 mx-auto" />
+                                        <div className="relative bg-blue-500/10 border border-blue-500/20 p-8 rounded-2xl">
+                                            <Users className="h-16 w-16 text-cyan-400 mx-auto" />
                                         </div>
                                     </div>
                                 </motion.div>
-                                <h3 className="text-xl font-semibold text-slate-900 mb-2">
+                                <h3 className="text-xl font-semibold text-white mb-2">
                                     No Users Found
                                 </h3>
                                 <p className="text-slate-500 max-w-md mx-auto">
@@ -539,10 +539,10 @@ export function AdminUserManagement({ initialUsers, initialStats }: AdminUserMan
                                         exit={{ opacity: 0, x: -20 }}
                                         transition={{ delay: index * 0.03 }}
                                         className={cn(
-                                            "group bg-white rounded-2xl border overflow-hidden transition-all duration-300",
+                                            "group bg-white/5 backdrop-blur-md rounded-2xl border overflow-hidden transition-all duration-300",
                                             isExpanded
-                                                ? "border-emerald-200 shadow-lg shadow-emerald-100/50 ring-1 ring-emerald-100"
-                                                : "border-slate-200 hover:border-slate-300 hover:shadow-md"
+                                                ? "border-cyan-500/25 shadow-lg shadow-emerald-100/50 ring-1 ring-emerald-100"
+                                                : "border-blue-500/20 hover:border-blue-500/25 hover:shadow-md"
                                         )}
                                     >
                                         {/* Main Row */}
@@ -566,7 +566,7 @@ export function AdminUserManagement({ initialUsers, initialStats }: AdminUserMan
                                                 <div
                                                     className={cn(
                                                         "absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-2 border-white",
-                                                        user.isactive ? "bg-green-500" : "bg-slate-300"
+                                                        user.isactive ? "bg-blue-500" : "bg-slate-300"
                                                     )}
                                                 />
                                             </div>
@@ -574,7 +574,7 @@ export function AdminUserManagement({ initialUsers, initialStats }: AdminUserMan
                                             {/* User Info */}
                                             <div className="flex-1 min-w-0">
                                                 <div className="flex items-center gap-2 mb-0.5">
-                                                    <h3 className="font-semibold text-slate-900 truncate">
+                                                    <h3 className="font-semibold text-white truncate">
                                                         {user.name || "Unnamed User"}
                                                     </h3>
                                                     <Badge
@@ -591,7 +591,7 @@ export function AdminUserManagement({ initialUsers, initialStats }: AdminUserMan
                                                     {!user.isactive && (
                                                         <Badge
                                                             variant="outline"
-                                                            className="text-[10px] px-1.5 py-0 h-5 border-slate-200 text-slate-400"
+                                                            className="text-[10px] px-1.5 py-0 h-5 border-blue-500/20 text-slate-400"
                                                         >
                                                             Inactive
                                                         </Badge>
@@ -657,7 +657,7 @@ export function AdminUserManagement({ initialUsers, initialStats }: AdminUserMan
                                                         </SelectItem>
                                                         <SelectItem value="STUDENT">
                                                             <div className="flex items-center gap-2">
-                                                                <GraduationCap className="h-4 w-4 text-emerald-500" />
+                                                                <GraduationCap className="h-4 w-4 text-cyan-400" />
                                                                 Student
                                                             </div>
                                                         </SelectItem>
@@ -685,44 +685,44 @@ export function AdminUserManagement({ initialUsers, initialStats }: AdminUserMan
                                                     className="overflow-hidden"
                                                 >
                                                     <div className="px-5 pb-5 pt-0">
-                                                        <div className="border-t border-slate-100 pt-5">
+                                                        <div className="border-t border-blue-500/15 pt-5">
                                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                                                 {/* Left: User Details */}
                                                                 <div className="space-y-4">
-                                                                    <h4 className="text-sm font-semibold text-slate-900 flex items-center gap-2">
-                                                                        <Sparkles className="h-4 w-4 text-emerald-500" />
+                                                                    <h4 className="text-sm font-semibold text-white flex items-center gap-2">
+                                                                        <Sparkles className="h-4 w-4 text-cyan-400" />
                                                                         User Details
                                                                     </h4>
                                                                     <div className="space-y-3">
-                                                                        <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
+                                                                        <div className="flex items-center justify-between p-3 bg-white/5 rounded-xl">
                                                                             <span className="text-sm text-slate-500">
                                                                                 User ID
                                                                             </span>
-                                                                            <span className="text-sm font-mono font-medium text-slate-700">
+                                                                            <span className="text-sm font-mono font-medium text-slate-200">
                                                                                 #{user.userid}
                                                                             </span>
                                                                         </div>
-                                                                        <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
+                                                                        <div className="flex items-center justify-between p-3 bg-white/5 rounded-xl">
                                                                             <span className="text-sm text-slate-500">
                                                                                 Clerk ID
                                                                             </span>
-                                                                            <span className="text-xs font-mono text-slate-600 bg-slate-100 px-2 py-0.5 rounded">
+                                                                            <span className="text-xs font-mono text-slate-300 bg-white/5 px-2 py-0.5 rounded">
                                                                                 {user.clerkid.substring(0, 20)}...
                                                                             </span>
                                                                         </div>
-                                                                        <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
+                                                                        <div className="flex items-center justify-between p-3 bg-white/5 rounded-xl">
                                                                             <span className="text-sm text-slate-500">
                                                                                 Email
                                                                             </span>
-                                                                            <span className="text-sm font-medium text-slate-700">
+                                                                            <span className="text-sm font-medium text-slate-200">
                                                                                 {user.email}
                                                                             </span>
                                                                         </div>
-                                                                        <div className="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
+                                                                        <div className="flex items-center justify-between p-3 bg-white/5 rounded-xl">
                                                                             <span className="text-sm text-slate-500">
                                                                                 Joined
                                                                             </span>
-                                                                            <span className="text-sm text-slate-700">
+                                                                            <span className="text-sm text-slate-200">
                                                                                 {formatDate(user.created)}{" "}
                                                                                 <span className="text-slate-400">
                                                                                     at {formatTime(user.created)}
@@ -730,13 +730,13 @@ export function AdminUserManagement({ initialUsers, initialStats }: AdminUserMan
                                                                             </span>
                                                                         </div>
                                                                         {user.modified && (
-                                                                            <div className="flex items-center justify-between p-3 bg-amber-50 rounded-xl border border-amber-100">
-                                                                                <span className="text-sm text-amber-600">
+                                                                            <div className="flex items-center justify-between p-3 bg-amber-500/10 rounded-xl border border-amber-500/20">
+                                                                                <span className="text-sm text-amber-400">
                                                                                     Last Modified
                                                                                 </span>
-                                                                                <span className="text-sm font-medium text-amber-700">
+                                                                                <span className="text-sm font-medium text-amber-400">
                                                                                     {formatDate(user.modified)}{" "}
-                                                                                    <span className="text-amber-500">
+                                                                                    <span className="text-amber-400">
                                                                                         at {formatTime(user.modified)}
                                                                                     </span>
                                                                                 </span>
@@ -747,13 +747,13 @@ export function AdminUserManagement({ initialUsers, initialStats }: AdminUserMan
 
                                                                 {/* Right: Actions */}
                                                                 <div className="space-y-4">
-                                                                    <h4 className="text-sm font-semibold text-slate-900 flex items-center gap-2">
-                                                                        <Shield className="h-4 w-4 text-emerald-500" />
+                                                                    <h4 className="text-sm font-semibold text-white flex items-center gap-2">
+                                                                        <Shield className="h-4 w-4 text-cyan-400" />
                                                                         Role & Status
                                                                     </h4>
 
                                                                     {/* Role Selector (for mobile - always visible here) */}
-                                                                    <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
+                                                                    <div className="p-4 bg-white/5 rounded-xl border border-blue-500/15">
                                                                         <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 block">
                                                                             Change Role
                                                                         </label>
@@ -797,7 +797,7 @@ export function AdminUserManagement({ initialUsers, initialStats }: AdminUserMan
                                                                                                             ? "ring-blue-300"
                                                                                                             : "ring-emerald-300"
                                                                                                 )
-                                                                                                : "border-slate-200 hover:border-slate-300 bg-white cursor-pointer"
+                                                                                                : "border-blue-500/20 hover:border-blue-500/25 bg-white cursor-pointer"
                                                                                         )}
                                                                                     >
                                                                                         <rc.icon
@@ -822,7 +822,7 @@ export function AdminUserManagement({ initialUsers, initialStats }: AdminUserMan
                                                                                             <motion.div
                                                                                                 layoutId={`check-${user.userid}`}
                                                                                             >
-                                                                                                <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+                                                                                                <CheckCircle2 className="h-4 w-4 text-cyan-400" />
                                                                                             </motion.div>
                                                                                         )}
                                                                                     </motion.button>
@@ -833,10 +833,10 @@ export function AdminUserManagement({ initialUsers, initialStats }: AdminUserMan
                                                                             <motion.div
                                                                                 initial={{ opacity: 0, y: -5 }}
                                                                                 animate={{ opacity: 1, y: 0 }}
-                                                                                className="flex items-center gap-2 mt-3 p-2 bg-emerald-50 border border-emerald-100 rounded-lg"
+                                                                                className="flex items-center gap-2 mt-3 p-2 bg-blue-500/10 border border-blue-500/20 rounded-lg"
                                                                             >
-                                                                                <RefreshCw className="h-3 w-3 animate-spin text-emerald-600" />
-                                                                                <span className="text-xs text-emerald-600 font-medium">
+                                                                                <RefreshCw className="h-3 w-3 animate-spin text-cyan-400" />
+                                                                                <span className="text-xs text-cyan-400 font-medium">
                                                                                     Updating role & syncing with
                                                                                     Clerk...
                                                                                 </span>
@@ -845,7 +845,7 @@ export function AdminUserManagement({ initialUsers, initialStats }: AdminUserMan
                                                                     </div>
 
                                                                     {/* Active Toggle */}
-                                                                    <div className="p-4 bg-slate-50 rounded-xl border border-slate-100">
+                                                                    <div className="p-4 bg-white/5 rounded-xl border border-blue-500/15">
                                                                         <div className="flex items-center justify-between">
                                                                             <div>
                                                                                 <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider block mb-1">
@@ -862,8 +862,8 @@ export function AdminUserManagement({ initialUsers, initialStats }: AdminUserMan
                                                                                     className={cn(
                                                                                         "text-xs",
                                                                                         user.isactive
-                                                                                            ? "bg-green-50 text-green-700 border-green-200"
-                                                                                            : "bg-slate-100 text-slate-500 border-slate-200"
+                                                                                            ? "bg-blue-500/10 text-cyan-400 border-cyan-500/25"
+                                                                                            : "bg-white/5 text-slate-500 border-blue-500/20"
                                                                                     )}
                                                                                 >
                                                                                     {user.isactive
@@ -914,10 +914,10 @@ export function AdminUserManagement({ initialUsers, initialStats }: AdminUserMan
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.5 }}
-                    className="mt-8 p-4 bg-white rounded-xl border border-slate-200"
+                    className="mt-8 p-4 bg-white/5 backdrop-blur-md rounded-xl border border-blue-500/20"
                 >
                     <div className="flex flex-wrap items-center justify-center gap-6 text-xs text-slate-500">
-                        <span className="font-semibold text-slate-700">Roles:</span>
+                        <span className="font-semibold text-slate-200">Roles:</span>
                         {(["ADMIN", "FACULTY", "STUDENT"] as const).map((role) => {
                             const config = roleConfig[role];
                             return (
@@ -929,7 +929,7 @@ export function AdminUserManagement({ initialUsers, initialStats }: AdminUserMan
                         })}
                         <span className="text-slate-300">|</span>
                         <div className="flex items-center gap-1.5">
-                            <div className="w-2 h-2 rounded-full bg-green-500" />
+                            <div className="w-2 h-2 rounded-full bg-blue-500" />
                             <span>Active</span>
                         </div>
                         <div className="flex items-center gap-1.5">
@@ -938,7 +938,7 @@ export function AdminUserManagement({ initialUsers, initialStats }: AdminUserMan
                         </div>
                         <span className="text-slate-300">|</span>
                         <div className="flex items-center gap-1.5">
-                            <Sparkles className="h-3 w-3 text-emerald-500" />
+                            <Sparkles className="h-3 w-3 text-cyan-400" />
                             <span>Changes sync to Clerk metadata</span>
                         </div>
                     </div>

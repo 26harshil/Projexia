@@ -114,7 +114,7 @@ export function AdminStudentsContent({ initialStudents, initialStats }: AdminStu
     ];
 
     return (
-        <div className="min-h-screen bg-slate-50">
+        <div className="min-h-screen bg-[#050A14]">
             <div className="max-w-7xl mx-auto px-4 md:px-6 py-8">
                 {/* Page Header */}
                 <motion.div
@@ -123,7 +123,7 @@ export function AdminStudentsContent({ initialStudents, initialStats }: AdminStu
                     className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8"
                 >
                     <div>
-                        <h1 className="text-2xl md:text-3xl font-bold text-slate-900 mb-1">
+                        <h1 className="text-2xl md:text-3xl font-bold text-white mb-1">
                             Students
                         </h1>
                         <p className="text-slate-500">
@@ -132,7 +132,7 @@ export function AdminStudentsContent({ initialStudents, initialStats }: AdminStu
                         </p>
                     </div>
                     <div className="flex gap-2">
-                        <Button variant="outline" className="border-slate-200">
+                        <Button variant="outline" className="border-blue-500/20">
                             <Download className="h-4 w-4 mr-2" />
                             Export
                         </Button>
@@ -153,22 +153,22 @@ export function AdminStudentsContent({ initialStudents, initialStats }: AdminStu
                             animate={{ opacity: 1, scale: 1 }}
                             transition={{ delay: 0.1 + index * 0.05 }}
                             whileHover={{ y: -2 }}
-                            className="bg-white rounded-xl border border-slate-200 p-5"
+                            className="bg-white/5 backdrop-blur-md rounded-xl border border-blue-500/20 p-5"
                         >
                             <div className="flex items-center gap-4">
                                 <div className={cn(
                                     "p-3 rounded-xl",
                                     stat.color === "violet" && "bg-violet-100",
-                                    stat.color === "emerald" && "bg-emerald-100",
-                                    stat.color === "slate" && "bg-slate-100",
-                                    stat.color === "blue" && "bg-blue-100",
+                                    stat.color === "emerald" && "bg-blue-500/15",
+                                    stat.color === "slate" && "bg-white/5",
+                                    stat.color === "blue" && "bg-blue-500/15",
                                 )}>
                                     <stat.icon className={cn(
                                         "h-5 w-5",
                                         stat.color === "violet" && "text-violet-600",
-                                        stat.color === "emerald" && "text-emerald-600",
-                                        stat.color === "slate" && "text-slate-600",
-                                        stat.color === "blue" && "text-blue-600",
+                                        stat.color === "emerald" && "text-cyan-400",
+                                        stat.color === "slate" && "text-slate-300",
+                                        stat.color === "blue" && "text-blue-400",
                                     )} />
                                 </div>
                                 <div>
@@ -176,7 +176,7 @@ export function AdminStudentsContent({ initialStudents, initialStats }: AdminStu
                                         key={stat.value}
                                         initial={{ scale: 0.5, opacity: 0 }}
                                         animate={{ scale: 1, opacity: 1 }}
-                                        className="text-2xl font-bold text-slate-900"
+                                        className="text-2xl font-bold text-white"
                                     >
                                         {stat.value}
                                     </motion.p>
@@ -192,21 +192,21 @@ export function AdminStudentsContent({ initialStudents, initialStats }: AdminStu
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.2 }}
-                    className="bg-white rounded-xl border border-slate-200 p-4 mb-6"
+                    className="bg-white/5 backdrop-blur-md rounded-xl border border-blue-500/20 p-4 mb-6"
                 >
                     <div className="flex flex-col sm:flex-row gap-4">
                         <div className="relative flex-1">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                             <Input
                                 placeholder="Search students by name, email, or phone..."
-                                className="pl-10 bg-slate-50 border-slate-200 focus:bg-white"
+                                className="pl-10 bg-white/5 border-blue-500/20 focus:bg-white/10"
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                             />
                             {searchQuery && (
                                 <button
                                     onClick={() => setSearchQuery("")}
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-300"
                                 >
                                     <X className="h-4 w-4" />
                                 </button>
@@ -224,7 +224,7 @@ export function AdminStudentsContent({ initialStudents, initialStats }: AdminStu
                                     "px-3 py-1.5 rounded-full text-xs font-medium transition-all",
                                     statusFilter === f.value
                                         ? "bg-violet-100 text-violet-700 ring-1 ring-violet-300"
-                                        : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                                        : "bg-white/5 text-slate-300 hover:bg-slate-200"
                                 )}
                             >
                                 {f.label}
@@ -256,7 +256,7 @@ export function AdminStudentsContent({ initialStudents, initialStats }: AdminStu
                                 initial={{ opacity: 0, scale: 0.95 }}
                                 animate={{ opacity: 1, scale: 1 }}
                                 exit={{ opacity: 0, scale: 0.95 }}
-                                className="bg-white rounded-2xl border border-slate-200 p-12 text-center"
+                                className="bg-white/5 backdrop-blur-md rounded-2xl border border-blue-500/20 p-12 text-center"
                             >
                                 <motion.div
                                     animate={{ y: [0, -8, 0] }}
@@ -270,7 +270,7 @@ export function AdminStudentsContent({ initialStudents, initialStats }: AdminStu
                                         </div>
                                     </div>
                                 </motion.div>
-                                <h3 className="text-xl font-semibold text-slate-900 mb-2">No Students Found</h3>
+                                <h3 className="text-xl font-semibold text-white mb-2">No Students Found</h3>
                                 <p className="text-slate-500 mb-6 max-w-md mx-auto">
                                     {searchQuery || statusFilter !== "ALL"
                                         ? "No students match your current search or filter criteria."
@@ -300,7 +300,7 @@ export function AdminStudentsContent({ initialStudents, initialStats }: AdminStu
                                         animate={{ opacity: 1, y: 0 }}
                                         exit={{ opacity: 0, scale: 0.95 }}
                                         transition={{ delay: index * 0.03 }}
-                                        className="bg-white rounded-xl border border-slate-200 overflow-hidden hover:shadow-md transition-shadow"
+                                        className="bg-white/5 backdrop-blur-md rounded-xl border border-blue-500/20 overflow-hidden hover:shadow-md transition-shadow"
                                     >
                                         <div
                                             className="grid grid-cols-1 md:grid-cols-12 gap-4 p-4 md:p-5 items-center cursor-pointer"
@@ -312,7 +312,7 @@ export function AdminStudentsContent({ initialStudents, initialStats }: AdminStu
                                                     {student.studentname.charAt(0).toUpperCase()}
                                                 </div>
                                                 <div>
-                                                    <p className="font-semibold text-slate-900 text-sm">{student.studentname}</p>
+                                                    <p className="font-semibold text-white text-sm">{student.studentname}</p>
                                                     <p className="text-xs text-slate-500">ID: {student.studentid}</p>
                                                 </div>
                                             </div>
@@ -320,7 +320,7 @@ export function AdminStudentsContent({ initialStudents, initialStats }: AdminStu
                                             {/* Contact */}
                                             <div className="col-span-2">
                                                 {student.email && (
-                                                    <div className="flex items-center gap-1.5 text-xs text-slate-600">
+                                                    <div className="flex items-center gap-1.5 text-xs text-slate-300">
                                                         <Mail className="h-3 w-3 text-slate-400" />
                                                         <span className="truncate max-w-[150px]">{student.email}</span>
                                                     </div>
@@ -340,11 +340,11 @@ export function AdminStudentsContent({ initialStudents, initialStats }: AdminStu
                                                         {student.projectgroupmember.slice(0, 1).map((m, i) => (
                                                             <div key={i} className="flex items-center gap-2">
                                                                 <FolderKanban className="h-3.5 w-3.5 text-blue-500" />
-                                                                <span className="text-xs text-slate-700 font-medium truncate max-w-[180px]">
+                                                                <span className="text-xs text-slate-200 font-medium truncate max-w-[180px]">
                                                                     {m.projectgroup.projectgroupname}
                                                                 </span>
                                                                 {m.isgroupleader && (
-                                                                    <Badge className="bg-amber-100 text-amber-700 text-[10px] px-1.5 py-0">
+                                                                    <Badge className="bg-amber-500/15 text-amber-400 text-[10px] px-1.5 py-0">
                                                                         Leader
                                                                     </Badge>
                                                                 )}
@@ -366,12 +366,12 @@ export function AdminStudentsContent({ initialStudents, initialStats }: AdminStu
                                                 <Badge className={cn(
                                                     "text-[11px]",
                                                     isActive
-                                                        ? "bg-emerald-100 text-emerald-700 border-emerald-200"
-                                                        : "bg-slate-100 text-slate-500 border-slate-200"
+                                                        ? "bg-blue-500/15 text-cyan-400 border-cyan-500/25"
+                                                        : "bg-white/5 text-slate-500 border-blue-500/20"
                                                 )}>
                                                     <span className={cn(
                                                         "w-1.5 h-1.5 rounded-full mr-1.5",
-                                                        isActive ? "bg-emerald-500" : "bg-slate-400"
+                                                        isActive ? "bg-blue-500" : "bg-slate-400"
                                                     )} />
                                                     {isActive ? "Active" : "Inactive"}
                                                 </Badge>
@@ -396,23 +396,23 @@ export function AdminStudentsContent({ initialStudents, initialStats }: AdminStu
                                                     exit={{ height: 0, opacity: 0 }}
                                                     className="overflow-hidden"
                                                 >
-                                                    <div className="px-5 pb-5 pt-1 border-t border-slate-100">
+                                                    <div className="px-5 pb-5 pt-1 border-t border-blue-500/15">
                                                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-3">
-                                                            <div className="bg-slate-50 rounded-lg p-3">
+                                                            <div className="bg-white/5 rounded-lg p-3">
                                                                 <p className="text-[10px] font-medium text-slate-400 uppercase mb-1">Student ID</p>
-                                                                <p className="text-sm font-mono text-slate-700">{student.studentid}</p>
+                                                                <p className="text-sm font-mono text-slate-200">{student.studentid}</p>
                                                             </div>
-                                                            <div className="bg-slate-50 rounded-lg p-3">
+                                                            <div className="bg-white/5 rounded-lg p-3">
                                                                 <p className="text-[10px] font-medium text-slate-400 uppercase mb-1">Joined</p>
-                                                                <p className="text-sm text-slate-700">
+                                                                <p className="text-sm text-slate-200">
                                                                     {new Date(student.created).toLocaleDateString("en-US", {
                                                                         year: "numeric", month: "short", day: "numeric"
                                                                     })}
                                                                 </p>
                                                             </div>
-                                                            <div className="bg-slate-50 rounded-lg p-3">
+                                                            <div className="bg-white/5 rounded-lg p-3">
                                                                 <p className="text-[10px] font-medium text-slate-400 uppercase mb-1">Last Modified</p>
-                                                                <p className="text-sm text-slate-700">
+                                                                <p className="text-sm text-slate-200">
                                                                     {student.modified
                                                                         ? new Date(student.modified).toLocaleDateString("en-US", {
                                                                             year: "numeric", month: "short", day: "numeric"
@@ -425,18 +425,18 @@ export function AdminStudentsContent({ initialStudents, initialStats }: AdminStu
                                                         {/* Project groups detail */}
                                                         {student.projectgroupmember.length > 0 && (
                                                             <div className="mt-4">
-                                                                <p className="text-xs font-semibold text-slate-600 mb-2">Project Groups</p>
+                                                                <p className="text-xs font-semibold text-slate-300 mb-2">Project Groups</p>
                                                                 <div className="space-y-2">
                                                                     {student.projectgroupmember.map((m, i) => (
-                                                                        <div key={i} className="flex items-center justify-between bg-blue-50 rounded-lg p-3">
+                                                                        <div key={i} className="flex items-center justify-between bg-blue-500/10 rounded-lg p-3">
                                                                             <div>
-                                                                                <p className="text-sm font-medium text-slate-800">{m.projectgroup.projectgroupname}</p>
+                                                                                <p className="text-sm font-medium text-white">{m.projectgroup.projectgroupname}</p>
                                                                                 {m.projectgroup.projecttitle && (
                                                                                     <p className="text-xs text-slate-500">{m.projectgroup.projecttitle}</p>
                                                                                 )}
                                                                             </div>
                                                                             {m.isgroupleader && (
-                                                                                <Badge className="bg-amber-100 text-amber-700 text-xs">
+                                                                                <Badge className="bg-amber-500/15 text-amber-400 text-xs">
                                                                                     Group Leader
                                                                                 </Badge>
                                                                             )}
@@ -447,9 +447,9 @@ export function AdminStudentsContent({ initialStudents, initialStats }: AdminStu
                                                         )}
 
                                                         {student.description && (
-                                                            <div className="mt-3 bg-slate-50 rounded-lg p-3">
+                                                            <div className="mt-3 bg-white/5 rounded-lg p-3">
                                                                 <p className="text-[10px] font-medium text-slate-400 uppercase mb-1">Description</p>
-                                                                <p className="text-sm text-slate-700">{student.description}</p>
+                                                                <p className="text-sm text-slate-200">{student.description}</p>
                                                             </div>
                                                         )}
                                                     </div>

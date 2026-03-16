@@ -61,8 +61,8 @@ export default function AdminNavbar() {
       className={cn(
         "fixed top-0 z-50 w-full transition-all duration-500",
         scrolled
-          ? "bg-white/95 backdrop-blur-xl border-b border-slate-200 shadow-sm"
-          : "bg-white border-b border-slate-100"
+          ? "bg-[#050A14]/90 backdrop-blur-xl border-b border-blue-500/20 shadow-lg shadow-blue-900/20"
+          : "bg-[#050A14]/80 backdrop-blur-md border-b border-blue-500/10"
       )}
     >
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 md:px-6">
@@ -77,17 +77,17 @@ export default function AdminNavbar() {
             priority
           />
           <div className="flex flex-col">
-            <span className="text-lg font-bold text-slate-900">
+            <span className="text-lg font-bold text-white">
               {title}
             </span>
-            <span className="text-[10px] text-emerald-600 font-semibold tracking-wider -mt-0.5">
+            <span className="text-[10px] text-blue-400 font-semibold tracking-wider -mt-0.5">
               SYSTEM ADMIN
             </span>
           </div>
         </Link>
 
         {/* Desktop Navigation */}
-        <nav className="hidden lg:flex items-center gap-0.5 bg-slate-50 p-1 rounded-xl">
+        <nav className="hidden lg:flex items-center gap-0.5 bg-white/5 border border-blue-500/15 p-1 rounded-xl backdrop-blur-sm">
           {links.map((link, index) => {
             const Icon = iconMap[link.name] || LayoutDashboard;
             const isActive = pathname === link.href;
@@ -106,13 +106,13 @@ export default function AdminNavbar() {
                     className={cn(
                       "relative flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200",
                       isActive
-                        ? "bg-white text-emerald-700 shadow-sm"
-                        : "text-slate-600 hover:text-slate-900 hover:bg-white/50"
+                        ? "bg-gradient-to-r from-blue-600 to-cyan-500 text-white shadow-md shadow-blue-500/30"
+                        : "text-slate-400 hover:text-white hover:bg-white/5"
                     )}
                   >
                     <Icon className={cn(
                       "h-4 w-4",
-                      isActive ? "text-emerald-600" : "text-slate-400"
+                      isActive ? "text-white" : "text-slate-500"
                     )} />
                     <span className="hidden xl:inline">{link.name}</span>
                   </motion.div>
@@ -124,7 +124,7 @@ export default function AdminNavbar() {
 
         {/* Right Section */}
         <div className="flex items-center gap-2">
-          {/* Command Palette Trigger */}
+          {/* Search Button */}
           <motion.div
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
@@ -133,11 +133,11 @@ export default function AdminNavbar() {
             <Button
               variant="outline"
               size="sm"
-              className="text-slate-500 border-slate-200 hover:bg-slate-50 gap-2"
+              className="text-slate-400 border-blue-500/20 bg-white/5 hover:bg-blue-500/10 hover:text-white hover:border-blue-400/40 gap-2 backdrop-blur-sm"
             >
               <Search className="h-4 w-4" />
               <span className="text-xs">Search...</span>
-              <kbd className="pointer-events-none hidden sm:inline-flex h-5 select-none items-center gap-1 rounded border bg-slate-100 px-1.5 font-mono text-[10px] font-medium text-slate-600">
+              <kbd className="pointer-events-none hidden sm:inline-flex h-5 select-none items-center gap-1 rounded border border-blue-500/20 bg-white/5 px-1.5 font-mono text-[10px] font-medium text-slate-400">
                 <Command className="h-3 w-3" />K
               </kbd>
             </Button>
@@ -152,29 +152,29 @@ export default function AdminNavbar() {
             <Button
               variant="ghost"
               size="icon"
-              className="text-slate-500 hover:text-slate-900 hover:bg-slate-100 relative"
+              className="text-slate-400 hover:text-white hover:bg-blue-500/10 relative"
             >
               <Bell className="h-5 w-5" />
               <span className="absolute top-1 right-1 flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
               </span>
             </Button>
           </motion.div>
 
           {/* Divider */}
-          <div className="hidden md:block w-px h-8 bg-slate-200 mx-2" />
+          <div className="hidden md:block w-px h-8 bg-blue-500/20 mx-2" />
 
-          {/* User Section - Links to custom profile page */}
+          {/* User Section */}
           <Link href="/profile" className="flex items-center gap-3 group">
             <div className="hidden md:flex flex-col items-end">
-              <span className="text-sm font-semibold text-slate-900 group-hover:text-emerald-600 transition-colors">Admin</span>
-              <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-4 border-emerald-200 text-emerald-600">
+              <span className="text-sm font-semibold text-white group-hover:text-cyan-300 transition-colors">Admin</span>
+              <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-4 border-blue-500/30 text-blue-400 bg-blue-500/10">
                 Super Admin
               </Badge>
             </div>
             <motion.div whileHover={{ scale: 1.05 }}>
-              <div className="h-9 w-9 rounded-full ring-2 ring-emerald-100 ring-offset-2 bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white font-bold text-sm overflow-hidden">
+              <div className="h-9 w-9 rounded-full ring-2 ring-blue-500/40 ring-offset-2 ring-offset-[#050A14] bg-gradient-to-br from-blue-600 to-cyan-500 flex items-center justify-center text-white font-bold text-sm overflow-hidden">
                 <UserProfileAvatar />
               </div>
             </motion.div>
@@ -183,21 +183,21 @@ export default function AdminNavbar() {
           {/* Mobile Menu */}
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild className="lg:hidden">
-              <Button variant="ghost" size="icon" className="ml-2">
-                <Menu className="h-5 w-5 text-slate-600" />
+              <Button variant="ghost" size="icon" className="ml-2 text-slate-400 hover:text-white hover:bg-blue-500/10">
+                <Menu className="h-5 w-5" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="right" className="w-80 bg-white p-0">
+            <SheetContent side="right" className="w-80 bg-[#07111F] border-l border-blue-500/20 p-0">
               <div className="flex flex-col h-full">
                 {/* Mobile Header */}
-                <div className="p-6 border-b border-slate-100 bg-gradient-to-r from-emerald-50 to-emerald-50">
+                <div className="p-6 border-b border-blue-500/15 bg-gradient-to-r from-blue-600/10 to-cyan-500/10">
                   <div className="flex items-center gap-3">
-                    <div className="bg-gradient-to-br from-emerald-600 to-emerald-700 p-2.5 rounded-xl">
+                    <div className="bg-gradient-to-br from-blue-600 to-cyan-500 p-2.5 rounded-xl shadow-lg shadow-blue-500/30">
                       <Shield className="h-5 w-5 text-white" />
                     </div>
                     <div>
-                      <span className="font-bold text-slate-900">Admin Portal</span>
-                      <p className="text-xs text-emerald-600 font-medium">System Administration</p>
+                      <span className="font-bold text-white">Admin Portal</span>
+                      <p className="text-xs text-blue-400 font-medium">System Administration</p>
                     </div>
                   </div>
                 </div>
@@ -221,17 +221,17 @@ export default function AdminNavbar() {
                           className={cn(
                             "flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200",
                             isActive
-                              ? "bg-emerald-50 text-emerald-700 border border-emerald-100"
-                              : "text-slate-600 hover:bg-slate-50"
+                              ? "bg-gradient-to-r from-blue-600 to-cyan-500 text-white shadow-md shadow-blue-500/25"
+                              : "text-slate-400 hover:bg-blue-500/10 hover:text-cyan-300"
                           )}
                         >
                           <Icon className={cn(
                             "h-5 w-5",
-                            isActive ? "text-emerald-600" : "text-slate-400"
+                            isActive ? "text-white" : "text-slate-500"
                           )} />
                           <span className="font-medium">{link.name}</span>
                           {isActive && (
-                            <div className="ml-auto w-1.5 h-1.5 bg-emerald-600 rounded-full" />
+                            <div className="ml-auto w-1.5 h-1.5 bg-cyan-400 rounded-full" />
                           )}
                         </Link>
                       </motion.div>
@@ -240,14 +240,14 @@ export default function AdminNavbar() {
                 </nav>
 
                 {/* Mobile Footer */}
-                <div className="p-4 border-t border-slate-100 bg-slate-50">
-                  <div className="flex items-center gap-3 p-3 bg-white rounded-xl border border-slate-100">
-                    <div className="p-2 bg-green-100 rounded-lg">
-                      <div className="w-2 h-2 bg-green-500 rounded-full" />
+                <div className="p-4 border-t border-blue-500/15 bg-white/3">
+                  <div className="flex items-center gap-3 p-3 bg-white/5 rounded-xl border border-blue-500/15">
+                    <div className="p-2 bg-cyan-500/20 rounded-lg">
+                      <div className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse" />
                     </div>
                     <div className="flex-1">
-                      <p className="text-xs font-medium text-slate-900">System Status</p>
-                      <p className="text-[10px] text-green-600">All systems operational</p>
+                      <p className="text-xs font-medium text-white">System Status</p>
+                      <p className="text-[10px] text-cyan-400">All systems operational</p>
                     </div>
                   </div>
                 </div>

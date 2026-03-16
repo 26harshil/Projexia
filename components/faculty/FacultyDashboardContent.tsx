@@ -155,14 +155,14 @@ export function FacultyDashboardContent({
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Student Groups Card */}
         <motion.div variants={itemVariants}>
-          <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden h-full shadow-sm hover:shadow-md transition-shadow">
-            <div className="flex items-center justify-between p-6 border-b border-slate-100">
+          <div className="bg-white/5 backdrop-blur-md rounded-2xl border border-blue-500/20 overflow-hidden h-full shadow-sm hover:shadow-md transition-shadow">
+            <div className="flex items-center justify-between p-6 border-b border-blue-500/15">
               <div className="flex items-center gap-3">
-                <div className="p-2.5 bg-amber-100 rounded-xl">
-                  <Users className="h-5 w-5 text-amber-600" />
+                <div className="p-2.5 bg-amber-500/15 rounded-xl">
+                  <Users className="h-5 w-5 text-amber-400" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-slate-900">
+                  <h3 className="font-semibold text-white">
                     Student Groups
                   </h3>
                   <p className="text-sm text-slate-500">
@@ -175,7 +175,7 @@ export function FacultyDashboardContent({
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
+                  className="text-cyan-400 hover:text-cyan-400 hover:bg-blue-500/10"
                 >
                   View All
                   <ArrowRight className="h-4 w-4 ml-1" />
@@ -192,13 +192,13 @@ export function FacultyDashboardContent({
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: 0.2 + index * 0.1 }}
-                      className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors"
+                      className="flex items-center gap-3 p-3 bg-white/5 rounded-xl hover:bg-white/5 transition-colors"
                     >
-                      <div className="p-2 bg-amber-100 rounded-lg">
-                        <FolderKanban className="h-4 w-4 text-amber-600" />
+                      <div className="p-2 bg-amber-500/15 rounded-lg">
+                        <FolderKanban className="h-4 w-4 text-amber-400" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="font-medium text-slate-900 text-sm truncate">
+                        <p className="font-medium text-white text-sm truncate">
                           {group.title || group.name}
                         </p>
                         <div className="flex items-center gap-2 text-xs text-slate-500">
@@ -209,7 +209,7 @@ export function FacultyDashboardContent({
                           {group.projectType && (
                             <Badge
                               variant="secondary"
-                              className="text-xs bg-emerald-50 text-emerald-600"
+                              className="text-xs bg-blue-500/10 text-cyan-400"
                             >
                               {group.projectType}
                             </Badge>
@@ -217,7 +217,7 @@ export function FacultyDashboardContent({
                         </div>
                       </div>
                       {group.leaderName && (
-                        <div className="flex items-center gap-1 text-xs text-amber-600">
+                        <div className="flex items-center gap-1 text-xs text-amber-400">
                           <Crown className="h-3 w-3" />
                           <span className="truncate max-w-[80px]">
                             {group.leaderName}
@@ -244,11 +244,11 @@ export function FacultyDashboardContent({
                     className="relative mb-6"
                   >
                     <div className="absolute inset-0 bg-amber-200 rounded-2xl blur-xl opacity-40" />
-                    <div className="relative bg-amber-50 border border-amber-100 p-6 rounded-2xl">
+                    <div className="relative bg-amber-500/10 border border-amber-500/20 p-6 rounded-2xl">
                       <Users className="h-12 w-12 text-amber-400" />
                     </div>
                   </motion.div>
-                  <p className="text-slate-600 font-medium mb-1">
+                  <p className="text-slate-300 font-medium mb-1">
                     No groups assigned yet
                   </p>
                   <p className="text-sm text-slate-400 text-center max-w-xs">
@@ -262,14 +262,14 @@ export function FacultyDashboardContent({
 
         {/* Meeting Schedule Card */}
         <motion.div variants={itemVariants}>
-          <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden h-full shadow-sm hover:shadow-md transition-shadow">
-            <div className="flex items-center justify-between p-6 border-b border-slate-100">
+          <div className="bg-white/5 backdrop-blur-md rounded-2xl border border-blue-500/20 overflow-hidden h-full shadow-sm hover:shadow-md transition-shadow">
+            <div className="flex items-center justify-between p-6 border-b border-blue-500/15">
               <div className="flex items-center gap-3">
-                <div className="p-2.5 bg-emerald-100 rounded-xl">
-                  <Calendar className="h-5 w-5 text-emerald-600" />
+                <div className="p-2.5 bg-blue-500/15 rounded-xl">
+                  <Calendar className="h-5 w-5 text-cyan-400" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-slate-900">
+                  <h3 className="font-semibold text-white">
                     Meeting Schedule
                   </h3>
                   <p className="text-sm text-slate-500">
@@ -279,7 +279,7 @@ export function FacultyDashboardContent({
               </div>
               <Badge
                 variant="secondary"
-                className="bg-emerald-50 text-emerald-700 border-emerald-100"
+                className="bg-blue-500/10 text-cyan-400 border-blue-500/20"
               >
                 {stats?.todayMeetings || 0} Today
               </Badge>
@@ -307,20 +307,20 @@ export function FacultyDashboardContent({
                         className={cn(
                           "flex items-center gap-3 p-3 rounded-xl transition-colors",
                           isToday
-                            ? "bg-emerald-50 border border-emerald-100"
-                            : "bg-slate-50 hover:bg-slate-100"
+                            ? "bg-blue-500/10 border border-blue-500/20"
+                            : "bg-white/5 hover:bg-white/5"
                         )}
                       >
                         <div
                           className={cn(
                             "p-2 rounded-lg text-center min-w-[50px]",
-                            isToday ? "bg-emerald-100" : "bg-slate-200"
+                            isToday ? "bg-blue-500/15" : "bg-slate-200"
                           )}
                         >
                           <p
                             className={cn(
                               "text-xs font-medium",
-                              isToday ? "text-emerald-600" : "text-slate-600"
+                              isToday ? "text-cyan-400" : "text-slate-300"
                             )}
                           >
                             {isToday
@@ -332,7 +332,7 @@ export function FacultyDashboardContent({
                                     month: "short",
                                   })}
                           </p>
-                          <p className="text-sm font-bold text-slate-900">
+                          <p className="text-sm font-bold text-white">
                             {meetingDate.toLocaleTimeString("en-IN", {
                               hour: "2-digit",
                               minute: "2-digit",
@@ -340,10 +340,10 @@ export function FacultyDashboardContent({
                           </p>
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="font-medium text-slate-900 text-sm truncate">
+                          <p className="font-medium text-white text-sm truncate">
                             {meeting.purpose || "Project Meeting"}
                           </p>
-                          <p className="text-xs text-emerald-600 truncate">
+                          <p className="text-xs text-cyan-400 truncate">
                             {meeting.groupName || meeting.projectTitle}
                           </p>
                           {meeting.location && (
@@ -354,7 +354,7 @@ export function FacultyDashboardContent({
                           )}
                         </div>
                         {isToday && (
-                          <Badge className="bg-emerald-600 text-white text-xs">
+                          <Badge className="bg-blue-600 text-white text-xs">
                             Now
                           </Badge>
                         )}
@@ -364,7 +364,7 @@ export function FacultyDashboardContent({
                   <Link href="/faculty/meetings" className="block">
                     <Button
                       variant="outline"
-                      className="w-full mt-2 border-emerald-200 text-emerald-600 hover:bg-emerald-50"
+                      className="w-full mt-2 border-cyan-500/25 text-cyan-400 hover:bg-blue-500/10"
                     >
                       View All Meetings
                       <ArrowRight className="h-4 w-4 ml-1" />
@@ -383,18 +383,18 @@ export function FacultyDashboardContent({
                     className="relative mb-6"
                   >
                     <div className="absolute inset-0 bg-emerald-200 rounded-2xl blur-xl opacity-40" />
-                    <div className="relative bg-emerald-50 border border-emerald-100 p-6 rounded-2xl">
-                      <Calendar className="h-12 w-12 text-emerald-400" />
+                    <div className="relative bg-blue-500/10 border border-blue-500/20 p-6 rounded-2xl">
+                      <Calendar className="h-12 w-12 text-cyan-400" />
                     </div>
                   </motion.div>
-                  <p className="text-slate-600 font-medium mb-1">
+                  <p className="text-slate-300 font-medium mb-1">
                     No meetings scheduled
                   </p>
                   <p className="text-sm text-slate-400 text-center max-w-xs mb-4">
                     Schedule meetings with your student groups
                   </p>
                   <Link href="/faculty/meetings">
-                    <Button className="bg-emerald-600 hover:bg-emerald-700 text-white">
+                    <Button className="bg-blue-600 hover:bg-emerald-700 text-white">
                       <Clock className="h-4 w-4 mr-2" />
                       Schedule Meeting
                     </Button>
@@ -408,14 +408,14 @@ export function FacultyDashboardContent({
 
       {/* Middle Row: Project Overview (full width) */}
       <motion.div variants={itemVariants}>
-        <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-          <div className="flex items-center justify-between p-6 border-b border-slate-100">
+        <div className="bg-white/5 backdrop-blur-md rounded-2xl border border-blue-500/20 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+          <div className="flex items-center justify-between p-6 border-b border-blue-500/15">
             <div className="flex items-center gap-3">
               <div className="p-2.5 bg-violet-100 rounded-xl">
                 <Layers className="h-5 w-5 text-violet-600" />
               </div>
               <div>
-                <h3 className="font-semibold text-slate-900">
+                <h3 className="font-semibold text-white">
                   Project Overview
                 </h3>
                 <p className="text-sm text-slate-500">
@@ -456,11 +456,11 @@ export function FacultyDashboardContent({
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.1 + index * 0.05 }}
-                        className="hover:bg-slate-50 transition-colors"
+                        className="hover:bg-white/5 transition-colors"
                       >
                         <td className="py-3 pr-4">
                           <div>
-                            <p className="font-medium text-slate-900 text-sm">
+                            <p className="font-medium text-white text-sm">
                               {group.title || group.name}
                             </p>
                             {group.area && (
@@ -483,14 +483,14 @@ export function FacultyDashboardContent({
                           )}
                         </td>
                         <td className="py-3 pr-4">
-                          <div className="flex items-center gap-1 text-sm text-slate-700">
+                          <div className="flex items-center gap-1 text-sm text-slate-200">
                             <Users className="h-3.5 w-3.5 text-slate-400" />
                             {group.memberCount}
                           </div>
                         </td>
                         <td className="py-3 pr-4">
                           {group.leaderName ? (
-                            <div className="flex items-center gap-1 text-sm text-amber-600">
+                            <div className="flex items-center gap-1 text-sm text-amber-400">
                               <Crown className="h-3.5 w-3.5" />
                               <span className="truncate max-w-[100px]">
                                 {group.leaderName}
@@ -504,7 +504,7 @@ export function FacultyDashboardContent({
                         </td>
                         <td className="py-3 pr-4">
                           {group.lastMeetingDate ? (
-                            <div className="text-xs text-slate-600">
+                            <div className="text-xs text-slate-300">
                               <p>
                                 {new Date(
                                   group.lastMeetingDate
@@ -528,17 +528,17 @@ export function FacultyDashboardContent({
                         </td>
                         <td className="py-3">
                           {group.lastMeetingStatus === "Completed" ? (
-                            <Badge className="bg-emerald-50 text-emerald-600 border-emerald-100 text-xs">
+                            <Badge className="bg-blue-500/10 text-cyan-400 border-blue-500/20 text-xs">
                               <CheckCircle2 className="h-3 w-3 mr-1" />
                               On Track
                             </Badge>
                           ) : group.lastMeetingStatus ? (
-                            <Badge className="bg-amber-50 text-amber-600 border-amber-100 text-xs">
+                            <Badge className="bg-amber-500/10 text-amber-400 border-amber-500/20 text-xs">
                               <Clock className="h-3 w-3 mr-1" />
                               {group.lastMeetingStatus}
                             </Badge>
                           ) : (
-                            <Badge className="bg-slate-50 text-slate-500 border-slate-100 text-xs">
+                            <Badge className="bg-white/5 text-slate-500 border-blue-500/15 text-xs">
                               New
                             </Badge>
                           )}
@@ -556,7 +556,7 @@ export function FacultyDashboardContent({
                     <Layers className="h-12 w-12 text-violet-400" />
                   </div>
                 </div>
-                <p className="text-slate-600 font-medium mb-1">
+                <p className="text-slate-300 font-medium mb-1">
                   No projects yet
                 </p>
                 <p className="text-sm text-slate-400 text-center max-w-xs">
@@ -572,14 +572,14 @@ export function FacultyDashboardContent({
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Recent Activity Card */}
         <motion.div variants={itemVariants}>
-          <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden h-full shadow-sm hover:shadow-md transition-shadow">
-            <div className="flex items-center justify-between p-6 border-b border-slate-100">
+          <div className="bg-white/5 backdrop-blur-md rounded-2xl border border-blue-500/20 overflow-hidden h-full shadow-sm hover:shadow-md transition-shadow">
+            <div className="flex items-center justify-between p-6 border-b border-blue-500/15">
               <div className="flex items-center gap-3">
-                <div className="p-2.5 bg-blue-100 rounded-xl">
-                  <Activity className="h-5 w-5 text-blue-600" />
+                <div className="p-2.5 bg-blue-500/15 rounded-xl">
+                  <Activity className="h-5 w-5 text-blue-400" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-slate-900">
+                  <h3 className="font-semibold text-white">
                     Recent Activity
                   </h3>
                   <p className="text-sm text-slate-500">
@@ -607,24 +607,24 @@ export function FacultyDashboardContent({
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: 0.2 + index * 0.1 }}
-                        className="flex items-start gap-3 p-3 bg-slate-50 rounded-xl"
+                        className="flex items-start gap-3 p-3 bg-white/5 rounded-xl"
                       >
                         <div
                           className={cn(
                             "p-1.5 rounded-lg mt-0.5",
                             activity.status === "Completed"
-                              ? "bg-emerald-100"
-                              : "bg-amber-100"
+                              ? "bg-blue-500/15"
+                              : "bg-amber-500/15"
                           )}
                         >
                           {activity.status === "Completed" ? (
-                            <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />
+                            <CheckCircle2 className="h-3.5 w-3.5 text-cyan-400" />
                           ) : (
-                            <AlertCircle className="h-3.5 w-3.5 text-amber-600" />
+                            <AlertCircle className="h-3.5 w-3.5 text-amber-400" />
                           )}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="font-medium text-slate-900 text-sm truncate">
+                          <p className="font-medium text-white text-sm truncate">
                             {activity.purpose || "Meeting"}
                           </p>
                           <p className="text-xs text-slate-500 truncate">
@@ -661,14 +661,14 @@ export function FacultyDashboardContent({
 
         {/* Quick Stats Card */}
         <motion.div variants={itemVariants}>
-          <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden h-full shadow-sm hover:shadow-md transition-shadow">
-            <div className="flex items-center justify-between p-6 border-b border-slate-100">
+          <div className="bg-white/5 backdrop-blur-md rounded-2xl border border-blue-500/20 overflow-hidden h-full shadow-sm hover:shadow-md transition-shadow">
+            <div className="flex items-center justify-between p-6 border-b border-blue-500/15">
               <div className="flex items-center gap-3">
-                <div className="p-2.5 bg-slate-100 rounded-xl">
-                  <BarChart3 className="h-5 w-5 text-slate-600" />
+                <div className="p-2.5 bg-white/5 rounded-xl">
+                  <BarChart3 className="h-5 w-5 text-slate-300" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-slate-900">Quick Stats</h3>
+                  <h3 className="font-semibold text-white">Quick Stats</h3>
                   <p className="text-sm text-slate-500">
                     Your activity overview
                   </p>
@@ -716,31 +716,31 @@ export function FacultyDashboardContent({
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: 0.4 + index * 0.08 }}
-                      className="flex items-center justify-between p-3 bg-slate-50 rounded-xl hover:bg-slate-100 transition-colors cursor-pointer"
+                      className="flex items-center justify-between p-3 bg-white/5 rounded-xl hover:bg-white/5 transition-colors cursor-pointer"
                     >
                       <div className="flex items-center gap-3">
                         <div
                           className={cn(
                             "p-2 rounded-lg",
-                            stat.color === "emerald" && "bg-emerald-100",
-                            stat.color === "amber" && "bg-amber-100",
-                            stat.color === "blue" && "bg-blue-100"
+                            stat.color === "emerald" && "bg-blue-500/15",
+                            stat.color === "amber" && "bg-amber-500/15",
+                            stat.color === "blue" && "bg-blue-500/15"
                           )}
                         >
                           <stat.icon
                             className={cn(
                               "h-4 w-4",
-                              stat.color === "emerald" && "text-emerald-600",
-                              stat.color === "amber" && "text-amber-600",
-                              stat.color === "blue" && "text-blue-600"
+                              stat.color === "emerald" && "text-cyan-400",
+                              stat.color === "amber" && "text-amber-400",
+                              stat.color === "blue" && "text-blue-400"
                             )}
                           />
                         </div>
-                        <span className="text-sm text-slate-600">
+                        <span className="text-sm text-slate-300">
                           {stat.label}
                         </span>
                       </div>
-                      <span className="font-bold text-slate-900">
+                      <span className="font-bold text-white">
                         {stat.value}
                       </span>
                     </motion.div>
@@ -757,12 +757,12 @@ export function FacultyDashboardContent({
               </div>
 
               {/* Attendance Rate */}
-              <div className="mt-4 p-4 bg-gradient-to-r from-emerald-50 to-amber-50 rounded-xl border border-emerald-100">
+              <div className="mt-4 p-4 bg-gradient-to-r from-emerald-50 to-amber-50 rounded-xl border border-blue-500/20">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium text-slate-700">
+                  <span className="text-sm font-medium text-slate-200">
                     Attendance Rate
                   </span>
-                  <span className="text-sm font-bold text-emerald-600">
+                  <span className="text-sm font-bold text-cyan-400">
                     {stats?.attendanceRate !== undefined
                       ? `${stats.attendanceRate}%`
                       : "N/A"}
@@ -775,12 +775,12 @@ export function FacultyDashboardContent({
               </div>
 
               {/* Meeting Completion Rate */}
-              <div className="mt-3 p-4 bg-gradient-to-r from-blue-50 to-violet-50 rounded-xl border border-blue-100">
+              <div className="mt-3 p-4 bg-gradient-to-r from-blue-50 to-violet-50 rounded-xl border border-blue-500/20">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium text-slate-700">
+                  <span className="text-sm font-medium text-slate-200">
                     Meeting Completion
                   </span>
-                  <span className="text-sm font-bold text-blue-600">
+                  <span className="text-sm font-bold text-blue-400">
                     {stats?.meetingCompletionRate !== undefined
                       ? `${stats.meetingCompletionRate}%`
                       : "N/A"}
@@ -797,14 +797,14 @@ export function FacultyDashboardContent({
 
         {/* Project Type Breakdown Card */}
         <motion.div variants={itemVariants}>
-          <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden h-full shadow-sm hover:shadow-md transition-shadow">
-            <div className="flex items-center justify-between p-6 border-b border-slate-100">
+          <div className="bg-white/5 backdrop-blur-md rounded-2xl border border-blue-500/20 overflow-hidden h-full shadow-sm hover:shadow-md transition-shadow">
+            <div className="flex items-center justify-between p-6 border-b border-blue-500/15">
               <div className="flex items-center gap-3">
-                <div className="p-2.5 bg-emerald-100 rounded-xl">
-                  <BookOpen className="h-5 w-5 text-emerald-600" />
+                <div className="p-2.5 bg-blue-500/15 rounded-xl">
+                  <BookOpen className="h-5 w-5 text-cyan-400" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-slate-900">
+                  <h3 className="font-semibold text-white">
                     Project Types
                   </h3>
                   <p className="text-sm text-slate-500">
@@ -824,13 +824,13 @@ export function FacultyDashboardContent({
                     );
                     const colors = [
                       {
-                        bg: "bg-emerald-100",
-                        text: "text-emerald-600",
-                        bar: "bg-emerald-500",
+                        bg: "bg-blue-500/15",
+                        text: "text-cyan-400",
+                        bar: "bg-blue-500",
                       },
                       {
-                        bg: "bg-amber-100",
-                        text: "text-amber-600",
+                        bg: "bg-amber-500/15",
+                        text: "text-amber-400",
                         bar: "bg-amber-500",
                       },
                       {
@@ -839,8 +839,8 @@ export function FacultyDashboardContent({
                         bar: "bg-violet-500",
                       },
                       {
-                        bg: "bg-blue-100",
-                        text: "text-blue-600",
+                        bg: "bg-blue-500/15",
+                        text: "text-blue-400",
                         bar: "bg-blue-500",
                       },
                       {
@@ -866,18 +866,18 @@ export function FacultyDashboardContent({
                                 className={cn("h-3.5 w-3.5", colorSet.text)}
                               />
                             </div>
-                            <span className="text-sm font-medium text-slate-700">
+                            <span className="text-sm font-medium text-slate-200">
                               {pt.name}
                             </span>
                           </div>
-                          <span className="text-sm font-bold text-slate-900">
+                          <span className="text-sm font-bold text-white">
                             {pt.groupCount}{" "}
                             <span className="font-normal text-xs text-slate-400">
                               group{pt.groupCount !== 1 ? "s" : ""}
                             </span>
                           </span>
                         </div>
-                        <div className="w-full bg-slate-100 rounded-full h-1.5">
+                        <div className="w-full bg-white/5 rounded-full h-1.5">
                           <motion.div
                             initial={{ width: 0 }}
                             animate={{ width: `${percentage}%` }}
@@ -893,10 +893,10 @@ export function FacultyDashboardContent({
                   })}
 
                   {/* Summary */}
-                  <div className="mt-4 pt-3 border-t border-slate-100">
+                  <div className="mt-4 pt-3 border-t border-blue-500/15">
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-slate-500">Total Groups</span>
-                      <span className="font-bold text-slate-900">
+                      <span className="font-bold text-white">
                         {stats?.studentGroups || 0}
                       </span>
                     </div>
@@ -914,11 +914,11 @@ export function FacultyDashboardContent({
                     className="relative mb-6"
                   >
                     <div className="absolute inset-0 bg-emerald-200 rounded-2xl blur-xl opacity-40" />
-                    <div className="relative bg-emerald-50 border border-emerald-100 p-6 rounded-2xl">
-                      <BookOpen className="h-12 w-12 text-emerald-400" />
+                    <div className="relative bg-blue-500/10 border border-blue-500/20 p-6 rounded-2xl">
+                      <BookOpen className="h-12 w-12 text-cyan-400" />
                     </div>
                   </motion.div>
-                  <p className="text-slate-600 font-medium mb-1">
+                  <p className="text-slate-300 font-medium mb-1">
                     No project types yet
                   </p>
                   <p className="text-sm text-slate-400 text-center max-w-xs">

@@ -47,73 +47,75 @@
 }
 
 :root {
-  --radius: 0.625rem;
-  --background: #FFFFFF; /* Pure White */
-  --foreground: #111827; /* Rich Grey */
-  --card: #F9FAFB; /* Cool Grey White */
-  --card-foreground: #111827;
-  --popover: #FFFFFF;
-  --popover-foreground: #111827;
-  --primary: #064E3B; /* Deep Emerald */
-  --primary-foreground: #FFFFFF;
-  --secondary: #10B981; /* Emerald Green */
-  --secondary-foreground: #FFFFFF;
-  --muted: #F3F4F6;
-  --muted-foreground: #374151; /* Cool Grey Body */
-  --accent: #F59E0B; /* Professional Amber */
-  --accent-foreground: #FFFFFF;
-  --destructive: #EF4444;
-  --border: #E5E7EB;
-  --input: #E5E7EB;
-  --ring: #064E3B; /* Deep Emerald */
-  --chart-1: #064E3B;
-  --chart-2: #10B981;
-  --chart-3: #F59E0B;
-  --chart-4: #34D399;
-  --chart-5: #FBBF24;
-  --sidebar: #F9FAFB;
-  --sidebar-foreground: #111827;
-  --sidebar-primary: #064E3B;
-  --sidebar-primary-foreground: #FFFFFF;
-  --sidebar-accent: #F3F4F6;
-  --sidebar-accent-foreground: #064E3B;
-  --sidebar-border: #E5E7EB;
-  --sidebar-ring: #064E3B;
+  --radius: 0.75rem;
+  /* === BLACK / BLUE / SILVER DARK THEME === */
+  --background: #050A14;          /* deep space black */
+  --foreground: #E8EDF5;          /* silver-white text */
+  --card: rgba(10, 20, 40, 0.6);  /* glass dark blue */
+  --card-foreground: #E8EDF5;
+  --popover: #0A1428;
+  --popover-foreground: #E8EDF5;
+  --primary: #3B9EFF;             /* electric blue */
+  --primary-foreground: #050A14;
+  --secondary: #00D4C8;           /* cyan accent */
+  --secondary-foreground: #050A14;
+  --muted: #0D1F3C;
+  --muted-foreground: #8BA0BF;    /* muted silver */
+  --accent: #00D4C8;              /* cyan */
+  --accent-foreground: #050A14;
+  --destructive: #FF4D6D;
+  --border: rgba(59, 158, 255, 0.25);
+  --input: rgba(59, 158, 255, 0.15);
+  --ring: #3B9EFF;
+  --chart-1: #3B9EFF;
+  --chart-2: #00D4C8;
+  --chart-3: #A78BFA;
+  --chart-4: #38BDF8;
+  --chart-5: #67E8F9;
+  --sidebar: #07111F;
+  --sidebar-foreground: #E8EDF5;
+  --sidebar-primary: #3B9EFF;
+  --sidebar-primary-foreground: #050A14;
+  --sidebar-accent: #0D1F3C;
+  --sidebar-accent-foreground: #E8EDF5;
+  --sidebar-border: rgba(59, 158, 255, 0.2);
+  --sidebar-ring: #3B9EFF;
 }
 
 .dark {
-  --background: #022C22; /* Very Dark Emerald/Grey */
-  --foreground: #F9FAFB;
-  --card: #064E3B;
-  --card-foreground: #F9FAFB;
-  --popover: #064E3B;
-  --popover-foreground: #F9FAFB;
-  --primary: #10B981; /* Lighter Emerald for dark mode */
-  --primary-foreground: #022C22;
-  --secondary: #065F46;
-  --secondary-foreground: #FFFFFF;
-  --muted: #064E3B;
-  --muted-foreground: #9CA3AF;
-  --accent: #F59E0B;
-  --accent-foreground: #FFFFFF;
-  --destructive: #7F1D1D;
-  --border: #065F46;
-  --input: #065F46;
-  --ring: #10B981;
-  --chart-1: #10B981;
-  --chart-2: #34D399;
-  --chart-3: #FBBF24;
-  --chart-4: #6EE7B7;
-  --chart-5: #FDE68A;
-  --sidebar: #022C22;
-  --sidebar-foreground: #F9FAFB;
-  --sidebar-primary: #10B981;
-  --sidebar-primary-foreground: #FFFFFF;
-  --sidebar-accent: #064E3B;
-  --sidebar-accent-foreground: #F9FAFB;
-  --sidebar-border: #065F46;
-  --sidebar-ring: #10B981;
+  --background: #050A14;
+  --foreground: #E8EDF5;
+  --card: rgba(10, 20, 40, 0.6);
+  --card-foreground: #E8EDF5;
+  --popover: #0A1428;
+  --popover-foreground: #E8EDF5;
+  --primary: #3B9EFF;
+  --primary-foreground: #050A14;
+  --secondary: #00D4C8;
+  --secondary-foreground: #050A14;
+  --muted: #0D1F3C;
+  --muted-foreground: #8BA0BF;
+  --accent: #00D4C8;
+  --accent-foreground: #050A14;
+  --destructive: #FF4D6D;
+  --border: rgba(59, 158, 255, 0.25);
+  --input: rgba(59, 158, 255, 0.15);
+  --ring: #3B9EFF;
+  --chart-1: #3B9EFF;
+  --chart-2: #00D4C8;
+  --chart-3: #A78BFA;
+  --chart-4: #38BDF8;
+  --chart-5: #67E8F9;
+  --sidebar: #07111F;
+  --sidebar-foreground: #E8EDF5;
+  --sidebar-primary: #3B9EFF;
+  --sidebar-primary-foreground: #050A14;
+  --sidebar-accent: #0D1F3C;
+  --sidebar-accent-foreground: #E8EDF5;
+  --sidebar-border: rgba(59, 158, 255, 0.2);
+  --sidebar-ring: #3B9EFF;
 }
+
 
 @layer base {
   * {
@@ -122,7 +124,36 @@
   body {
     @apply bg-background text-foreground;
   }
+  /* Dark scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #050A14;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(59, 158, 255, 0.4);
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 212, 200, 0.6);
+  }
 }
+
+/* Glass card utility */
+.glass-card {
+  background: rgba(10, 20, 40, 0.5);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(59, 158, 255, 0.2);
+  border-radius: 0.75rem;
+}
+
+.glass-card:hover {
+  border-color: rgba(0, 212, 200, 0.35);
+  box-shadow: 0 0 20px rgba(59, 158, 255, 0.1);
+}
+
 .cl-footer > div:last-child {
   display: none !important;
 }

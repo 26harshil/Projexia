@@ -136,7 +136,7 @@ export function FacultyGroupsContent({ groups, students, projectTypes, staffList
     const completedGroups = filteredGroups.filter((g) => g.status === "Completed");
 
     return (
-        <div className="min-h-screen bg-slate-50">
+        <div className="min-h-screen bg-[#050A14]">
             <div className="max-w-7xl mx-auto px-4 md:px-6 py-8">
                 {/* Page Header */}
                 <motion.div
@@ -145,7 +145,7 @@ export function FacultyGroupsContent({ groups, students, projectTypes, staffList
                     className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8"
                 >
                     <div>
-                        <h1 className="text-2xl md:text-3xl font-bold text-slate-900 mb-1">
+                        <h1 className="text-2xl md:text-3xl font-bold text-white mb-1">
                             My Groups
                         </h1>
                         <p className="text-slate-500">
@@ -153,7 +153,7 @@ export function FacultyGroupsContent({ groups, students, projectTypes, staffList
                         </p>
                     </div>
                     <Button
-                        className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm"
+                        className="bg-blue-600 hover:bg-emerald-700 text-white shadow-sm"
                         onClick={() => setShowCreateModal(true)}
                     >
                         <UserPlus className="h-4 w-4 mr-2" />
@@ -166,7 +166,7 @@ export function FacultyGroupsContent({ groups, students, projectTypes, staffList
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.1 }}
-                    className="bg-white rounded-xl border border-slate-200 p-4 mb-6"
+                    className="bg-white/5 backdrop-blur-md rounded-xl border border-blue-500/20 p-4 mb-6"
                 >
                     <div className="flex flex-col sm:flex-row gap-4">
                         <div className="relative flex-1">
@@ -175,19 +175,19 @@ export function FacultyGroupsContent({ groups, students, projectTypes, staffList
                                 placeholder="Search groups..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="pl-10 bg-slate-50 border-slate-200 focus:bg-white"
+                                className="pl-10 bg-white/5 border-blue-500/20 focus:bg-white/10"
                             />
                         </div>
                         <div className="flex gap-2">
-                            <Button variant="outline" className="border-slate-200">
+                            <Button variant="outline" className="border-blue-500/20">
                                 <Filter className="h-4 w-4 mr-2" />
                                 Filter
                             </Button>
-                            <div className="flex border border-slate-200 rounded-lg p-1">
+                            <div className="flex border border-blue-500/20 rounded-lg p-1">
                                 <Button
                                     variant="ghost"
                                     size="icon"
-                                    className={`h-8 w-8 rounded-md ${viewMode === "grid" ? "bg-slate-100" : ""}`}
+                                    className={`h-8 w-8 rounded-md ${viewMode === "grid" ? "bg-white/5" : ""}`}
                                     onClick={() => setViewMode("grid")}
                                 >
                                     <LayoutGrid className="h-4 w-4" />
@@ -195,7 +195,7 @@ export function FacultyGroupsContent({ groups, students, projectTypes, staffList
                                 <Button
                                     variant="ghost"
                                     size="icon"
-                                    className={`h-8 w-8 rounded-md ${viewMode === "list" ? "bg-slate-100" : ""}`}
+                                    className={`h-8 w-8 rounded-md ${viewMode === "list" ? "bg-white/5" : ""}`}
                                     onClick={() => setViewMode("list")}
                                 >
                                     <List className="h-4 w-4" />
@@ -212,22 +212,22 @@ export function FacultyGroupsContent({ groups, students, projectTypes, staffList
                     transition={{ delay: 0.2 }}
                 >
                     <Tabs defaultValue="all" className="w-full">
-                        <TabsList className="bg-white border border-slate-200 p-1 mb-6">
+                        <TabsList className="bg-white/5 border border-blue-500/20 p-1 mb-6">
                             <TabsTrigger
                                 value="all"
-                                className="data-[state=active]:bg-emerald-50 data-[state=active]:text-emerald-700"
+                                className="data-[state=active]:bg-blue-500/10 data-[state=active]:text-cyan-400"
                             >
                                 All Groups ({filteredGroups.length})
                             </TabsTrigger>
                             <TabsTrigger
                                 value="active"
-                                className="data-[state=active]:bg-emerald-50 data-[state=active]:text-emerald-700"
+                                className="data-[state=active]:bg-blue-500/10 data-[state=active]:text-cyan-400"
                             >
                                 Active ({activeGroups.length})
                             </TabsTrigger>
                             <TabsTrigger
                                 value="completed"
-                                className="data-[state=active]:bg-emerald-50 data-[state=active]:text-emerald-700"
+                                className="data-[state=active]:bg-blue-500/10 data-[state=active]:text-cyan-400"
                             >
                                 Completed ({completedGroups.length})
                             </TabsTrigger>
@@ -281,7 +281,7 @@ export function FacultyGroupsContent({ groups, students, projectTypes, staffList
                                     ))}
                                 </motion.div>
                             ) : (
-                                <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center">
+                                <div className="bg-white/5 backdrop-blur-md rounded-2xl border border-blue-500/20 p-12 text-center">
                                     <p className="text-slate-500">No active groups</p>
                                 </div>
                             )}
@@ -309,7 +309,7 @@ export function FacultyGroupsContent({ groups, students, projectTypes, staffList
                                     ))}
                                 </motion.div>
                             ) : (
-                                <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center">
+                                <div className="bg-white/5 backdrop-blur-md rounded-2xl border border-blue-500/20 p-12 text-center">
                                     <p className="text-slate-500">No completed groups</p>
                                 </div>
                             )}
@@ -366,18 +366,18 @@ function GroupCard({
     if (viewMode === "list") {
         return (
             <motion.div variants={itemVariants}>
-                <div className="bg-white rounded-xl border border-slate-200 p-4 hover:shadow-md transition-all">
+                <div className="bg-white/5 backdrop-blur-md rounded-xl border border-blue-500/20 p-4 hover:shadow-md transition-all">
                     <div className="flex items-center gap-4">
-                        <div className="p-3 bg-amber-100 rounded-xl shrink-0">
-                            <Users className="h-6 w-6 text-amber-600" />
+                        <div className="p-3 bg-amber-500/15 rounded-xl shrink-0">
+                            <Users className="h-6 w-6 text-amber-400" />
                         </div>
                         <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 mb-1">
-                                <h3 className="font-semibold text-slate-900 truncate">
+                                <h3 className="font-semibold text-white truncate">
                                     {group.title || group.name}
                                 </h3>
                                 {group.projectType && (
-                                    <Badge className="bg-emerald-100 text-emerald-700 text-xs">
+                                    <Badge className="bg-blue-500/15 text-cyan-400 text-xs">
                                         {group.projectType}
                                     </Badge>
                                 )}
@@ -398,7 +398,7 @@ function GroupCard({
                         <Button
                             variant="ghost"
                             size="sm"
-                            className="text-emerald-600"
+                            className="text-cyan-400"
                             onClick={onViewDetails}
                         >
                             View <ChevronRight className="h-4 w-4 ml-1" />
@@ -411,14 +411,14 @@ function GroupCard({
 
     return (
         <motion.div variants={itemVariants}>
-            <div className="bg-white rounded-2xl border border-slate-200 p-6 hover:shadow-lg transition-all h-full flex flex-col">
+            <div className="bg-white/5 backdrop-blur-md rounded-2xl border border-blue-500/20 p-6 hover:shadow-lg transition-all h-full flex flex-col">
                 {/* Header */}
                 <div className="flex items-start justify-between mb-4">
-                    <div className="p-3 bg-amber-100 rounded-xl">
-                        <FolderKanban className="h-5 w-5 text-amber-600" />
+                    <div className="p-3 bg-amber-500/15 rounded-xl">
+                        <FolderKanban className="h-5 w-5 text-amber-400" />
                     </div>
                     {group.projectType && (
-                        <Badge className="bg-emerald-100 text-emerald-700 text-xs">
+                        <Badge className="bg-blue-500/15 text-cyan-400 text-xs">
                             {group.projectType}
                         </Badge>
                     )}
@@ -426,7 +426,7 @@ function GroupCard({
 
                 {/* Content */}
                 <div className="flex-1">
-                    <h3 className="font-semibold text-slate-900 mb-1 line-clamp-1">
+                    <h3 className="font-semibold text-white mb-1 line-clamp-1">
                         {group.title || group.name}
                     </h3>
                     {group.area && (
@@ -436,7 +436,7 @@ function GroupCard({
                         </p>
                     )}
                     {group.description && (
-                        <p className="text-sm text-slate-600 line-clamp-2 mb-4">
+                        <p className="text-sm text-slate-300 line-clamp-2 mb-4">
                             {group.description}
                         </p>
                     )}
@@ -456,7 +456,7 @@ function GroupCard({
                             ))}
                             {group.memberCount > 3 && (
                                 <div className="w-8 h-8 bg-slate-200 rounded-full border-2 border-white flex items-center justify-center">
-                                    <span className="text-slate-600 text-xs font-medium">
+                                    <span className="text-slate-300 text-xs font-medium">
                                         +{group.memberCount - 3}
                                     </span>
                                 </div>
@@ -467,9 +467,9 @@ function GroupCard({
 
                     {/* Leader */}
                     {leader && (
-                        <div className="flex items-center gap-2 p-2 bg-amber-50 rounded-lg mb-4">
-                            <Crown className="h-4 w-4 text-amber-600" />
-                            <span className="text-sm text-amber-700 font-medium">
+                        <div className="flex items-center gap-2 p-2 bg-amber-500/10 rounded-lg mb-4">
+                            <Crown className="h-4 w-4 text-amber-400" />
+                            <span className="text-sm text-amber-400 font-medium">
                                 Leader: {leader.name}
                             </span>
                         </div>
@@ -477,11 +477,11 @@ function GroupCard({
 
                     {/* Next Meeting */}
                     {group.nextMeeting && (
-                        <div className="flex items-center gap-2 p-2 bg-blue-50 rounded-lg">
-                            <Calendar className="h-4 w-4 text-blue-600" />
+                        <div className="flex items-center gap-2 p-2 bg-blue-500/10 rounded-lg">
+                            <Calendar className="h-4 w-4 text-blue-400" />
                             <div className="text-sm">
                                 <span className="text-blue-700 font-medium">Next Meeting: </span>
-                                <span className="text-blue-600">
+                                <span className="text-blue-400">
                                     {new Date(group.nextMeeting.meetingdatetime).toLocaleDateString("en-IN", {
                                         day: "numeric",
                                         month: "short",
@@ -495,10 +495,10 @@ function GroupCard({
                 </div>
 
                 {/* Footer */}
-                <div className="mt-4 pt-4 border-t border-slate-100">
+                <div className="mt-4 pt-4 border-t border-blue-500/15">
                     <Button
                         variant="outline"
-                        className="w-full border-emerald-200 text-emerald-600 hover:bg-emerald-50"
+                        className="w-full border-cyan-500/25 text-cyan-400 hover:bg-blue-500/10"
                         onClick={onViewDetails}
                     >
                         View Details
@@ -627,15 +627,15 @@ function GroupDetailsModal({
                 initial={{ scale: 0.95, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0.95, opacity: 0 }}
-                className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden"
+                className="bg-white/5 backdrop-blur-md rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden"
                 onClick={(e) => e.stopPropagation()}
             >
                 {/* Header */}
-                <div className="p-6 border-b border-slate-100 bg-gradient-to-r from-emerald-50 to-amber-50">
+                <div className="p-6 border-b border-blue-500/15 bg-gradient-to-r from-emerald-50 to-amber-50">
                     <div className="flex items-start justify-between">
                         <div className="flex items-center gap-4">
-                            <div className="p-3 bg-white rounded-xl shadow-sm">
-                                <FolderKanban className="h-6 w-6 text-emerald-600" />
+                            <div className="p-3 bg-white/5 backdrop-blur-md rounded-xl shadow-sm">
+                                <FolderKanban className="h-6 w-6 text-cyan-400" />
                             </div>
                             <div>
                                 {isEditing ? (
@@ -645,13 +645,13 @@ function GroupDetailsModal({
                                         className="font-bold text-lg"
                                     />
                                 ) : (
-                                    <h2 className="text-xl font-bold text-slate-900">
+                                    <h2 className="text-xl font-bold text-white">
                                         {group.title || group.name}
                                     </h2>
                                 )}
                                 <div className="flex items-center gap-2 mt-1">
                                     {group.projectType && (
-                                        <Badge className="bg-emerald-100 text-emerald-700">
+                                        <Badge className="bg-blue-500/15 text-cyan-400">
                                             {group.projectType}
                                         </Badge>
                                     )}
@@ -674,7 +674,7 @@ function GroupDetailsModal({
                 <div className="p-6 overflow-y-auto max-h-[calc(90vh-200px)]">
                     {/* Edit Mode Fields */}
                     {isEditing && (
-                        <div className="space-y-4 mb-6 p-4 bg-emerald-50 rounded-xl">
+                        <div className="space-y-4 mb-6 p-4 bg-blue-500/10 rounded-xl">
                             <div className="space-y-2">
                                 <Label>Project Title</Label>
                                 <Input
@@ -706,21 +706,21 @@ function GroupDetailsModal({
                     {/* Project Description */}
                     {!isEditing && group.description && (
                         <div className="mb-6">
-                            <h3 className="text-sm font-medium text-slate-700 mb-2">Project Description</h3>
-                            <p className="text-slate-600 bg-slate-50 p-4 rounded-lg">{group.description}</p>
+                            <h3 className="text-sm font-medium text-slate-200 mb-2">Project Description</h3>
+                            <p className="text-slate-300 bg-white/5 p-4 rounded-lg">{group.description}</p>
                         </div>
                     )}
 
                     {/* Project Info Grid */}
                     <div className="grid grid-cols-2 gap-4 mb-6">
-                        <div className="p-4 bg-emerald-50 rounded-xl">
-                            <p className="text-xs text-emerald-600 uppercase tracking-wide font-medium mb-1">Group Name</p>
-                            <p className="font-semibold text-slate-900">{group.name}</p>
+                        <div className="p-4 bg-blue-500/10 rounded-xl">
+                            <p className="text-xs text-cyan-400 uppercase tracking-wide font-medium mb-1">Group Name</p>
+                            <p className="font-semibold text-white">{group.name}</p>
                         </div>
                         {group.averageCpi && (
-                            <div className="p-4 bg-amber-50 rounded-xl">
-                                <p className="text-xs text-amber-600 uppercase tracking-wide font-medium mb-1">Average CPI</p>
-                                <p className="font-semibold text-slate-900">{group.averageCpi.toFixed(2)}</p>
+                            <div className="p-4 bg-amber-500/10 rounded-xl">
+                                <p className="text-xs text-amber-400 uppercase tracking-wide font-medium mb-1">Average CPI</p>
+                                <p className="font-semibold text-white">{group.averageCpi.toFixed(2)}</p>
                             </div>
                         )}
                     </div>
@@ -728,14 +728,14 @@ function GroupDetailsModal({
                     {/* Faculty Info */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                         {group.convener && (
-                            <div className="p-4 bg-slate-50 rounded-xl">
+                            <div className="p-4 bg-white/5 rounded-xl">
                                 <p className="text-xs text-slate-500 uppercase tracking-wide font-medium mb-2">Convener</p>
                                 <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center">
-                                        <User className="h-5 w-5 text-emerald-600" />
+                                    <div className="w-10 h-10 bg-blue-500/15 rounded-full flex items-center justify-center">
+                                        <User className="h-5 w-5 text-cyan-400" />
                                     </div>
                                     <div>
-                                        <p className="font-medium text-slate-900">{group.convener.staffname}</p>
+                                        <p className="font-medium text-white">{group.convener.staffname}</p>
                                         {group.convener.email && (
                                             <p className="text-sm text-slate-500">{group.convener.email}</p>
                                         )}
@@ -744,14 +744,14 @@ function GroupDetailsModal({
                             </div>
                         )}
                         {group.expert && (
-                            <div className="p-4 bg-slate-50 rounded-xl">
+                            <div className="p-4 bg-white/5 rounded-xl">
                                 <p className="text-xs text-slate-500 uppercase tracking-wide font-medium mb-2">Expert</p>
                                 <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center">
-                                        <GraduationCap className="h-5 w-5 text-emerald-600" />
+                                    <div className="w-10 h-10 bg-blue-500/15 rounded-full flex items-center justify-center">
+                                        <GraduationCap className="h-5 w-5 text-cyan-400" />
                                     </div>
                                     <div>
-                                        <p className="font-medium text-slate-900">{group.expert.staffname}</p>
+                                        <p className="font-medium text-white">{group.expert.staffname}</p>
                                         {group.expert.email && (
                                             <p className="text-sm text-slate-500">{group.expert.email}</p>
                                         )}
@@ -764,7 +764,7 @@ function GroupDetailsModal({
                     {/* Team Members */}
                     <div>
                         <div className="flex items-center justify-between mb-4">
-                            <h3 className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                            <h3 className="text-sm font-medium text-slate-200 flex items-center gap-2">
                                 <Users className="h-4 w-4" />
                                 Team Members ({group.members.length})
                             </h3>
@@ -772,7 +772,7 @@ function GroupDetailsModal({
                                 <Button
                                     variant="outline"
                                     size="sm"
-                                    className="text-emerald-600 border-emerald-200"
+                                    className="text-cyan-400 border-cyan-500/25"
                                     onClick={() => setIsAddingStudent(!isAddingStudent)}
                                 >
                                     <UserPlus className="h-3 w-3 mr-1" />
@@ -782,7 +782,7 @@ function GroupDetailsModal({
                         </div>
 
                         {isEditing && isAddingStudent && (
-                            <div className="mb-4 p-4 bg-slate-50 border border-slate-200 rounded-xl flex items-end gap-3">
+                            <div className="mb-4 p-4 bg-white/5 border border-blue-500/20 rounded-xl flex items-end gap-3">
                                 <div className="flex-1 space-y-2">
                                     <Label>Select Student to Add</Label>
                                     <Select value={newStudentId} onValueChange={setNewStudentId}>
@@ -799,7 +799,7 @@ function GroupDetailsModal({
                                     </Select>
                                 </div>
                                 <Button 
-                                    className="bg-emerald-600 hover:bg-emerald-700 text-white" 
+                                    className="bg-blue-600 hover:bg-emerald-700 text-white" 
                                     onClick={handleAddMember}
                                     disabled={!newStudentId || isPending}
                                 >
@@ -811,19 +811,19 @@ function GroupDetailsModal({
                         {/* Leader */}
                         {leader && (
                             <div className="mb-3">
-                                <p className="text-xs text-amber-600 uppercase tracking-wide font-medium mb-2 flex items-center gap-1">
+                                <p className="text-xs text-amber-400 uppercase tracking-wide font-medium mb-2 flex items-center gap-1">
                                     <Crown className="h-3 w-3" />
                                     Group Leader
                                 </p>
-                                <div className="p-4 bg-amber-50 border border-amber-100 rounded-xl">
+                                <div className="p-4 bg-amber-500/10 border border-amber-500/20 rounded-xl">
                                     <div className="flex items-center gap-4">
                                         <div className="w-12 h-12 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center text-white font-bold text-lg">
                                             {leader.name?.charAt(0) || "?"}
                                         </div>
                                         <div className="flex-1">
                                             <div className="flex items-center gap-2">
-                                                <p className="font-semibold text-slate-900">{leader.name}</p>
-                                                <Badge className="bg-amber-100 text-amber-700 text-xs">Leader</Badge>
+                                                <p className="font-semibold text-white">{leader.name}</p>
+                                                <Badge className="bg-amber-500/15 text-amber-400 text-xs">Leader</Badge>
                                             </div>
                                             <div className="flex flex-wrap gap-3 mt-1 text-sm text-slate-500">
                                                 {leader.email && (
@@ -839,7 +839,7 @@ function GroupDetailsModal({
                                                     </span>
                                                 )}
                                                 {leader.cgpa !== null && (
-                                                    <span className="text-emerald-600 font-medium">
+                                                    <span className="text-cyan-400 font-medium">
                                                         CGPA: {leader.cgpa}
                                                     </span>
                                                 )}
@@ -860,13 +860,13 @@ function GroupDetailsModal({
                                     {regularMembers.map((member, index) => (
                                         <div
                                             key={member.id || index}
-                                            className="p-3 bg-slate-50 rounded-lg flex items-center gap-3"
+                                            className="p-3 bg-white/5 rounded-lg flex items-center gap-3"
                                         >
                                             <div className="w-10 h-10 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-full flex items-center justify-center text-white font-medium">
                                                 {member.name?.charAt(0) || "?"}
                                             </div>
                                             <div className="flex-1">
-                                                <p className="font-medium text-slate-900">{member.name}</p>
+                                                <p className="font-medium text-white">{member.name}</p>
                                                 <div className="flex flex-wrap gap-3 text-sm text-slate-500">
                                                     {member.email && (
                                                         <span className="flex items-center gap-1">
@@ -875,7 +875,7 @@ function GroupDetailsModal({
                                                         </span>
                                                     )}
                                                     {member.cgpa !== null && (
-                                                        <span className="text-emerald-600 font-medium">
+                                                        <span className="text-cyan-400 font-medium">
                                                             CGPA: {member.cgpa}
                                                         </span>
                                                     )}
@@ -885,7 +885,7 @@ function GroupDetailsModal({
                                                 <Button
                                                     variant="ghost"
                                                     size="icon"
-                                                    className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                                                    className="text-red-500 hover:text-red-700 hover:bg-red-500/10"
                                                     onClick={() => handleRemoveMember(member.id)}
                                                     disabled={isPending}
                                                 >
@@ -901,15 +901,15 @@ function GroupDetailsModal({
 
                     {/* Next Meeting */}
                     {group.nextMeeting && (
-                        <div className="mt-6 p-4 bg-blue-50 border border-blue-100 rounded-xl">
+                        <div className="mt-6 p-4 bg-blue-500/10 border border-blue-500/20 rounded-xl">
                             <div className="flex items-center gap-2 mb-2">
-                                <Calendar className="h-5 w-5 text-blue-600" />
+                                <Calendar className="h-5 w-5 text-blue-400" />
                                 <span className="font-medium text-blue-900">Next Meeting</span>
                             </div>
                             <div className="grid grid-cols-2 gap-4 text-sm">
                                 <div>
-                                    <p className="text-blue-600">Date & Time</p>
-                                    <p className="font-medium text-slate-900">
+                                    <p className="text-blue-400">Date & Time</p>
+                                    <p className="font-medium text-white">
                                         {new Date(group.nextMeeting.meetingdatetime).toLocaleString("en-IN", {
                                             dateStyle: "medium",
                                             timeStyle: "short",
@@ -918,15 +918,15 @@ function GroupDetailsModal({
                                 </div>
                                 {group.nextMeeting.meetinglocation && (
                                     <div>
-                                        <p className="text-blue-600">Location</p>
-                                        <p className="font-medium text-slate-900">{group.nextMeeting.meetinglocation}</p>
+                                        <p className="text-blue-400">Location</p>
+                                        <p className="font-medium text-white">{group.nextMeeting.meetinglocation}</p>
                                     </div>
                                 )}
                             </div>
                             {group.nextMeeting.meetingpurpose && (
                                 <div className="mt-2">
-                                    <p className="text-blue-600 text-sm">Purpose</p>
-                                    <p className="font-medium text-slate-900">{group.nextMeeting.meetingpurpose}</p>
+                                    <p className="text-blue-400 text-sm">Purpose</p>
+                                    <p className="font-medium text-white">{group.nextMeeting.meetingpurpose}</p>
                                 </div>
                             )}
                         </div>
@@ -934,7 +934,7 @@ function GroupDetailsModal({
                 </div>
 
                 {/* Footer */}
-                <div className="p-4 border-t border-slate-100 bg-slate-50 flex gap-3 justify-between">
+                <div className="p-4 border-t border-blue-500/15 bg-white/5 flex gap-3 justify-between">
                     <div className="flex gap-2">
                         <Button variant="outline" onClick={handleDownloadPDF}>
                             <Download className="h-4 w-4 mr-2" />
@@ -943,7 +943,7 @@ function GroupDetailsModal({
                         {isEditing && (
                             <Button 
                                 variant="destructive" 
-                                className="bg-red-50 text-red-600 hover:bg-red-100 border-red-200"
+                                className="bg-red-500/10 text-red-600 hover:bg-red-500/15 border-red-200"
                                 onClick={handleDeleteGroup} 
                                 disabled={isPending}
                             >
@@ -954,7 +954,7 @@ function GroupDetailsModal({
                         {!isEditing && group.status !== "Completed" && (
                             <Button 
                                 variant="outline" 
-                                className="bg-emerald-50 text-emerald-600 hover:bg-emerald-100 border-emerald-200"
+                                className="bg-blue-500/10 text-cyan-400 hover:bg-blue-500/15 border-cyan-500/25"
                                 onClick={handleCompleteGroup} 
                                 disabled={isPending}
                             >
@@ -970,7 +970,7 @@ function GroupDetailsModal({
                                     Cancel
                                 </Button>
                                 <Button
-                                    className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                                    className="bg-blue-600 hover:bg-emerald-700 text-white"
                                     onClick={handleSaveEdit}
                                     disabled={isPending}
                                 >
@@ -993,7 +993,7 @@ function GroupDetailsModal({
                                     Close
                                 </Button>
                                 <Button
-                                    className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                                    className="bg-blue-600 hover:bg-emerald-700 text-white"
                                     onClick={() => setIsEditing(true)}
                                 >
                                     <Edit className="h-4 w-4 mr-2" />
@@ -1121,18 +1121,18 @@ function CreateGroupModal({
                 initial={{ scale: 0.95, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0.95, opacity: 0 }}
-                className="bg-white rounded-2xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-hidden"
+                className="bg-white/5 backdrop-blur-md rounded-2xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-hidden"
                 onClick={(e) => e.stopPropagation()}
             >
                 {/* Header */}
-                <div className="p-6 border-b border-slate-100 bg-gradient-to-r from-emerald-50 to-emerald-50">
+                <div className="p-6 border-b border-blue-500/15 bg-gradient-to-r from-blue-500/10 to-blue-500/10">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                            <div className="p-2 bg-white rounded-xl shadow-sm">
-                                <UserPlus className="h-5 w-5 text-emerald-600" />
+                            <div className="p-2 bg-white/5 backdrop-blur-md rounded-xl shadow-sm">
+                                <UserPlus className="h-5 w-5 text-cyan-400" />
                             </div>
                             <div>
-                                <h2 className="text-xl font-bold text-slate-900">Create New Group</h2>
+                                <h2 className="text-xl font-bold text-white">Create New Group</h2>
                                 <p className="text-sm text-slate-500">
                                     Step {step} of 2: {step === 1 ? "Project Details" : "Select Members"}
                                 </p>
@@ -1145,8 +1145,8 @@ function CreateGroupModal({
 
                     {/* Step Indicator */}
                     <div className="flex gap-2 mt-4">
-                        <div className={`flex-1 h-1 rounded-full transition-colors ${step >= 1 ? "bg-emerald-600" : "bg-slate-200"}`} />
-                        <div className={`flex-1 h-1 rounded-full transition-colors ${step >= 2 ? "bg-emerald-600" : "bg-slate-200"}`} />
+                        <div className={`flex-1 h-1 rounded-full transition-colors ${step >= 1 ? "bg-blue-600" : "bg-slate-200"}`} />
+                        <div className={`flex-1 h-1 rounded-full transition-colors ${step >= 2 ? "bg-blue-600" : "bg-slate-200"}`} />
                     </div>
                 </div>
 
@@ -1233,8 +1233,8 @@ function CreateGroupModal({
                         <div className="space-y-4">
                             {/* Selected Members */}
                             {selectedMembers.length > 0 && (
-                                <div className="p-4 bg-emerald-50 rounded-xl mb-4">
-                                    <p className="text-sm font-medium text-emerald-700 mb-2">
+                                <div className="p-4 bg-blue-500/10 rounded-xl mb-4">
+                                    <p className="text-sm font-medium text-cyan-400 mb-2">
                                         Selected Members ({selectedMembers.length})
                                     </p>
                                     <div className="flex flex-wrap gap-2">
@@ -1242,8 +1242,8 @@ function CreateGroupModal({
                                             <Badge
                                                 key={member.id}
                                                 className={`${member.isLeader
-                                                    ? "bg-amber-100 text-amber-700"
-                                                    : "bg-white text-slate-700"
+                                                    ? "bg-amber-500/15 text-amber-400"
+                                                    : "bg-white text-slate-200"
                                                     } flex items-center gap-1 pr-1`}
                                             >
                                                 {member.isLeader && <Crown className="h-3 w-3" />}
@@ -1251,7 +1251,7 @@ function CreateGroupModal({
                                                 <Button
                                                     variant="ghost"
                                                     size="icon"
-                                                    className="h-4 w-4 ml-1 hover:bg-red-100"
+                                                    className="h-4 w-4 ml-1 hover:bg-red-500/15"
                                                     onClick={() => toggleMember({ id: member.id, name: member.name } as Student)}
                                                 >
                                                     <X className="h-3 w-3" />
@@ -1274,7 +1274,7 @@ function CreateGroupModal({
                             </div>
 
                             {/* Students List */}
-                            <div className="border border-slate-200 rounded-xl overflow-hidden max-h-[300px] overflow-y-auto">
+                            <div className="border border-blue-500/20 rounded-xl overflow-hidden max-h-[300px] overflow-y-auto">
                                 {filteredStudents.length > 0 ? (
                                     filteredStudents.map((student) => {
                                         const isSelected = selectedMembers.some((m) => m.id === student.id);
@@ -1283,7 +1283,7 @@ function CreateGroupModal({
                                         return (
                                             <div
                                                 key={student.id}
-                                                className={`p-3 border-b border-slate-100 last:border-b-0 flex items-center gap-3 hover:bg-slate-50 transition-colors ${isSelected ? "bg-emerald-50" : ""
+                                                className={`p-3 border-b border-blue-500/15 last:border-b-0 flex items-center gap-3 hover:bg-white/5 transition-colors ${isSelected ? "bg-blue-500/10" : ""
                                                     }`}
                                             >
                                                 <Checkbox
@@ -1295,7 +1295,7 @@ function CreateGroupModal({
                                                 </div>
                                                 <div className="flex-1">
                                                     <div className="flex items-center gap-2">
-                                                        <p className="font-medium text-slate-900">{student.name}</p>
+                                                        <p className="font-medium text-white">{student.name}</p>
                                                         {student.isInGroup && (
                                                             <Badge variant="outline" className="text-xs text-slate-500">
                                                                 In {student.groupCount} group(s)
@@ -1329,7 +1329,7 @@ function CreateGroupModal({
                 </div>
 
                 {/* Footer */}
-                <div className="p-4 border-t border-slate-100 bg-slate-50 flex gap-3 justify-between">
+                <div className="p-4 border-t border-blue-500/15 bg-white/5 flex gap-3 justify-between">
                     {step > 1 ? (
                         <Button variant="outline" onClick={() => setStep(step - 1)}>
                             Back
@@ -1342,7 +1342,7 @@ function CreateGroupModal({
 
                     {step < 2 ? (
                         <Button
-                            className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                            className="bg-blue-600 hover:bg-emerald-700 text-white"
                             onClick={() => setStep(2)}
                             disabled={!groupName || !projectTypeId}
                         >
@@ -1351,7 +1351,7 @@ function CreateGroupModal({
                         </Button>
                     ) : (
                         <Button
-                            className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                            className="bg-blue-600 hover:bg-emerald-700 text-white"
                             onClick={handleSubmit}
                             disabled={isPending || selectedMembers.length === 0}
                         >
@@ -1378,7 +1378,7 @@ function CreateGroupModal({
 
 function EmptyState({ onCreateGroup }: { onCreateGroup: () => void }) {
     return (
-        <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center">
+        <div className="bg-white/5 backdrop-blur-md rounded-2xl border border-blue-500/20 p-12 text-center">
             <motion.div
                 animate={{ rotate: [0, 5, -5, 0] }}
                 transition={{ duration: 4, repeat: Infinity }}
@@ -1386,18 +1386,18 @@ function EmptyState({ onCreateGroup }: { onCreateGroup: () => void }) {
             >
                 <div className="relative">
                     <div className="absolute inset-0 bg-amber-200 rounded-2xl blur-xl opacity-40" />
-                    <div className="relative bg-amber-50 border border-amber-100 p-8 rounded-2xl">
+                    <div className="relative bg-amber-500/10 border border-amber-500/20 p-8 rounded-2xl">
                         <Users className="h-16 w-16 text-amber-400 mx-auto" />
                     </div>
                 </div>
             </motion.div>
-            <h3 className="text-xl font-semibold text-slate-900 mb-2">No Groups Yet</h3>
+            <h3 className="text-xl font-semibold text-white mb-2">No Groups Yet</h3>
             <p className="text-slate-500 mb-6 max-w-md mx-auto">
                 You haven&apos;t been assigned any student groups yet. Create a new group or wait for
                 assignments.
             </p>
             <Button
-                className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                className="bg-blue-600 hover:bg-emerald-700 text-white"
                 onClick={onCreateGroup}
             >
                 <Plus className="h-4 w-4 mr-2" />

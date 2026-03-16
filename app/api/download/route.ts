@@ -87,14 +87,15 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const fileBuffer = await upstream.arrayBuffer();
+    // const fileBuffer = await upstream.arrayBuffer();
     const contentType =
       upstream.headers.get("content-type") || "application/octet-stream";
 
-    return new NextResponse(fileBuffer, {
+    return new NextResponse(upstream.body, {
       status: 200,
       headers: {
         "Content-Type": contentType,
+        "Content-Transfer-Encoding": "binary",
         "Content-Disposition": `attachment; filename="${safeName}"; filename*=UTF-8''${encodeURIComponent(safeName)}`,
         "Cache-Control": "private, no-store",
       },

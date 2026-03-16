@@ -1,8 +1,8 @@
 // components/sections/TechStackSection.tsx
 "use client";
 
-import { motion, AnimatePresence } from "framer-motion";
-import { Card, CardContent } from "@/components/ui/card"; // Assuming Badge is a custom component, not from lucide-react
+import { motion } from "framer-motion";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "lucide-react";
 
 const techStack = [
@@ -17,20 +17,22 @@ const techStack = [
 ];
 
 const categoryColors = {
-  Frontend: "bg-blue-100 text-blue-800",
-  Framework: "bg-emerald-100 text-emerald-800",
-  Styling: "bg-green-100 text-green-800",
-  Components: "bg-orange-100 text-orange-800",
-  Animation: "bg-teal-100 text-teal-800",
-  Database: "bg-red-100 text-red-800",
-  ORM: "bg-cyan-100 text-cyan-800",
-  Backend: "bg-cyan-100 text-cyan-800",
+  Frontend: "bg-blue-500/20 text-blue-300 border-blue-500/30",
+  Framework: "bg-cyan-500/20 text-cyan-300 border-cyan-500/30",
+  Styling: "bg-teal-500/20 text-teal-300 border-teal-500/30",
+  Components: "bg-indigo-500/20 text-indigo-300 border-indigo-500/30",
+  Animation: "bg-violet-500/20 text-violet-300 border-violet-500/30",
+  Database: "bg-blue-600/20 text-blue-200 border-blue-600/30",
+  ORM: "bg-cyan-600/20 text-cyan-200 border-cyan-600/30",
+  Backend: "bg-slate-500/20 text-slate-300 border-slate-500/30",
 };
 
 export function TechStackSection() {
   return (
-    <section className="py-20 px-4 bg-white">
-      <div className="max-w-6xl mx-auto">
+    <section className="py-20 px-4 bg-[#050A14] relative overflow-hidden">
+      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[600px] h-64 bg-blue-600/8 rounded-full blur-3xl pointer-events-none" />
+
+      <div className="max-w-6xl mx-auto relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -38,13 +40,13 @@ export function TechStackSection() {
           viewport={{ once: true }}
           className="text-center mb-16"
         >
-          <h2 className="text-4xl md:text-5xl font-bold text-slate-800 mb-6">
+          <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
             Technology{" "}
-            <span className="bg-linear-to-r from-blue-600 to-emerald-600 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
               Stack
             </span>
           </h2>
-          <p className="text-xl text-slate-600 max-w-3xl mx-auto">
+          <p className="text-xl text-slate-300 max-w-3xl mx-auto">
             Built with modern, industry-standard technologies for optimal
             performance and scalability
           </p>
@@ -56,7 +58,7 @@ export function TechStackSection() {
           transition={{ duration: 0.6, delay: 0.2 }}
           viewport={{ once: true }}
         >
-          <Card className="border-0 shadow-lg bg-linear-to-br from-slate-50 to-white">
+          <Card className="border border-blue-500/20 shadow-xl shadow-blue-900/20 bg-white/5 backdrop-blur-md">
             <CardContent className="p-8">
               <div className="flex flex-wrap gap-4 justify-center">
                 {techStack.map((tech, index) => (
@@ -66,18 +68,18 @@ export function TechStackSection() {
                     whileInView={{ opacity: 1, scale: 1 }}
                     transition={{ duration: 0.4, delay: index * 0.05 }}
                     viewport={{ once: true }}
-                    whileHover={{ scale: 1.05 }}
+                    whileHover={{ scale: 1.08 }}
                   >
                     <div className="flex flex-col items-center space-y-2">
-                      <Badge
-                        className={`text-sm font-semibold px-4 py-2 ${
+                      <span
+                        className={`text-sm font-semibold px-4 py-2 rounded-lg border backdrop-blur-sm ${
                           categoryColors[
                             tech.category as keyof typeof categoryColors
                           ]
                         }`}
                       >
                         {tech.name}
-                      </Badge>
+                      </span>
                       <span className="text-xs text-slate-500 font-medium">
                         {tech.category}
                       </span>

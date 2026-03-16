@@ -94,7 +94,7 @@ export function AdminProjectsContent({ initialProjects, initialStats }: AdminPro
     ];
 
     return (
-        <div className="min-h-screen bg-slate-50">
+        <div className="min-h-screen bg-[#050A14]">
             <div className="max-w-7xl mx-auto px-4 md:px-6 py-8">
                 {/* Page Header */}
                 <motion.div
@@ -103,7 +103,7 @@ export function AdminProjectsContent({ initialProjects, initialStats }: AdminPro
                     className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8"
                 >
                     <div>
-                        <h1 className="text-2xl md:text-3xl font-bold text-slate-900 mb-1">
+                        <h1 className="text-2xl md:text-3xl font-bold text-white mb-1">
                             Projects
                         </h1>
                         <p className="text-slate-500">
@@ -112,7 +112,7 @@ export function AdminProjectsContent({ initialProjects, initialStats }: AdminPro
                         </p>
                     </div>
                     <div className="flex gap-2">
-                        <Button variant="outline" className="border-slate-200">
+                        <Button variant="outline" className="border-blue-500/20">
                             <Download className="h-4 w-4 mr-2" />
                             Export
                         </Button>
@@ -133,22 +133,22 @@ export function AdminProjectsContent({ initialProjects, initialStats }: AdminPro
                             animate={{ opacity: 1, scale: 1 }}
                             transition={{ delay: 0.1 + index * 0.05 }}
                             whileHover={{ y: -2 }}
-                            className="bg-white rounded-xl border border-slate-200 p-5"
+                            className="bg-white/5 backdrop-blur-md rounded-xl border border-blue-500/20 p-5"
                         >
                             <div className="flex items-center gap-4">
                                 <div className={cn(
                                     "p-3 rounded-xl",
-                                    stat.color === "blue" && "bg-blue-100",
+                                    stat.color === "blue" && "bg-blue-500/15",
                                     stat.color === "violet" && "bg-violet-100",
-                                    stat.color === "emerald" && "bg-emerald-100",
-                                    stat.color === "amber" && "bg-amber-100",
+                                    stat.color === "emerald" && "bg-blue-500/15",
+                                    stat.color === "amber" && "bg-amber-500/15",
                                 )}>
                                     <stat.icon className={cn(
                                         "h-5 w-5",
-                                        stat.color === "blue" && "text-blue-600",
+                                        stat.color === "blue" && "text-blue-400",
                                         stat.color === "violet" && "text-violet-600",
-                                        stat.color === "emerald" && "text-emerald-600",
-                                        stat.color === "amber" && "text-amber-600",
+                                        stat.color === "emerald" && "text-cyan-400",
+                                        stat.color === "amber" && "text-amber-400",
                                     )} />
                                 </div>
                                 <div>
@@ -156,7 +156,7 @@ export function AdminProjectsContent({ initialProjects, initialStats }: AdminPro
                                         key={stat.value}
                                         initial={{ scale: 0.5, opacity: 0 }}
                                         animate={{ scale: 1, opacity: 1 }}
-                                        className="text-2xl font-bold text-slate-900"
+                                        className="text-2xl font-bold text-white"
                                     >
                                         {stat.value}
                                     </motion.p>
@@ -172,20 +172,20 @@ export function AdminProjectsContent({ initialProjects, initialStats }: AdminPro
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.2 }}
-                    className="bg-white rounded-xl border border-slate-200 p-4 mb-6"
+                    className="bg-white/5 backdrop-blur-md rounded-xl border border-blue-500/20 p-4 mb-6"
                 >
                     <div className="relative flex-1">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                         <Input
                             placeholder="Search projects by name, title, area, type, or guide..."
-                            className="pl-10 bg-slate-50 border-slate-200 focus:bg-white"
+                            className="pl-10 bg-white/5 border-blue-500/20 focus:bg-white/10"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                         />
                         {searchQuery && (
                             <button
                                 onClick={() => setSearchQuery("")}
-                                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-300"
                             >
                                 <X className="h-4 w-4" />
                             </button>
@@ -207,7 +207,7 @@ export function AdminProjectsContent({ initialProjects, initialStats }: AdminPro
                                 initial={{ opacity: 0, scale: 0.95 }}
                                 animate={{ opacity: 1, scale: 1 }}
                                 exit={{ opacity: 0, scale: 0.95 }}
-                                className="bg-white rounded-2xl border border-slate-200 p-12 text-center"
+                                className="bg-white/5 backdrop-blur-md rounded-2xl border border-blue-500/20 p-12 text-center"
                             >
                                 <motion.div
                                     animate={{ y: [0, -8, 0] }}
@@ -216,12 +216,12 @@ export function AdminProjectsContent({ initialProjects, initialStats }: AdminPro
                                 >
                                     <div className="relative">
                                         <div className="absolute inset-0 bg-blue-200 rounded-2xl blur-xl opacity-40" />
-                                        <div className="relative bg-blue-50 border border-blue-100 p-8 rounded-2xl">
+                                        <div className="relative bg-blue-500/10 border border-blue-500/20 p-8 rounded-2xl">
                                             <FolderKanban className="h-16 w-16 text-blue-400 mx-auto" />
                                         </div>
                                     </div>
                                 </motion.div>
-                                <h3 className="text-xl font-semibold text-slate-900 mb-2">No Projects Found</h3>
+                                <h3 className="text-xl font-semibold text-white mb-2">No Projects Found</h3>
                                 <p className="text-slate-500 mb-6 max-w-md mx-auto">
                                     {searchQuery
                                         ? "No projects match your search criteria."
@@ -231,7 +231,7 @@ export function AdminProjectsContent({ initialProjects, initialStats }: AdminPro
                                     <Button
                                         variant="outline"
                                         onClick={() => setSearchQuery("")}
-                                        className="border-blue-200 text-blue-600 hover:bg-blue-50"
+                                        className="border-blue-500/25 text-blue-400 hover:bg-blue-500/10"
                                     >
                                         Clear Search
                                     </Button>
@@ -251,7 +251,7 @@ export function AdminProjectsContent({ initialProjects, initialStats }: AdminPro
                                         animate={{ opacity: 1, y: 0 }}
                                         exit={{ opacity: 0, scale: 0.95 }}
                                         transition={{ delay: index * 0.03 }}
-                                        className="bg-white rounded-xl border border-slate-200 overflow-hidden hover:shadow-md transition-shadow"
+                                        className="bg-white/5 backdrop-blur-md rounded-xl border border-blue-500/20 overflow-hidden hover:shadow-md transition-shadow"
                                     >
                                         <div
                                             className="p-4 md:p-5 cursor-pointer"
@@ -264,13 +264,13 @@ export function AdminProjectsContent({ initialProjects, initialStats }: AdminPro
                                                     </div>
                                                     <div className="min-w-0 flex-1">
                                                         <div className="flex items-center gap-2 flex-wrap">
-                                                            <p className="font-semibold text-slate-900">{project.projectgroupname}</p>
-                                                            <Badge className="bg-blue-100 text-blue-700 text-[10px]">
+                                                            <p className="font-semibold text-white">{project.projectgroupname}</p>
+                                                            <Badge className="bg-blue-500/15 text-blue-700 text-[10px]">
                                                                 {project.projecttype.projecttypename}
                                                             </Badge>
                                                         </div>
                                                         {project.projecttitle && (
-                                                            <p className="text-sm text-slate-600 mt-0.5">{project.projecttitle}</p>
+                                                            <p className="text-sm text-slate-300 mt-0.5">{project.projecttitle}</p>
                                                         )}
                                                         <div className="flex items-center gap-4 mt-2 flex-wrap">
                                                             {project.guidestaffname && (
@@ -295,7 +295,7 @@ export function AdminProjectsContent({ initialProjects, initialStats }: AdminPro
 
                                                 <div className="flex items-center gap-2">
                                                     {leader && (
-                                                        <Badge className="bg-amber-50 text-amber-700 text-[10px] hidden sm:flex">
+                                                        <Badge className="bg-amber-500/10 text-amber-400 text-[10px] hidden sm:flex">
                                                             <Crown className="h-2.5 w-2.5 mr-1" />
                                                             {leader.student.studentname}
                                                         </Badge>
@@ -318,23 +318,23 @@ export function AdminProjectsContent({ initialProjects, initialStats }: AdminPro
                                                     exit={{ height: 0, opacity: 0 }}
                                                     className="overflow-hidden"
                                                 >
-                                                    <div className="px-5 pb-5 pt-1 border-t border-slate-100">
+                                                    <div className="px-5 pb-5 pt-1 border-t border-blue-500/15">
                                                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-3">
-                                                            <div className="bg-slate-50 rounded-lg p-3">
+                                                            <div className="bg-white/5 rounded-lg p-3">
                                                                 <p className="text-[10px] font-medium text-slate-400 uppercase mb-1">Project ID</p>
-                                                                <p className="text-sm font-mono text-slate-700">{project.projectgroupid}</p>
+                                                                <p className="text-sm font-mono text-slate-200">{project.projectgroupid}</p>
                                                             </div>
-                                                            <div className="bg-slate-50 rounded-lg p-3">
+                                                            <div className="bg-white/5 rounded-lg p-3">
                                                                 <p className="text-[10px] font-medium text-slate-400 uppercase mb-1">Created</p>
-                                                                <p className="text-sm text-slate-700">
+                                                                <p className="text-sm text-slate-200">
                                                                     {new Date(project.created).toLocaleDateString("en-US", {
                                                                         year: "numeric", month: "short", day: "numeric"
                                                                     })}
                                                                 </p>
                                                             </div>
-                                                            <div className="bg-slate-50 rounded-lg p-3">
+                                                            <div className="bg-white/5 rounded-lg p-3">
                                                                 <p className="text-[10px] font-medium text-slate-400 uppercase mb-1">Avg CPI</p>
-                                                                <p className="text-sm text-slate-700">
+                                                                <p className="text-sm text-slate-200">
                                                                     {project.averagecpi ? Number(project.averagecpi).toFixed(2) : "N/A"}
                                                                 </p>
                                                             </div>
@@ -343,17 +343,17 @@ export function AdminProjectsContent({ initialProjects, initialStats }: AdminPro
                                                         {/* Staff info */}
                                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
                                                             {project.staff_projectgroup_convenerstaffidTostaff && (
-                                                                <div className="bg-emerald-50 rounded-lg p-3">
-                                                                    <p className="text-[10px] font-medium text-emerald-500 uppercase mb-1">Convener</p>
-                                                                    <p className="text-sm font-medium text-slate-700">
+                                                                <div className="bg-blue-500/10 rounded-lg p-3">
+                                                                    <p className="text-[10px] font-medium text-cyan-400 uppercase mb-1">Convener</p>
+                                                                    <p className="text-sm font-medium text-slate-200">
                                                                         {project.staff_projectgroup_convenerstaffidTostaff.staffname}
                                                                     </p>
                                                                 </div>
                                                             )}
                                                             {project.staff_projectgroup_expertstaffidTostaff && (
-                                                                <div className="bg-blue-50 rounded-lg p-3">
+                                                                <div className="bg-blue-500/10 rounded-lg p-3">
                                                                     <p className="text-[10px] font-medium text-blue-500 uppercase mb-1">Expert</p>
-                                                                    <p className="text-sm font-medium text-slate-700">
+                                                                    <p className="text-sm font-medium text-slate-200">
                                                                         {project.staff_projectgroup_expertstaffidTostaff.staffname}
                                                                     </p>
                                                                 </div>
@@ -363,25 +363,25 @@ export function AdminProjectsContent({ initialProjects, initialStats }: AdminPro
                                                         {/* Members */}
                                                         {project.projectgroupmember.length > 0 && (
                                                             <div className="mt-4">
-                                                                <p className="text-xs font-semibold text-slate-600 mb-2">
+                                                                <p className="text-xs font-semibold text-slate-300 mb-2">
                                                                     Group Members ({project.projectgroupmember.length})
                                                                 </p>
                                                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                                                                     {project.projectgroupmember.map((m, i) => (
-                                                                        <div key={i} className="flex items-center justify-between bg-slate-50 rounded-lg p-3">
+                                                                        <div key={i} className="flex items-center justify-between bg-white/5 rounded-lg p-3">
                                                                             <div className="flex items-center gap-2">
                                                                                 <div className="h-7 w-7 rounded-full bg-gradient-to-br from-violet-400 to-violet-600 flex items-center justify-center text-white text-[10px] font-bold">
                                                                                     {m.student.studentname.charAt(0)}
                                                                                 </div>
                                                                                 <div>
-                                                                                    <p className="text-sm font-medium text-slate-800">{m.student.studentname}</p>
+                                                                                    <p className="text-sm font-medium text-white">{m.student.studentname}</p>
                                                                                     {m.student.email && (
                                                                                         <p className="text-[10px] text-slate-400">{m.student.email}</p>
                                                                                     )}
                                                                                 </div>
                                                                             </div>
                                                                             {m.isgroupleader && (
-                                                                                <Badge className="bg-amber-100 text-amber-700 text-[10px]">Leader</Badge>
+                                                                                <Badge className="bg-amber-500/15 text-amber-400 text-[10px]">Leader</Badge>
                                                                             )}
                                                                         </div>
                                                                     ))}
@@ -391,9 +391,9 @@ export function AdminProjectsContent({ initialProjects, initialStats }: AdminPro
 
                                                         {/* Description */}
                                                         {(project.projectdescription || project.description) && (
-                                                            <div className="mt-3 bg-slate-50 rounded-lg p-3">
+                                                            <div className="mt-3 bg-white/5 rounded-lg p-3">
                                                                 <p className="text-[10px] font-medium text-slate-400 uppercase mb-1">Description</p>
-                                                                <p className="text-sm text-slate-700">
+                                                                <p className="text-sm text-slate-200">
                                                                     {project.projectdescription || project.description}
                                                                 </p>
                                                             </div>

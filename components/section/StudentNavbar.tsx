@@ -16,7 +16,6 @@ import {
   Calendar,
   FileText,
   Menu,
-  X,
   GraduationCap,
   Sparkles
 } from "lucide-react";
@@ -57,8 +56,8 @@ export default function StudentNavbar() {
       className={cn(
         "fixed top-0 z-50 w-full transition-all duration-500",
         scrolled
-          ? "bg-white/80 backdrop-blur-xl border-b border-emerald-100 shadow-lg shadow-emerald-500/5"
-          : "bg-white/50 backdrop-blur-sm"
+          ? "bg-[#050A14]/90 backdrop-blur-xl border-b border-blue-500/20 shadow-lg shadow-blue-900/20"
+          : "bg-[#050A14]/70 backdrop-blur-md border-b border-blue-500/10"
       )}
     >
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 md:px-6">
@@ -72,7 +71,7 @@ export default function StudentNavbar() {
             className="h-10 w-auto"
             priority
           />
-          <span className="text-lg font-bold bg-gradient-to-r from-emerald-600 via-teal-500 to-blue-600 bg-clip-text text-transparent">
+          <span className="text-lg font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
             {title}
           </span>
         </Link>
@@ -98,20 +97,20 @@ export default function StudentNavbar() {
                       "relative flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300",
                       isActive
                         ? "text-white"
-                        : "text-slate-600 hover:text-emerald-600 hover:bg-emerald-50"
+                        : "text-slate-400 hover:text-cyan-300 hover:bg-blue-500/10"
                     )}
                   >
                     {isActive && (
                       <motion.div
-                        layoutId="activeTab"
-                        className="absolute inset-0 bg-gradient-to-r from-emerald-600 via-teal-500 to-blue-500 rounded-xl"
+                        layoutId="studentActiveTab"
+                        className="absolute inset-0 bg-gradient-to-r from-blue-600 to-cyan-500 rounded-xl shadow-lg shadow-blue-500/30"
                         transition={{ type: "spring", stiffness: 400, damping: 30 }}
                       />
                     )}
                     <Icon className={cn("h-4 w-4 relative z-10", isActive && "text-white")} />
                     <span className="relative z-10">{link.name}</span>
                     {isActive && (
-                      <Sparkles className="h-3 w-3 relative z-10 text-yellow-300" />
+                      <Sparkles className="h-3 w-3 relative z-10 text-cyan-200" />
                     )}
                   </motion.div>
                 </Link>
@@ -128,8 +127,8 @@ export default function StudentNavbar() {
               whileHover={{ scale: 1.05 }}
               className="relative"
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-emerald-400 to-teal-400 rounded-full blur opacity-30" />
-              <div className="relative h-9 w-9 rounded-full ring-2 ring-emerald-200 ring-offset-2 bg-gradient-to-r from-emerald-600 via-teal-500 to-blue-500 flex items-center justify-center text-white font-bold text-sm overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-cyan-400 rounded-full blur opacity-40 group-hover:opacity-60 transition-opacity" />
+              <div className="relative h-9 w-9 rounded-full ring-2 ring-blue-500/40 ring-offset-2 ring-offset-[#050A14] bg-gradient-to-r from-blue-600 to-cyan-500 flex items-center justify-center text-white font-bold text-sm overflow-hidden">
                 <UserProfileAvatar />
               </div>
             </motion.div>
@@ -138,17 +137,17 @@ export default function StudentNavbar() {
           {/* Mobile Menu */}
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild className="md:hidden">
-              <Button variant="ghost" size="icon" className="relative">
-                <Menu className="h-5 w-5 text-slate-600" />
+              <Button variant="ghost" size="icon" className="relative text-slate-400 hover:text-white hover:bg-blue-500/10">
+                <Menu className="h-5 w-5" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="right" className="w-72 bg-white/95 backdrop-blur-xl">
+            <SheetContent side="right" className="w-72 bg-[#07111F] border-l border-blue-500/20 backdrop-blur-xl">
               <div className="flex flex-col gap-4 mt-8">
                 <div className="flex items-center gap-2 px-2 mb-4">
-                  <div className="bg-gradient-to-r from-emerald-600 via-teal-500 to-blue-500 p-2 rounded-xl">
+                  <div className="bg-gradient-to-r from-blue-600 to-cyan-500 p-2 rounded-xl shadow-lg shadow-blue-500/30">
                     <GraduationCap className="h-5 w-5 text-white" />
                   </div>
-                  <span className="font-bold bg-gradient-to-r from-emerald-600 to-teal-500 bg-clip-text text-transparent">
+                  <span className="font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
                     Student Portal
                   </span>
                 </div>
@@ -169,8 +168,8 @@ export default function StudentNavbar() {
                         className={cn(
                           "flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300",
                           isActive
-                            ? "bg-gradient-to-r from-emerald-600 via-teal-500 to-blue-500 text-white shadow-lg shadow-emerald-500/25"
-                            : "text-slate-600 hover:bg-emerald-50 hover:text-emerald-600"
+                            ? "bg-gradient-to-r from-blue-600 to-cyan-500 text-white shadow-lg shadow-blue-500/25"
+                            : "text-slate-400 hover:bg-blue-500/10 hover:text-cyan-300"
                         )}
                       >
                         <Icon className="h-5 w-5" />

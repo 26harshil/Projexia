@@ -38,7 +38,7 @@ export default async function AdminDashboard() {
   const userEmail = user.emailAddresses[0]?.emailAddress || "";
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-[#050A14]">
       <AdminHeader
         userName={userName}
         userEmail={userEmail}

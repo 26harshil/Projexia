@@ -248,7 +248,7 @@ export function ProfileContent({ profile }: ProfileContentProps) {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-[#050A14]">
       {/* Header Banner */}
       <div className={cn("relative h-56 bg-linear-to-r", role.gradient)}>
         {/* Decorative pattern */}
@@ -307,7 +307,7 @@ export function ProfileContent({ profile }: ProfileContentProps) {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="bg-white rounded-2xl border border-slate-200 shadow-xl shadow-slate-200/50 overflow-hidden"
+          className="bg-white/5 backdrop-blur-md rounded-2xl border border-blue-500/20 shadow-xl shadow-blue-900/20 overflow-hidden"
         >
           {/* Avatar + Name Section */}
           <div className="p-6 md:p-8">
@@ -337,7 +337,7 @@ export function ProfileContent({ profile }: ProfileContentProps) {
                   <div
                     className={cn(
                       "absolute bottom-1 right-1 h-5 w-5 rounded-full border-3 border-white",
-                      profile.isactive ? "bg-emerald-500" : "bg-slate-400",
+                      profile.isactive ? "bg-blue-500" : "bg-slate-400",
                     )}
                   />
                 </div>
@@ -349,7 +349,7 @@ export function ProfileContent({ profile }: ProfileContentProps) {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.3 }}
-                  className="text-2xl md:text-3xl font-bold text-slate-900"
+                  className="text-2xl md:text-3xl font-bold text-white"
                 >
                   {currentName}
                 </motion.h1>
@@ -365,7 +365,7 @@ export function ProfileContent({ profile }: ProfileContentProps) {
                         type="text"
                         value={nameValue}
                         onChange={(e) => setNameValue(e.target.value)}
-                        className="min-w-55 text-sm px-2 py-1 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-slate-500"
+                        className="min-w-55 text-sm px-2 py-1 border border-blue-500/25 rounded-md focus:outline-none focus:ring-2 focus:ring-slate-500"
                         placeholder="Enter your name"
                       />
                       <button
@@ -377,7 +377,7 @@ export function ProfileContent({ profile }: ProfileContentProps) {
                       </button>
                       <button
                         onClick={handleCancelName}
-                        className="bg-slate-300 hover:bg-slate-400 text-slate-700 px-2 py-1 rounded-md text-xs"
+                        className="bg-slate-300 hover:bg-slate-400 text-slate-200 px-2 py-1 rounded-md text-xs"
                       >
                         <X className="h-3 w-3" />
                       </button>
@@ -385,7 +385,7 @@ export function ProfileContent({ profile }: ProfileContentProps) {
                   ) : (
                     <button
                       onClick={() => setEditingName(true)}
-                      className="text-xs text-slate-600 hover:text-slate-800 underline"
+                      className="text-xs text-slate-300 hover:text-white underline"
                     >
                       Edit name
                     </button>
@@ -396,7 +396,7 @@ export function ProfileContent({ profile }: ProfileContentProps) {
                         nameSaveMessage.includes("Error") ||
                         nameSaveMessage.includes("required")
                           ? "text-red-600"
-                          : "text-emerald-600"
+                          : "text-cyan-400"
                       }`}
                     >
                       {nameSaveMessage}
@@ -413,8 +413,8 @@ export function ProfileContent({ profile }: ProfileContentProps) {
                     className={cn(
                       "text-sm px-3 py-1",
                       role.color === "emerald" &&
-                        "bg-emerald-100 text-emerald-700",
-                      role.color === "blue" && "bg-blue-100 text-blue-700",
+                        "bg-blue-500/15 text-cyan-400",
+                      role.color === "blue" && "bg-blue-500/15 text-blue-700",
                       role.color === "violet" &&
                         "bg-violet-100 text-violet-700",
                     )}
@@ -426,8 +426,8 @@ export function ProfileContent({ profile }: ProfileContentProps) {
                     className={cn(
                       "text-xs",
                       profile.isactive
-                        ? "bg-emerald-50 text-emerald-600 border-emerald-200"
-                        : "bg-red-50 text-red-600 border-red-200",
+                        ? "bg-blue-500/10 text-cyan-400 border-cyan-500/25"
+                        : "bg-red-500/10 text-red-600 border-red-200",
                     )}
                   >
                     {profile.isactive ? (
@@ -462,7 +462,7 @@ export function ProfileContent({ profile }: ProfileContentProps) {
             transition={{ delay: 0.4 }}
             className="p-6 md:p-8"
           >
-            <h2 className="text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
+            <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
               <User className="h-5 w-5 text-slate-400" />
               Account Information
             </h2>
@@ -471,19 +471,19 @@ export function ProfileContent({ profile }: ProfileContentProps) {
               {profile.emailAddresses.map((e, i) => (
                 <div
                   key={i}
-                  className="bg-slate-50 rounded-xl p-4 flex items-start gap-3"
+                  className="bg-white/5 rounded-xl p-4 flex items-start gap-3"
                 >
-                  <div className="bg-blue-100 p-2 rounded-lg">
-                    <Mail className="h-4 w-4 text-blue-600" />
+                  <div className="bg-blue-500/15 p-2 rounded-lg">
+                    <Mail className="h-4 w-4 text-blue-400" />
                   </div>
                   <div className="min-w-0">
                     <p className="text-[10px] font-medium text-slate-400 uppercase">
                       Email{" "}
                       {e.isPrimary && (
-                        <span className="text-emerald-500">(Primary)</span>
+                        <span className="text-cyan-400">(Primary)</span>
                       )}
                     </p>
-                    <p className="text-sm font-medium text-slate-800 truncate">
+                    <p className="text-sm font-medium text-white truncate">
                       {e.email}
                     </p>
                   </div>
@@ -493,9 +493,9 @@ export function ProfileContent({ profile }: ProfileContentProps) {
               {/* Phone - Editable for Students and Faculty */}
               {(profile.role === "STUDENT" || profile.role === "FACULTY") &&
               (profile.student || profile.staff) ? (
-                <div className="bg-slate-50 rounded-xl p-4 flex items-start gap-3">
-                  <div className="bg-emerald-100 p-2 rounded-lg">
-                    <Phone className="h-4 w-4 text-emerald-600" />
+                <div className="bg-white/5 rounded-xl p-4 flex items-start gap-3">
+                  <div className="bg-blue-500/15 p-2 rounded-lg">
+                    <Phone className="h-4 w-4 text-cyan-400" />
                   </div>
                   <div className="flex-1">
                     <p className="text-[10px] font-medium text-slate-400 uppercase">
@@ -507,31 +507,31 @@ export function ProfileContent({ profile }: ProfileContentProps) {
                           type="tel"
                           value={phoneValue}
                           onChange={(e) => setPhoneValue(e.target.value)}
-                          className="flex-1 text-sm px-2 py-1 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                          className="flex-1 text-sm px-2 py-1 border border-blue-500/25 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
                           placeholder="Enter phone number"
                         />
                         <button
                           onClick={handleSavePhone}
                           disabled={isSaving}
-                          className="bg-emerald-500 hover:bg-emerald-600 text-white px-2 py-1 rounded-md text-xs disabled:opacity-50"
+                          className="bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded-md text-xs disabled:opacity-50"
                         >
                           <Save className="h-3 w-3" />
                         </button>
                         <button
                           onClick={handleCancelEdit}
-                          className="bg-slate-300 hover:bg-slate-400 text-slate-700 px-2 py-1 rounded-md text-xs"
+                          className="bg-slate-300 hover:bg-slate-400 text-slate-200 px-2 py-1 rounded-md text-xs"
                         >
                           <X className="h-3 w-3" />
                         </button>
                       </div>
                     ) : (
                       <div className="flex items-center justify-between mt-1">
-                        <p className="text-sm font-medium text-slate-800">
+                        <p className="text-sm font-medium text-white">
                           {phoneValue || "Not provided"}
                         </p>
                         <button
                           onClick={() => setEditingPhone(true)}
-                          className="ml-2 text-xs text-emerald-600 hover:text-emerald-700 underline"
+                          className="ml-2 text-xs text-cyan-400 hover:text-cyan-400 underline"
                         >
                           Edit
                         </button>
@@ -542,7 +542,7 @@ export function ProfileContent({ profile }: ProfileContentProps) {
                         className={`text-xs mt-1 ${
                           saveMessage.includes("Error")
                             ? "text-red-600"
-                            : "text-emerald-600"
+                            : "text-cyan-400"
                         }`}
                       >
                         {saveMessage}
@@ -551,8 +551,8 @@ export function ProfileContent({ profile }: ProfileContentProps) {
                   </div>
                 </div>
               ) : (
-                <div className="bg-slate-50 rounded-xl p-4 flex items-start gap-3">
-                  <div className="bg-slate-100 p-2 rounded-lg">
+                <div className="bg-white/5 rounded-xl p-4 flex items-start gap-3">
+                  <div className="bg-white/5 p-2 rounded-lg">
                     <Phone className="h-4 w-4 text-slate-400" />
                   </div>
                   <div>
@@ -568,7 +568,7 @@ export function ProfileContent({ profile }: ProfileContentProps) {
 
               {/* Enrollment Number - For Students (editable) */}
               {profile.role === "STUDENT" && profile.student && (
-                <div className="bg-slate-50 rounded-xl p-4 flex items-start gap-3">
+                <div className="bg-white/5 rounded-xl p-4 flex items-start gap-3">
                   <div className="bg-violet-100 p-2 rounded-lg">
                     <Hash className="h-4 w-4 text-violet-600" />
                   </div>
@@ -582,7 +582,7 @@ export function ProfileContent({ profile }: ProfileContentProps) {
                           type="text"
                           value={enrollmentValue}
                           onChange={(e) => setEnrollmentValue(e.target.value)}
-                          className="flex-1 text-sm px-2 py-1 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-violet-500"
+                          className="flex-1 text-sm px-2 py-1 border border-blue-500/25 rounded-md focus:outline-none focus:ring-2 focus:ring-violet-500"
                           placeholder="Enter enrollment number"
                         />
                         <button
@@ -594,14 +594,14 @@ export function ProfileContent({ profile }: ProfileContentProps) {
                         </button>
                         <button
                           onClick={handleCancelEnrollment}
-                          className="bg-slate-300 hover:bg-slate-400 text-slate-700 px-2 py-1 rounded-md text-xs"
+                          className="bg-slate-300 hover:bg-slate-400 text-slate-200 px-2 py-1 rounded-md text-xs"
                         >
                           <X className="h-3 w-3" />
                         </button>
                       </div>
                     ) : (
                       <div className="flex items-center justify-between mt-1">
-                        <p className="text-sm font-mono text-slate-800">
+                        <p className="text-sm font-mono text-white">
                           {profile.student.enrollment || "Not provided"}
                         </p>
                         <button
@@ -629,15 +629,15 @@ export function ProfileContent({ profile }: ProfileContentProps) {
 
               {/* Faculty ID - For Faculty */}
               {profile.role === "FACULTY" && profile.staff && (
-                <div className="bg-slate-50 rounded-xl p-4 flex items-start gap-3">
-                  <div className="bg-blue-100 p-2 rounded-lg">
-                    <Briefcase className="h-4 w-4 text-blue-600" />
+                <div className="bg-white/5 rounded-xl p-4 flex items-start gap-3">
+                  <div className="bg-blue-500/15 p-2 rounded-lg">
+                    <Briefcase className="h-4 w-4 text-blue-400" />
                   </div>
                   <div>
                     <p className="text-[10px] font-medium text-slate-400 uppercase">
                       Faculty ID
                     </p>
-                    <p className="text-sm font-mono text-slate-800">
+                    <p className="text-sm font-mono text-white">
                       {profile.staff.staffid}
                     </p>
                   </div>
@@ -645,7 +645,7 @@ export function ProfileContent({ profile }: ProfileContentProps) {
               )}
 
               {/* User ID - System ID, separate from enrollment */}
-              <div className="bg-slate-50 rounded-xl p-4 flex items-start gap-3">
+              <div className="bg-white/5 rounded-xl p-4 flex items-start gap-3">
                 <div className="bg-violet-100 p-2 rounded-lg">
                   <Hash className="h-4 w-4 text-violet-600" />
                 </div>
@@ -653,27 +653,27 @@ export function ProfileContent({ profile }: ProfileContentProps) {
                   <p className="text-[10px] font-medium text-slate-400 uppercase">
                     User ID
                   </p>
-                  <p className="text-sm font-mono text-slate-800">
+                  <p className="text-sm font-mono text-white">
                     {profile.userid}
                   </p>
                 </div>
               </div>
 
               {/* Role */}
-              <div className="bg-slate-50 rounded-xl p-4 flex items-start gap-3">
+              <div className="bg-white/5 rounded-xl p-4 flex items-start gap-3">
                 <div
                   className={cn(
                     "p-2 rounded-lg",
-                    role.color === "emerald" && "bg-emerald-100",
-                    role.color === "blue" && "bg-blue-100",
+                    role.color === "emerald" && "bg-blue-500/15",
+                    role.color === "blue" && "bg-blue-500/15",
                     role.color === "violet" && "bg-violet-100",
                   )}
                 >
                   <RoleIcon
                     className={cn(
                       "h-4 w-4",
-                      role.color === "emerald" && "text-emerald-600",
-                      role.color === "blue" && "text-blue-600",
+                      role.color === "emerald" && "text-cyan-400",
+                      role.color === "blue" && "text-blue-400",
                       role.color === "violet" && "text-violet-600",
                     )}
                   />
@@ -682,29 +682,29 @@ export function ProfileContent({ profile }: ProfileContentProps) {
                   <p className="text-[10px] font-medium text-slate-400 uppercase">
                     Role
                   </p>
-                  <p className="text-sm font-medium text-slate-800">
+                  <p className="text-sm font-medium text-white">
                     {role.label}
                   </p>
                 </div>
               </div>
 
               {/* Joined Date */}
-              <div className="bg-slate-50 rounded-xl p-4 flex items-start gap-3">
-                <div className="bg-amber-100 p-2 rounded-lg">
-                  <Calendar className="h-4 w-4 text-amber-600" />
+              <div className="bg-white/5 rounded-xl p-4 flex items-start gap-3">
+                <div className="bg-amber-500/15 p-2 rounded-lg">
+                  <Calendar className="h-4 w-4 text-amber-400" />
                 </div>
                 <div>
                   <p className="text-[10px] font-medium text-slate-400 uppercase">
                     Joined
                   </p>
-                  <p className="text-sm font-medium text-slate-800">
+                  <p className="text-sm font-medium text-white">
                     {formatDate(profile.createdAt)}
                   </p>
                 </div>
               </div>
 
               {/* Last Sign In */}
-              <div className="bg-slate-50 rounded-xl p-4 flex items-start gap-3">
+              <div className="bg-white/5 rounded-xl p-4 flex items-start gap-3">
                 <div className="bg-indigo-100 p-2 rounded-lg">
                   <Clock className="h-4 w-4 text-indigo-600" />
                 </div>
@@ -712,7 +712,7 @@ export function ProfileContent({ profile }: ProfileContentProps) {
                   <p className="text-[10px] font-medium text-slate-400 uppercase">
                     Last Sign In
                   </p>
-                  <p className="text-sm font-medium text-slate-800">
+                  <p className="text-sm font-medium text-white">
                     {formatTime(profile.lastSignInAt)}
                   </p>
                 </div>
@@ -726,7 +726,7 @@ export function ProfileContent({ profile }: ProfileContentProps) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.6 }}
-            className="p-6 md:p-8 bg-slate-50/50"
+            className="p-6 md:p-8 bg-white/5/50"
           >
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
               <p className="text-xs text-slate-400">{}</p>
@@ -734,7 +734,7 @@ export function ProfileContent({ profile }: ProfileContentProps) {
                 <Link href={dashboardHref}>
                   <Button
                     variant="outline"
-                    className="border-slate-200 text-slate-600"
+                    className="border-blue-500/20 text-slate-300"
                   >
                     <ExternalLink className="h-4 w-4 mr-2" />
                     Go to Dashboard

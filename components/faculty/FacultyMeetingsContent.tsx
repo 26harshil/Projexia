@@ -145,7 +145,7 @@ export function FacultyMeetingsContent({ meetings, groups }: FacultyMeetingsCont
     };
 
     return (
-        <div className="min-h-screen bg-slate-50">
+        <div className="min-h-screen bg-[#050A14]">
             <div className="max-w-7xl mx-auto px-4 md:px-6 py-8">
                 {/* Page Header */}
                 <motion.div
@@ -154,7 +154,7 @@ export function FacultyMeetingsContent({ meetings, groups }: FacultyMeetingsCont
                     className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8"
                 >
                     <div>
-                        <h1 className="text-2xl md:text-3xl font-bold text-slate-900 mb-1">
+                        <h1 className="text-2xl md:text-3xl font-bold text-white mb-1">
                             Meetings
                         </h1>
                         <p className="text-slate-500">Schedule and manage student meetings</p>
@@ -162,14 +162,14 @@ export function FacultyMeetingsContent({ meetings, groups }: FacultyMeetingsCont
                     <div className="flex gap-2">
                         <Button
                             variant="outline"
-                            className="border-slate-200"
+                            className="border-blue-500/20"
                             onClick={handleExportPDF}
                         >
                             <Download className="h-4 w-4 mr-2" />
                             Export PDF
                         </Button>
                         <Button
-                            className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm"
+                            className="bg-blue-600 hover:bg-emerald-700 text-white shadow-sm"
                             onClick={() => setShowScheduleModal(true)}
                         >
                             <Plus className="h-4 w-4 mr-2" />
@@ -189,32 +189,32 @@ export function FacultyMeetingsContent({ meetings, groups }: FacultyMeetingsCont
                         <motion.div
                             key={stat.label}
                             whileHover={{ y: -2 }}
-                            className={`bg-white rounded-xl border p-4 flex items-center gap-4 ${stat.color === "emerald"
-                                ? "border-emerald-100"
+                            className={`bg-white/5 backdrop-blur-md rounded-xl border border-blue-500/20 p-4 flex items-center gap-4 ${stat.color === "emerald"
+                                ? "border-blue-500/20"
                                 : stat.color === "emerald"
-                                    ? "border-emerald-100"
-                                    : "border-slate-200"
+                                    ? "border-blue-500/20"
+                                    : "border-blue-500/20"
                                 }`}
                         >
                             <div
                                 className={`p-3 rounded-xl ${stat.color === "emerald"
-                                    ? "bg-emerald-100"
+                                    ? "bg-blue-500/15"
                                     : stat.color === "emerald"
-                                        ? "bg-emerald-100"
-                                        : "bg-slate-100"
+                                        ? "bg-blue-500/15"
+                                        : "bg-white/5"
                                     }`}
                             >
                                 <stat.icon
                                     className={`h-5 w-5 ${stat.color === "emerald"
-                                        ? "text-emerald-600"
+                                        ? "text-cyan-400"
                                         : stat.color === "emerald"
-                                            ? "text-emerald-600"
-                                            : "text-slate-600"
+                                            ? "text-cyan-400"
+                                            : "text-slate-300"
                                         }`}
                                 />
                             </div>
                             <div>
-                                <p className="text-2xl font-bold text-slate-900">{stat.count}</p>
+                                <p className="text-2xl font-bold text-white">{stat.count}</p>
                                 <p className="text-sm text-slate-500">{stat.label}</p>
                             </div>
                         </motion.div>
@@ -226,7 +226,7 @@ export function FacultyMeetingsContent({ meetings, groups }: FacultyMeetingsCont
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.2 }}
-                    className="bg-white rounded-xl border border-slate-200 p-4 mb-6"
+                    className="bg-white/5 backdrop-blur-md rounded-xl border border-blue-500/20 p-4 mb-6"
                 >
                     <div className="flex flex-col sm:flex-row gap-4">
                         <div className="relative flex-1">
@@ -235,10 +235,10 @@ export function FacultyMeetingsContent({ meetings, groups }: FacultyMeetingsCont
                                 placeholder="Search meetings..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="pl-10 bg-slate-50 border-slate-200 focus:bg-white"
+                                className="pl-10 bg-white/5 border-blue-500/20 focus:bg-white/10"
                             />
                         </div>
-                        <Button variant="outline" className="border-slate-200">
+                        <Button variant="outline" className="border-blue-500/20">
                             <Filter className="h-4 w-4 mr-2" />
                             Filter
                         </Button>
@@ -252,17 +252,17 @@ export function FacultyMeetingsContent({ meetings, groups }: FacultyMeetingsCont
                     transition={{ delay: 0.3 }}
                 >
                     <Tabs defaultValue="upcoming" className="w-full">
-                        <TabsList className="bg-white border border-slate-200 p-1 mb-6">
+                        <TabsList className="bg-white/5 border border-blue-500/20 p-1 mb-6">
                             <TabsTrigger
                                 value="upcoming"
-                                className="data-[state=active]:bg-emerald-50 data-[state=active]:text-emerald-700"
+                                className="data-[state=active]:bg-blue-500/10 data-[state=active]:text-cyan-400"
                             >
                                 <CalendarPlus className="h-4 w-4 mr-2" />
                                 Upcoming ({filteredUpcoming.length})
                             </TabsTrigger>
                             <TabsTrigger
                                 value="past"
-                                className="data-[state=active]:bg-slate-100 data-[state=active]:text-slate-700"
+                                className="data-[state=active]:bg-white/5 data-[state=active]:text-slate-200"
                             >
                                 <CheckCircle2 className="h-4 w-4 mr-2" />
                                 Past ({filteredPast.length})
@@ -362,29 +362,29 @@ function MeetingCard({
 
     const getStatusBadge = () => {
         if (type === "upcoming") {
-            if (isToday) return <Badge className="bg-red-100 text-red-700">Today</Badge>;
+            if (isToday) return <Badge className="bg-red-500/15 text-red-700">Today</Badge>;
             if (isTomorrow) return <Badge className="bg-orange-100 text-orange-700">Tomorrow</Badge>;
-            return <Badge className="bg-emerald-100 text-emerald-700">Scheduled</Badge>;
+            return <Badge className="bg-blue-500/15 text-cyan-400">Scheduled</Badge>;
         }
         return meeting.status === "Completed"
-            ? <Badge className="bg-slate-100 text-slate-700">Completed</Badge>
-            : <Badge className="bg-amber-100 text-amber-700">Pending Review</Badge>;
+            ? <Badge className="bg-white/5 text-slate-200">Completed</Badge>
+            : <Badge className="bg-amber-500/15 text-amber-400">Pending Review</Badge>;
     };
 
     return (
         <motion.div variants={itemVariants}>
-            <div className={`bg-white rounded-xl border p-4 hover:shadow-md transition-all ${isToday ? "border-red-200 bg-red-50/30" : "border-slate-200"
+            <div className={`bg-white/5 backdrop-blur-md rounded-xl border border-blue-500/20 p-4 hover:shadow-md transition-all ${isToday ? "border-red-200 bg-red-500/10/30" : "border-blue-500/20"
                 }`}>
                 <div className="flex flex-col md:flex-row md:items-center gap-4">
                     {/* Date */}
                     <div className="flex items-center gap-4 md:w-32">
-                        <div className={`p-3 rounded-xl ${type === "upcoming" ? "bg-emerald-100" : "bg-slate-100"
+                        <div className={`p-3 rounded-xl ${type === "upcoming" ? "bg-blue-500/15" : "bg-white/5"
                             }`}>
-                            <Calendar className={`h-5 w-5 ${type === "upcoming" ? "text-emerald-600" : "text-slate-600"
+                            <Calendar className={`h-5 w-5 ${type === "upcoming" ? "text-cyan-400" : "text-slate-300"
                                 }`} />
                         </div>
                         <div className="md:hidden">
-                            <p className="font-semibold text-slate-900">
+                            <p className="font-semibold text-white">
                                 {meetingDate.toLocaleDateString("en-IN", { day: "numeric", month: "short" })}
                             </p>
                             <p className="text-sm text-slate-500">
@@ -394,7 +394,7 @@ function MeetingCard({
                     </div>
 
                     <div className="hidden md:block text-center w-20">
-                        <p className="text-2xl font-bold text-slate-900">
+                        <p className="text-2xl font-bold text-white">
                             {meetingDate.getDate()}
                         </p>
                         <p className="text-sm text-slate-500">
@@ -405,7 +405,7 @@ function MeetingCard({
                     {/* Details */}
                     <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap mb-1">
-                            <h3 className="font-semibold text-slate-900">
+                            <h3 className="font-semibold text-white">
                                 {meeting.purpose || "Meeting"}
                             </h3>
                             {getStatusBadge()}
@@ -439,7 +439,7 @@ function MeetingCard({
                         <Button
                             variant="outline"
                             size="sm"
-                            className="text-emerald-600 border-emerald-200 hover:bg-emerald-50"
+                            className="text-cyan-400 border-cyan-500/25 hover:bg-blue-500/10"
                             onClick={onViewDetails}
                         >
                             {type === "upcoming" ? "View" : "Details"}
@@ -509,18 +509,18 @@ function ScheduleMeetingModal({
                 initial={{ scale: 0.95, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0.95, opacity: 0 }}
-                className="bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-hidden"
+                className="bg-white/5 backdrop-blur-md rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-hidden"
                 onClick={(e) => e.stopPropagation()}
             >
                 {/* Header */}
-                <div className="p-6 border-b border-slate-100 bg-gradient-to-r from-emerald-50 to-teal-50">
+                <div className="p-6 border-b border-blue-500/15 bg-gradient-to-r from-blue-500/10 to-cyan-500/10">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                            <div className="p-2 bg-white rounded-xl shadow-sm">
-                                <CalendarPlus className="h-5 w-5 text-emerald-600" />
+                            <div className="p-2 bg-white/5 backdrop-blur-md rounded-xl shadow-sm">
+                                <CalendarPlus className="h-5 w-5 text-cyan-400" />
                             </div>
                             <div>
-                                <h2 className="text-xl font-bold text-slate-900">Schedule Meeting</h2>
+                                <h2 className="text-xl font-bold text-white">Schedule Meeting</h2>
                                 <p className="text-sm text-slate-500">Create a new meeting with your group</p>
                             </div>
                         </div>
@@ -567,7 +567,7 @@ function ScheduleMeetingModal({
                                         <Button
                                             variant={"outline"}
                                             className={cn(
-                                                "w-full justify-start text-left font-normal border-slate-200",
+                                                "w-full justify-start text-left font-normal border-blue-500/20",
                                                 !date && "text-muted-foreground"
                                             )}
                                         >
@@ -590,13 +590,13 @@ function ScheduleMeetingModal({
                             <div className="space-y-2">
                                 <Label htmlFor="time">Time *</Label>
                                 <div className="relative">
-                                    <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-emerald-600 pointer-events-none" />
+                                    <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-cyan-400 pointer-events-none" />
                                     <Input
                                         id="time"
                                         type="time"
                                         value={time}
                                         onChange={(e) => setTime(e.target.value)}
-                                        className="pl-10 cursor-pointer text-slate-700 bg-white border-slate-200 focus:bg-white focus:ring-emerald-500"
+                                        className="pl-10 cursor-pointer text-slate-200 bg-white border-blue-500/20 focus:bg-white/10 focus:ring-emerald-500"
                                     />
                                 </div>
                             </div>
@@ -623,17 +623,17 @@ function ScheduleMeetingModal({
                             />
                         </div>
 
-                        <div className="flex items-center gap-3 p-3 bg-emerald-50 rounded-lg">
+                        <div className="flex items-center gap-3 p-3 bg-blue-500/10 rounded-lg">
                             <Checkbox
                                 id="notification"
                                 checked={sendNotification}
                                 onCheckedChange={(checked) => setSendNotification(checked === true)}
                             />
                             <div>
-                                <Label htmlFor="notification" className="font-medium text-emerald-700 cursor-pointer">
+                                <Label htmlFor="notification" className="font-medium text-cyan-400 cursor-pointer">
                                     Send Email Notification
                                 </Label>
-                                <p className="text-xs text-emerald-600">
+                                <p className="text-xs text-cyan-400">
                                     Notify all group members via email about this meeting
                                 </p>
                             </div>
@@ -642,12 +642,12 @@ function ScheduleMeetingModal({
                 </div>
 
                 {/* Footer */}
-                <div className="p-4 border-t border-slate-100 bg-slate-50 flex gap-3 justify-end">
+                <div className="p-4 border-t border-blue-500/15 bg-white/5 flex gap-3 justify-end">
                     <Button variant="outline" onClick={onClose}>
                         Cancel
                     </Button>
                     <Button
-                        className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                        className="bg-blue-600 hover:bg-emerald-700 text-white"
                         onClick={handleSubmit}
                         disabled={isPending || !selectedGroup || !purpose || !date || !time}
                     >
@@ -856,25 +856,25 @@ function MeetingDetailsModal({
                 initial={{ scale: 0.95, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0.95, opacity: 0 }}
-                className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden"
+                className="bg-white/5 backdrop-blur-md rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden"
                 onClick={(e) => e.stopPropagation()}
             >
                 {/* Header */}
-                <div className={`p-6 border-b border-slate-100 ${needsReview
+                <div className={`p-6 border-b border-blue-500/15 ${needsReview
                         ? "bg-gradient-to-r from-amber-50 to-orange-50"
-                        : "bg-gradient-to-r from-emerald-50 to-teal-50"
+                        : "bg-gradient-to-r from-blue-500/10 to-cyan-500/10"
                     }`}>
                     <div className="flex items-start justify-between">
                         <div className="flex items-center gap-4">
-                            <div className="p-3 bg-white rounded-xl shadow-sm">
-                                <Calendar className={`h-6 w-6 ${needsReview ? "text-amber-600" : "text-emerald-600"}`} />
+                            <div className="p-3 bg-white/5 backdrop-blur-md rounded-xl shadow-sm">
+                                <Calendar className={`h-6 w-6 ${needsReview ? "text-amber-400" : "text-cyan-400"}`} />
                             </div>
                             <div>
-                                <h2 className="text-xl font-bold text-slate-900">
+                                <h2 className="text-xl font-bold text-white">
                                     {meeting.purpose || "Meeting Details"}
                                 </h2>
                                 <div className="flex items-center gap-2 mt-1">
-                                    <Badge className={needsReview ? "bg-amber-100 text-amber-700" : "bg-emerald-100 text-emerald-700"}>
+                                    <Badge className={needsReview ? "bg-amber-500/15 text-amber-400" : "bg-blue-500/15 text-cyan-400"}>
                                         {meeting.status || "Scheduled"}
                                     </Badge>
                                     <span className="text-sm text-slate-500">
@@ -889,7 +889,7 @@ function MeetingDetailsModal({
                                     if (isCompleted) setIsEditingReview(true);
                                     else setIsEditing(true);
                                 }}>
-                                    <Pencil className="h-4 w-4 text-slate-500 hover:text-emerald-600" />
+                                    <Pencil className="h-4 w-4 text-slate-500 hover:text-cyan-400" />
                                 </Button>
                             )}
                             <Button variant="ghost" size="icon" onClick={onClose}>
@@ -916,7 +916,7 @@ function MeetingDetailsModal({
                                             <Button
                                                 variant={"outline"}
                                                 className={cn(
-                                                    "w-full justify-start text-left font-normal border-slate-200",
+                                                    "w-full justify-start text-left font-normal border-blue-500/20",
                                                     !editDate && "text-muted-foreground"
                                                 )}
                                             >
@@ -938,12 +938,12 @@ function MeetingDetailsModal({
                                 <div className="space-y-2">
                                     <Label>Time *</Label>
                                     <div className="relative">
-                                        <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-emerald-600 pointer-events-none" />
+                                        <Clock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-cyan-400 pointer-events-none" />
                                         <Input
                                             type="time"
                                             value={editTime}
                                             onChange={(e) => setEditTime(e.target.value)}
-                                            className="pl-10 cursor-pointer text-slate-700 bg-white border-slate-200 focus:bg-white focus:ring-emerald-500"
+                                            className="pl-10 cursor-pointer text-slate-200 bg-white border-blue-500/20 focus:bg-white/10 focus:ring-emerald-500"
                                         />
                                     </div>
                                 </div>
@@ -952,17 +952,17 @@ function MeetingDetailsModal({
                                 <Label>Location</Label>
                                 <Input value={editLocation} onChange={e => setEditLocation(e.target.value)} />
                             </div>
-                             <div className="flex items-center gap-3 p-3 bg-emerald-50 rounded-lg">
+                             <div className="flex items-center gap-3 p-3 bg-blue-500/10 rounded-lg">
                                 <Checkbox
                                     id="edit-notification"
                                     checked={sendNotification}
                                     onCheckedChange={(checked) => setSendNotification(checked === true)}
                                 />
                                 <div>
-                                    <Label htmlFor="edit-notification" className="font-medium text-emerald-700 cursor-pointer">
+                                    <Label htmlFor="edit-notification" className="font-medium text-cyan-400 cursor-pointer">
                                         Send Update Email
                                     </Label>
-                                    <p className="text-xs text-emerald-600">
+                                    <p className="text-xs text-cyan-400">
                                         Notify students about the updated details
                                     </p>
                                 </div>
@@ -970,18 +970,18 @@ function MeetingDetailsModal({
                         </div>
                     ) : (
                         <div className="grid grid-cols-2 gap-4 mb-6">
-                            <div className="p-4 bg-slate-50 rounded-xl">
+                            <div className="p-4 bg-white/5 rounded-xl">
                                 <p className="text-xs text-slate-500 uppercase tracking-wide mb-1">Date & Time</p>
-                                <p className="font-semibold text-slate-900">
+                                <p className="font-semibold text-white">
                                     {meetingDate.toLocaleDateString("en-IN", { dateStyle: "full" })}
                                 </p>
-                                <p className="text-sm text-slate-600">
+                                <p className="text-sm text-slate-300">
                                     {meetingDate.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}
                                 </p>
                             </div>
-                            <div className="p-4 bg-slate-50 rounded-xl">
+                            <div className="p-4 bg-white/5 rounded-xl">
                                 <p className="text-xs text-slate-500 uppercase tracking-wide mb-1">Location</p>
-                                <p className="font-semibold text-slate-900">
+                                <p className="font-semibold text-white">
                                     {meeting.location || "Not specified"}
                                 </p>
                             </div>
@@ -989,8 +989,8 @@ function MeetingDetailsModal({
                     )}
 
                     {meeting.projectTitle && (
-                        <div className="mb-6 p-4 bg-emerald-50 rounded-xl">
-                            <p className="text-xs text-emerald-600 uppercase tracking-wide mb-1">Project</p>
+                        <div className="mb-6 p-4 bg-blue-500/10 rounded-xl">
+                            <p className="text-xs text-cyan-400 uppercase tracking-wide mb-1">Project</p>
                             <p className="font-semibold text-emerald-900">{meeting.projectTitle}</p>
                         </div>
                     )}
@@ -998,7 +998,7 @@ function MeetingDetailsModal({
                     {/* Attendance Section */}
                     <div className="mb-6">
                         <div className="flex items-center justify-between mb-3">
-                            <h3 className="text-sm font-medium text-slate-700 flex items-center gap-2">
+                            <h3 className="text-sm font-medium text-slate-200 flex items-center gap-2">
                                 <Users className="h-4 w-4" />
                                 Attendance ({totalStudents} members)
                             </h3>
@@ -1007,7 +1007,7 @@ function MeetingDetailsModal({
                                     <Button
                                         variant="outline"
                                         size="sm"
-                                        className="text-xs h-7 border-emerald-200 text-emerald-600 hover:bg-emerald-50"
+                                        className="text-xs h-7 border-cyan-500/25 text-cyan-400 hover:bg-blue-500/10"
                                         onClick={markAllPresent}
                                     >
                                         <CheckCircle2 className="h-3 w-3 mr-1" />
@@ -1016,7 +1016,7 @@ function MeetingDetailsModal({
                                     <Button
                                         variant="outline"
                                         size="sm"
-                                        className="text-xs h-7 border-red-200 text-red-600 hover:bg-red-50"
+                                        className="text-xs h-7 border-red-200 text-red-600 hover:bg-red-500/10"
                                         onClick={markAllAbsent}
                                     >
                                         <AlertCircle className="h-3 w-3 mr-1" />
@@ -1028,7 +1028,7 @@ function MeetingDetailsModal({
 
                         {/* Attendance Stats Bar */}
                         {totalStudents > 0 && (
-                            <div className="mb-3 p-3 bg-slate-50 rounded-lg">
+                            <div className="mb-3 p-3 bg-white/5 rounded-lg">
                                 <div className="flex items-center justify-between text-xs text-slate-500 mb-2">
                                     <span>Present: {presentCount}/{totalStudents}</span>
                                     <span>Absent: {absentCount}/{totalStudents}</span>
@@ -1036,7 +1036,7 @@ function MeetingDetailsModal({
                                 </div>
                                 <div className="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
                                     <div
-                                        className="h-full bg-emerald-500 rounded-full transition-all duration-300"
+                                        className="h-full bg-blue-500 rounded-full transition-all duration-300"
                                         style={{ width: `${totalStudents > 0 ? (presentCount / totalStudents) * 100 : 0}%` }}
                                     />
                                 </div>
@@ -1048,8 +1048,8 @@ function MeetingDetailsModal({
                                 <div
                                     key={attendee.studentId || index}
                                     className={`p-3 rounded-lg ${isCompleted
-                                            ? attendee.present ? "bg-emerald-50" : "bg-red-50"
-                                            : attendance[attendee.studentId!]?.present ? "bg-emerald-50/70" : "bg-slate-50"
+                                            ? attendee.present ? "bg-blue-500/10" : "bg-red-500/10"
+                                            : attendance[attendee.studentId!]?.present ? "bg-blue-500/10/70" : "bg-white/5"
                                         }`}
                                 >
                                     <div className="flex items-center justify-between">
@@ -1057,15 +1057,15 @@ function MeetingDetailsModal({
                                             <div className="w-8 h-8 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-full flex items-center justify-center text-white font-medium text-sm">
                                                 {attendee.name?.charAt(0) || "?"}
                                             </div>
-                                            <span className="font-medium text-slate-900">{attendee.name}</span>
+                                            <span className="font-medium text-white">{attendee.name}</span>
                                         </div>
                                         {(!isCompleted || isEditingReview) && attendee.studentId ? (
                                             <Button
                                                 variant={attendance[attendee.studentId]?.present ? "default" : "outline"}
                                                 size="sm"
                                                 className={attendance[attendee.studentId]?.present
-                                                    ? "bg-emerald-500 hover:bg-emerald-600"
-                                                    : "border-slate-200 hover:border-red-200 hover:text-red-600"
+                                                    ? "bg-blue-500 hover:bg-blue-600"
+                                                    : "border-blue-500/20 hover:border-red-200 hover:text-red-600"
                                                 }
                                                 onClick={() => toggleAttendance(attendee.studentId!)}
                                             >
@@ -1076,7 +1076,7 @@ function MeetingDetailsModal({
                                                 )}
                                             </Button>
                                         ) : (
-                                            <Badge className={attendee.present ? "bg-emerald-100 text-emerald-700" : "bg-red-100 text-red-700"}>
+                                            <Badge className={attendee.present ? "bg-blue-500/15 text-cyan-400" : "bg-red-500/15 text-red-700"}>
                                                 {attendee.present ? "Present" : "Absent"}
                                             </Badge>
                                         )}
@@ -1086,7 +1086,7 @@ function MeetingDetailsModal({
                                         <div className="mt-2 ml-11">
                                             <Input
                                                 placeholder="Add remarks (optional)..."
-                                                className="h-7 text-xs bg-white/70 border-slate-200"
+                                                className="h-7 text-xs bg-white/70 border-blue-500/20"
                                                 value={attendance[attendee.studentId]?.remarks || ""}
                                                 onChange={(e) => updateRemarks(attendee.studentId!, e.target.value)}
                                             />
@@ -1112,7 +1112,7 @@ function MeetingDetailsModal({
                         {!isCompleted && meeting.attendees.length > 0 && (
                             <div className="mt-3">
                                 <Button
-                                    className="w-full bg-emerald-600 hover:bg-emerald-700 text-white"
+                                    className="w-full bg-blue-600 hover:bg-emerald-700 text-white"
                                     onClick={handleSaveAttendance}
                                     disabled={isSavingAttendance}
                                     size="sm"
@@ -1155,14 +1155,14 @@ function MeetingDetailsModal({
                                 className="resize-none"
                             />
                         ) : (
-                            <div className="p-4 bg-slate-50 rounded-lg text-slate-700 whitespace-pre-wrap border border-slate-100">
+                            <div className="p-4 bg-white/5 rounded-lg text-slate-200 whitespace-pre-wrap border border-blue-500/15">
                                 {meeting.notes || "No notes available"}
                             </div>
                         )}
                     </div>
                     <div>
                         <Label htmlFor="grade" className="flex items-center gap-2 mb-2 border-slate-700">
-                            <Star className="h-4 w-4 text-amber-500" />
+                            <Star className="h-4 w-4 text-amber-400" />
                             Grade / Score
                         </Label>
                         {(needsReview || isEditingReview) ? (
@@ -1178,7 +1178,7 @@ function MeetingDetailsModal({
                                 </SelectContent>
                             </Select>
                         ) : (
-                            <div className="p-4 bg-emerald-50 rounded-lg border border-emerald-100 flex items-center justify-center font-bold text-emerald-700">
+                            <div className="p-4 bg-blue-500/10 rounded-lg border border-blue-500/20 flex items-center justify-center font-bold text-cyan-400">
                                 {meeting.grade || "No Grade"}
                             </div>
                         )}
@@ -1192,7 +1192,7 @@ function MeetingDetailsModal({
                 </div>
 
                 {/* Footer */}
-                <div className="p-4 border-t border-slate-100 bg-slate-50 flex gap-3 justify-between flex-wrap">
+                <div className="p-4 border-t border-blue-500/15 bg-white/5 flex gap-3 justify-between flex-wrap">
                     {isEditing ? (
                         <>
                             <div className="flex gap-2">
@@ -1205,7 +1205,7 @@ function MeetingDetailsModal({
                                 <Button variant="outline" onClick={() => setIsEditing(false)}>
                                     Cancel
                                 </Button>
-                                <Button className="bg-emerald-600 hover:bg-emerald-700 text-white" onClick={handleSaveEdits} disabled={isPending}>
+                                <Button className="bg-blue-600 hover:bg-emerald-700 text-white" onClick={handleSaveEdits} disabled={isPending}>
                                     {isPending ? (
                                         <>
                                             <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -1230,7 +1230,7 @@ function MeetingDetailsModal({
                                             Cancel
                                         </Button>
                                         <Button
-                                            className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                                            className="bg-blue-600 hover:bg-emerald-700 text-white"
                                             onClick={handleSubmitReview}
                                             disabled={isPending}
                                         >
@@ -1286,7 +1286,7 @@ function MeetingDetailsModal({
 
 function EmptyState({ type, onSchedule }: { type: "upcoming" | "past"; onSchedule?: () => void }) {
     return (
-        <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center">
+        <div className="bg-white/5 backdrop-blur-md rounded-2xl border border-blue-500/20 p-12 text-center">
             <motion.div
                 animate={{ y: [0, -5, 0] }}
                 transition={{ duration: 2, repeat: Infinity }}
@@ -1294,16 +1294,16 @@ function EmptyState({ type, onSchedule }: { type: "upcoming" | "past"; onSchedul
             >
                 <div className="relative">
                     <div className={`absolute inset-0 ${type === "upcoming" ? "bg-emerald-200" : "bg-slate-200"} rounded-2xl blur-xl opacity-40`} />
-                    <div className={`relative ${type === "upcoming" ? "bg-emerald-50 border-emerald-100" : "bg-slate-50 border-slate-100"} border p-8 rounded-2xl`}>
+                    <div className={`relative ${type === "upcoming" ? "bg-blue-500/10 border-blue-500/20" : "bg-white/5 border-blue-500/15"} border p-8 rounded-2xl`}>
                         {type === "upcoming" ? (
-                            <CalendarPlus className="h-16 w-16 text-emerald-400 mx-auto" />
+                            <CalendarPlus className="h-16 w-16 text-cyan-400 mx-auto" />
                         ) : (
                             <CheckCircle2 className="h-16 w-16 text-slate-400 mx-auto" />
                         )}
                     </div>
                 </div>
             </motion.div>
-            <h3 className="text-xl font-semibold text-slate-900 mb-2">
+            <h3 className="text-xl font-semibold text-white mb-2">
                 {type === "upcoming" ? "No Upcoming Meetings" : "No Past Meetings"}
             </h3>
             <p className="text-slate-500 mb-6 max-w-md mx-auto">
@@ -1313,7 +1313,7 @@ function EmptyState({ type, onSchedule }: { type: "upcoming" | "past"; onSchedul
             </p>
             {type === "upcoming" && onSchedule && (
                 <Button
-                    className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                    className="bg-blue-600 hover:bg-emerald-700 text-white"
                     onClick={onSchedule}
                 >
                     <Plus className="h-4 w-4 mr-2" />

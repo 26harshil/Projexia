@@ -42,6 +42,8 @@
     "react-dom": "19.2.3",
     "react-hook-form": "^7.71.1",
     "resend": "^6.9.3",
+    "stream-chat": "^9.36.0",
+    "stream-chat-react": "^13.14.2",
     "svix": "^1.84.1",
     "tailwind-merge": "^3.4.0",
     "zod": "^4.3.5"

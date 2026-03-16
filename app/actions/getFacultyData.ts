@@ -3,1464 +3,1577 @@
 import { prisma } from "@/lib/prisma";
 import { currentUser } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
+import {
+  ensureGroupChannel,
+  addMemberToGroupChannel,
+  removeMemberFromGroupChannel,
+  silentStreamOp,
+} from "@/lib/streamGroupChat";
 
 // ============== HELPER FUNCTIONS ==============
 
 // Helper function to get staff ID for current faculty user
 async function getStaffId() {
-    const user = await currentUser();
-    if (!user) return null;
+  const user = await currentUser();
+  if (!user) return null;
 
-    const staff = await prisma.staff.findFirst({
-        where: {
-            users: {
-                clerkid: user.id,
-            },
-        },
-        select: { staffid: true, staffname: true, email: true },
-    });
+  const staff = await prisma.staff.findFirst({
+    where: {
+      users: {
+        clerkid: user.id,
+      },
+    },
+    select: { staffid: true, staffname: true, email: true },
+  });
 
-    return staff;
+  return staff;
 }
 
 // ============== GET FUNCTIONS (Fetch from Database) ==============
 
 // Get all groups assigned to faculty
 export async function getFacultyGroups() {
-    const staff = await getStaffId();
-    if (!staff) return [];
+  const staff = await getStaffId();
+  if (!staff) return [];
 
-    // Also find groups where this faculty is a guide (from meetings)
-    const guideGroupIds = await prisma.projectmeeting.findMany({
-        where: { guidestaffid: staff.staffid },
-        select: { projectgroupid: true },
-        distinct: ['projectgroupid'],
-    });
-    const guideGroupIdList = guideGroupIds.map(g => g.projectgroupid);
+  // Also find groups where this faculty is a guide (from meetings)
+  const guideGroupIds = await prisma.projectmeeting.findMany({
+    where: { guidestaffid: staff.staffid },
+    select: { projectgroupid: true },
+    distinct: ["projectgroupid"],
+  });
+  const guideGroupIdList = guideGroupIds.map((g) => g.projectgroupid);
 
-    const groups = await prisma.projectgroup.findMany({
-        where: {
-            OR: [
-                { convenerstaffid: staff.staffid },
-                { expertstaffid: staff.staffid },
-                ...(guideGroupIdList.length > 0 ? [{ projectgroupid: { in: guideGroupIdList } }] : []),
-            ],
+  const groups = await prisma.projectgroup.findMany({
+    where: {
+      OR: [
+        { convenerstaffid: staff.staffid },
+        { expertstaffid: staff.staffid },
+        ...(guideGroupIdList.length > 0
+          ? [{ projectgroupid: { in: guideGroupIdList } }]
+          : []),
+      ],
+    },
+    include: {
+      projecttype: true,
+      staff_projectgroup_convenerstaffidTostaff: {
+        select: {
+          staffname: true,
+          email: true,
         },
+      },
+      staff_projectgroup_expertstaffidTostaff: {
+        select: {
+          staffname: true,
+          email: true,
+        },
+      },
+      projectgroupmember: {
         include: {
-            projecttype: true,
-            staff_projectgroup_convenerstaffidTostaff: {
-                select: {
-                    staffname: true,
-                    email: true,
-                },
+          student: {
+            select: {
+              studentid: true,
+              studentname: true,
+              email: true,
+              phone: true,
             },
-            staff_projectgroup_expertstaffidTostaff: {
-                select: {
-                    staffname: true,
-                    email: true,
-                },
-            },
-            projectgroupmember: {
-                include: {
-                    student: {
-                        select: {
-                            studentid: true,
-                            studentname: true,
-                            email: true,
-                            phone: true,
-                        },
-                    },
-                },
-            },
-            projectmeeting: {
-                where: {
-                    meetingdatetime: {
-                        gte: new Date(),
-                    },
-                },
-                orderBy: {
-                    meetingdatetime: 'asc',
-                },
-                take: 1,
-            },
+          },
+        },
+      },
+      projectmeeting: {
+        where: {
+          meetingdatetime: {
+            gte: new Date(),
+          },
         },
         orderBy: {
-            created: 'desc',
+          meetingdatetime: "asc",
         },
-    });
+        take: 1,
+      },
+    },
+    orderBy: {
+      created: "desc",
+    },
+  });
 
-    return groups.map((group) => ({
-        id: group.projectgroupid,
-        name: group.projectgroupname,
-        title: group.projecttitle,
-        area: group.projectarea,
-        description: group.projectdescription,
-        projectType: group.projecttype?.projecttypename || null,
-        status: group.projectstatus || "Active",
-        averageCpi: group.averagecpi ? group.averagecpi.toNumber() : null,
-        convener: group.staff_projectgroup_convenerstaffidTostaff,
-        expert: group.staff_projectgroup_expertstaffidTostaff,
-        memberCount: group.projectgroupmember.length,
-        members: group.projectgroupmember.map((m) => ({
-            id: m.student?.studentid,
-            name: m.student?.studentname,
-            email: m.student?.email,
-            phone: m.student?.phone,
-            isLeader: m.isgroupleader,
-            cgpa: m.studentcgpa ? m.studentcgpa.toNumber() : null,
-        })),
-        nextMeeting: group.projectmeeting[0] ? {
-            meetingdatetime: group.projectmeeting[0].meetingdatetime,
-            meetingpurpose: group.projectmeeting[0].meetingpurpose,
-            meetinglocation: group.projectmeeting[0].meetinglocation,
-        } : null,
-    }));
+  return groups.map((group) => ({
+    id: group.projectgroupid,
+    name: group.projectgroupname,
+    title: group.projecttitle,
+    area: group.projectarea,
+    description: group.projectdescription,
+    projectType: group.projecttype?.projecttypename || null,
+    status: group.projectstatus || "Active",
+    averageCpi: group.averagecpi ? group.averagecpi.toNumber() : null,
+    convener: group.staff_projectgroup_convenerstaffidTostaff,
+    expert: group.staff_projectgroup_expertstaffidTostaff,
+    memberCount: group.projectgroupmember.length,
+    members: group.projectgroupmember.map((m) => ({
+      id: m.student?.studentid,
+      name: m.student?.studentname,
+      email: m.student?.email,
+      phone: m.student?.phone,
+      isLeader: m.isgroupleader,
+      cgpa: m.studentcgpa ? m.studentcgpa.toNumber() : null,
+    })),
+    nextMeeting: group.projectmeeting[0]
+      ? {
+          meetingdatetime: group.projectmeeting[0].meetingdatetime,
+          meetingpurpose: group.projectmeeting[0].meetingpurpose,
+          meetinglocation: group.projectmeeting[0].meetinglocation,
+        }
+      : null,
+  }));
 }
 
 // Get single group by ID
 export async function getFacultyGroupById(groupId: number) {
-    const staff = await getStaffId();
-    if (!staff) return null;
+  const staff = await getStaffId();
+  if (!staff) return null;
 
-    const group = await prisma.projectgroup.findFirst({
-        where: {
-            projectgroupid: groupId,
-            OR: [
-                { convenerstaffid: staff.staffid },
-                { expertstaffid: staff.staffid },
-            ],
+  const group = await prisma.projectgroup.findFirst({
+    where: {
+      projectgroupid: groupId,
+      OR: [
+        { convenerstaffid: staff.staffid },
+        { expertstaffid: staff.staffid },
+      ],
+    },
+    include: {
+      projecttype: true,
+      staff_projectgroup_convenerstaffidTostaff: {
+        select: {
+          staffid: true,
+          staffname: true,
+          email: true,
+          phone: true,
         },
+      },
+      staff_projectgroup_expertstaffidTostaff: {
+        select: {
+          staffid: true,
+          staffname: true,
+          email: true,
+          phone: true,
+        },
+      },
+      projectgroupmember: {
         include: {
-            projecttype: true,
-            staff_projectgroup_convenerstaffidTostaff: {
-                select: {
-                    staffid: true,
-                    staffname: true,
-                    email: true,
-                    phone: true,
-                },
-            },
-            staff_projectgroup_expertstaffidTostaff: {
-                select: {
-                    staffid: true,
-                    staffname: true,
-                    email: true,
-                    phone: true,
-                },
-            },
-            projectgroupmember: {
-                include: {
-                    student: true,
-                },
-            },
-            projectmeeting: {
-                orderBy: {
-                    meetingdatetime: 'desc',
-                },
-            },
+          student: true,
         },
-    });
+      },
+      projectmeeting: {
+        orderBy: {
+          meetingdatetime: "desc",
+        },
+      },
+    },
+  });
 
-    if (!group) return null;
+  if (!group) return null;
 
-    return {
-        id: group.projectgroupid,
-        name: group.projectgroupname,
-        title: group.projecttitle,
-        area: group.projectarea,
-        description: group.projectdescription,
-        projectType: group.projecttype,
-        status: group.projectstatus || "Active",
-        averageCpi: group.averagecpi ? group.averagecpi.toNumber() : null,
-        convener: group.staff_projectgroup_convenerstaffidTostaff,
-        expert: group.staff_projectgroup_expertstaffidTostaff,
-        members: group.projectgroupmember.map((m) => ({
-            id: m.student?.studentid,
-            name: m.student?.studentname,
-            email: m.student?.email,
-            phone: m.student?.phone,
-            isLeader: m.isgroupleader,
-            cgpa: m.studentcgpa ? m.studentcgpa.toNumber() : null,
-        })),
-        meetings: group.projectmeeting.map((meeting) => ({
-            id: meeting.projectmeetingid,
-            datetime: meeting.meetingdatetime,
-            purpose: meeting.meetingpurpose,
-            location: meeting.meetinglocation,
-            status: meeting.meetingstatus,
-            notes: meeting.meetingnotes,
-        })),
-    };
+  return {
+    id: group.projectgroupid,
+    name: group.projectgroupname,
+    title: group.projecttitle,
+    area: group.projectarea,
+    description: group.projectdescription,
+    projectType: group.projecttype,
+    status: group.projectstatus || "Active",
+    averageCpi: group.averagecpi ? group.averagecpi.toNumber() : null,
+    convener: group.staff_projectgroup_convenerstaffidTostaff,
+    expert: group.staff_projectgroup_expertstaffidTostaff,
+    members: group.projectgroupmember.map((m) => ({
+      id: m.student?.studentid,
+      name: m.student?.studentname,
+      email: m.student?.email,
+      phone: m.student?.phone,
+      isLeader: m.isgroupleader,
+      cgpa: m.studentcgpa ? m.studentcgpa.toNumber() : null,
+    })),
+    meetings: group.projectmeeting.map((meeting) => ({
+      id: meeting.projectmeetingid,
+      datetime: meeting.meetingdatetime,
+      purpose: meeting.meetingpurpose,
+      location: meeting.meetinglocation,
+      status: meeting.meetingstatus,
+      notes: meeting.meetingnotes,
+    })),
+  };
 }
 
 // Get all meetings for faculty
 export async function getFacultyMeetings() {
-    const staff = await getStaffId();
-    if (!staff) return { upcoming: [], past: [] };
+  const staff = await getStaffId();
+  if (!staff) return { upcoming: [], past: [] };
 
-    const now = new Date();
+  const now = new Date();
 
-    const [upcomingMeetings, pastMeetings] = await Promise.all([
-        prisma.projectmeeting.findMany({
-            where: {
-                guidestaffid: staff.staffid,
-                meetingdatetime: {
-                    gte: now,
-                },
+  const [upcomingMeetings, pastMeetings] = await Promise.all([
+    prisma.projectmeeting.findMany({
+      where: {
+        guidestaffid: staff.staffid,
+        meetingdatetime: {
+          gte: now,
+        },
+      },
+      include: {
+        projectgroup: {
+          select: {
+            projectgroupid: true,
+            projectgroupname: true,
+            projecttitle: true,
+          },
+        },
+        projectmeetingattendance: {
+          include: {
+            student: {
+              select: {
+                studentid: true,
+                studentname: true,
+              },
             },
-            include: {
-                projectgroup: {
-                    select: {
-                        projectgroupid: true,
-                        projectgroupname: true,
-                        projecttitle: true,
-                    },
-                },
-                projectmeetingattendance: {
-                    include: {
-                        student: {
-                            select: {
-                                studentid: true,
-                                studentname: true,
-                            },
-                        },
-                    },
-                },
+          },
+        },
+      },
+      orderBy: {
+        created: "desc",
+      },
+    }),
+    prisma.projectmeeting.findMany({
+      where: {
+        guidestaffid: staff.staffid,
+        meetingdatetime: {
+          lt: now,
+        },
+      },
+      include: {
+        projectgroup: {
+          select: {
+            projectgroupid: true,
+            projectgroupname: true,
+            projecttitle: true,
+          },
+        },
+        projectmeetingattendance: {
+          include: {
+            student: {
+              select: {
+                studentid: true,
+                studentname: true,
+              },
             },
-            orderBy: {
-                created: 'desc',
-            },
-        }),
-        prisma.projectmeeting.findMany({
-            where: {
-                guidestaffid: staff.staffid,
-                meetingdatetime: {
-                    lt: now,
-                },
-            },
-            include: {
-                projectgroup: {
-                    select: {
-                        projectgroupid: true,
-                        projectgroupname: true,
-                        projecttitle: true,
-                    },
-                },
-                projectmeetingattendance: {
-                    include: {
-                        student: {
-                            select: {
-                                studentid: true,
-                                studentname: true,
-                            },
-                        },
-                    },
-                },
-            },
-            orderBy: {
-                meetingdatetime: 'desc',
-            },
-            take: 20,
-        }),
-    ]);
+          },
+        },
+      },
+      orderBy: {
+        meetingdatetime: "desc",
+      },
+      take: 20,
+    }),
+  ]);
 
-    const formatMeetings = (meetings: typeof upcomingMeetings) =>
-        meetings.map((meeting) => ({
-            id: meeting.projectmeetingid,
-            datetime: meeting.meetingdatetime,
-            purpose: meeting.meetingpurpose,
-            location: meeting.meetinglocation,
-            status: meeting.meetingstatus,
-            notes: meeting.meetingnotes,
-            grade: meeting.meetinggrade,
-            groupId: meeting.projectgroup?.projectgroupid,
-            groupName: meeting.projectgroup?.projectgroupname,
-            projectTitle: meeting.projectgroup?.projecttitle,
-            attendees: meeting.projectmeetingattendance.map((a) => ({
-                studentId: a.student?.studentid,
-                name: a.student?.studentname,
-                present: a.ispresent,
-                remarks: a.attendanceremarks,
-            })),
-        }));
+  const formatMeetings = (meetings: typeof upcomingMeetings) =>
+    meetings.map((meeting) => ({
+      id: meeting.projectmeetingid,
+      datetime: meeting.meetingdatetime,
+      purpose: meeting.meetingpurpose,
+      location: meeting.meetinglocation,
+      status: meeting.meetingstatus,
+      notes: meeting.meetingnotes,
+      grade: meeting.meetinggrade,
+      groupId: meeting.projectgroup?.projectgroupid,
+      groupName: meeting.projectgroup?.projectgroupname,
+      projectTitle: meeting.projectgroup?.projecttitle,
+      attendees: meeting.projectmeetingattendance.map((a) => ({
+        studentId: a.student?.studentid,
+        name: a.student?.studentname,
+        present: a.ispresent,
+        remarks: a.attendanceremarks,
+      })),
+    }));
 
-    return {
-        upcoming: formatMeetings(upcomingMeetings),
-        past: formatMeetings(pastMeetings),
-    };
+  return {
+    upcoming: formatMeetings(upcomingMeetings),
+    past: formatMeetings(pastMeetings),
+  };
 }
 
 // Get pending reviews for faculty
 export async function getFacultyReviews() {
-    const staff = await getStaffId();
-    if (!staff) return { pending: [], completed: [] };
+  const staff = await getStaffId();
+  if (!staff) return { pending: [], completed: [] };
 
-    // Get meetings that need review (past meetings without notes/completed status)
-    const [pendingReviews, completedReviews] = await Promise.all([
-        prisma.projectmeeting.findMany({
-            where: {
-                guidestaffid: staff.staffid,
-                meetingdatetime: {
-                    lt: new Date(),
-                },
-                OR: [
-                    { meetingstatus: null },
-                    { meetingstatus: { not: 'Completed' } },
-                ],
+  // Get meetings that need review (past meetings without notes/completed status)
+  const [pendingReviews, completedReviews] = await Promise.all([
+    prisma.projectmeeting.findMany({
+      where: {
+        guidestaffid: staff.staffid,
+        meetingdatetime: {
+          lt: new Date(),
+        },
+        OR: [{ meetingstatus: null }, { meetingstatus: { not: "Completed" } }],
+      },
+      include: {
+        projectgroup: {
+          select: {
+            projectgroupid: true,
+            projectgroupname: true,
+            projecttitle: true,
+          },
+        },
+        projectmeetingattendance: {
+          include: {
+            student: {
+              select: {
+                studentid: true,
+                studentname: true,
+              },
             },
-            include: {
-                projectgroup: {
-                    select: {
-                        projectgroupid: true,
-                        projectgroupname: true,
-                        projecttitle: true,
-                    },
-                },
-                projectmeetingattendance: {
-                    include: {
-                        student: {
-                            select: {
-                                studentid: true,
-                                studentname: true,
-                            },
-                        },
-                    },
-                },
-            },
-            orderBy: {
-                meetingdatetime: 'desc',
-            },
-        }),
-        prisma.projectmeeting.findMany({
-            where: {
-                guidestaffid: staff.staffid,
-                meetingstatus: 'Completed',
-            },
-            include: {
-                projectgroup: {
-                    select: {
-                        projectgroupid: true,
-                        projectgroupname: true,
-                        projecttitle: true,
-                    },
-                },
-            },
-            orderBy: {
-                meetingdatetime: 'desc',
-            },
-            take: 20,
-        }),
-    ]);
+          },
+        },
+      },
+      orderBy: {
+        meetingdatetime: "desc",
+      },
+    }),
+    prisma.projectmeeting.findMany({
+      where: {
+        guidestaffid: staff.staffid,
+        meetingstatus: "Completed",
+      },
+      include: {
+        projectgroup: {
+          select: {
+            projectgroupid: true,
+            projectgroupname: true,
+            projecttitle: true,
+          },
+        },
+      },
+      orderBy: {
+        meetingdatetime: "desc",
+      },
+      take: 20,
+    }),
+  ]);
 
-    return {
-        pending: pendingReviews.map((review) => ({
-            id: review.projectmeetingid,
-            datetime: review.meetingdatetime,
-            purpose: review.meetingpurpose,
-            location: review.meetinglocation,
-            groupId: review.projectgroup?.projectgroupid,
-            groupName: review.projectgroup?.projectgroupname,
-            projectTitle: review.projectgroup?.projecttitle,
-            attendees: review.projectmeetingattendance.map((a) => ({
-                studentId: a.student?.studentid,
-                name: a.student?.studentname,
-                present: a.ispresent,
-                remarks: a.attendanceremarks,
-            })),
-            attendeeCount: review.projectmeetingattendance.length,
-            presentCount: review.projectmeetingattendance.filter((a) => a.ispresent).length,
-        })),
-        completed: completedReviews.map((review) => ({
-            id: review.projectmeetingid,
-            datetime: review.meetingdatetime,
-            purpose: review.meetingpurpose,
-            groupId: review.projectgroup?.projectgroupid,
-            groupName: review.projectgroup?.projectgroupname,
-            projectTitle: review.projectgroup?.projecttitle,
-            notes: review.meetingnotes,
-            grade: review.meetinggrade,
-        })),
-    };
+  return {
+    pending: pendingReviews.map((review) => ({
+      id: review.projectmeetingid,
+      datetime: review.meetingdatetime,
+      purpose: review.meetingpurpose,
+      location: review.meetinglocation,
+      groupId: review.projectgroup?.projectgroupid,
+      groupName: review.projectgroup?.projectgroupname,
+      projectTitle: review.projectgroup?.projecttitle,
+      attendees: review.projectmeetingattendance.map((a) => ({
+        studentId: a.student?.studentid,
+        name: a.student?.studentname,
+        present: a.ispresent,
+        remarks: a.attendanceremarks,
+      })),
+      attendeeCount: review.projectmeetingattendance.length,
+      presentCount: review.projectmeetingattendance.filter((a) => a.ispresent)
+        .length,
+    })),
+    completed: completedReviews.map((review) => ({
+      id: review.projectmeetingid,
+      datetime: review.meetingdatetime,
+      purpose: review.meetingpurpose,
+      groupId: review.projectgroup?.projectgroupid,
+      groupName: review.projectgroup?.projectgroupname,
+      projectTitle: review.projectgroup?.projecttitle,
+      notes: review.meetingnotes,
+      grade: review.meetinggrade,
+    })),
+  };
 }
 
 // Get reports submitted to faculty
 export async function getFacultyReports() {
-    const staff = await getStaffId();
-    if (!staff) return [];
+  const staff = await getStaffId();
+  if (!staff) return [];
 
-    // Get groups assigned to this faculty with meeting counts
-    const groups = await prisma.projectgroup.findMany({
+  // Get groups assigned to this faculty with meeting counts
+  const groups = await prisma.projectgroup.findMany({
+    where: {
+      OR: [
+        { convenerstaffid: staff.staffid },
+        { expertstaffid: staff.staffid },
+      ],
+    },
+    include: {
+      projectgroupmember: {
+        select: {
+          student: {
+            select: {
+              studentid: true,
+              studentname: true,
+            },
+          },
+          isgroupleader: true,
+        },
+      },
+      projectmeeting: {
+        select: {
+          projectmeetingid: true,
+          meetingstatus: true,
+          meetingpurpose: true,
+          meetingdatetime: true,
+          meetinglocation: true,
+          meetingnotes: true,
+        },
+        orderBy: {
+          meetingdatetime: "desc",
+        },
+      },
+      projectreport: {
         where: {
-            OR: [
-                { convenerstaffid: staff.staffid },
-                { expertstaffid: staff.staffid },
-            ],
+          reporttype: "proposal",
         },
         include: {
-            projectgroupmember: {
-                select: {
-                    student: {
-                        select: {
-                            studentid: true,
-                            studentname: true,
-                        },
-                    },
-                    isgroupleader: true,
-                },
+          student: {
+            select: {
+              studentid: true,
+              studentname: true,
+              email: true,
             },
-            projectmeeting: {
-                select: {
-                    projectmeetingid: true,
-                    meetingstatus: true,
-                    meetingpurpose: true,
-                    meetingdatetime: true,
-                    meetinglocation: true,
-                    meetingnotes: true,
-                },
-                orderBy: {
-                    meetingdatetime: 'desc'
-                }
+          },
+          projectfile: {
+            select: {
+              fileid: true,
+              filename: true,
+              fileurl: true,
+              filetype: true,
+              filesize: true,
             },
-            projectreport: {
-                where: {
-                    reporttype: 'proposal',
-                },
-                include: {
-                    student: {
-                        select: {
-                            studentid: true,
-                            studentname: true,
-                            email: true,
-                        },
-                    },
-                    projectfile: {
-                        select: {
-                            fileid: true,
-                            filename: true,
-                            fileurl: true,
-                            filetype: true,
-                            filesize: true,
-                        },
-                    },
-                    staff: {
-                        select: {
-                            staffid: true,
-                            staffname: true,
-                        },
-                    },
-                },
-                orderBy: {
-                    created: 'desc',
-                },
+          },
+          staff: {
+            select: {
+              staffid: true,
+              staffname: true,
             },
+          },
         },
-    });
+        orderBy: {
+          created: "desc",
+        },
+      },
+    },
+  });
 
-    return groups.map((group) => {
-        const completedMeetings = group.projectmeeting.filter(m => m.meetingstatus === 'Completed').length;
-        const pendingMeetings = group.projectmeeting.filter(m => m.meetingstatus !== 'Completed').length;
-        const leader = group.projectgroupmember.find(m => m.isgroupleader);
+  return groups.map((group) => {
+    const completedMeetings = group.projectmeeting.filter(
+      (m) => m.meetingstatus === "Completed",
+    ).length;
+    const pendingMeetings = group.projectmeeting.filter(
+      (m) => m.meetingstatus !== "Completed",
+    ).length;
+    const leader = group.projectgroupmember.find((m) => m.isgroupleader);
 
-        return {
-            groupId: group.projectgroupid,
-            groupName: group.projectgroupname,
-            projectTitle: group.projecttitle,
-            leaderName: leader?.student?.studentname || null,
-            memberCount: group.projectgroupmember.length,
-            totalMeetings: group.projectmeeting.length,
-            completedMeetings,
-            pendingMeetings,
-            meetings: group.projectmeeting.map(m => ({
-                id: m.projectmeetingid,
-                status: m.meetingstatus,
-                purpose: m.meetingpurpose,
-                datetime: m.meetingdatetime,
-                location: m.meetinglocation,
-                notes: m.meetingnotes,
-            })),
-            proposalReports: group.projectreport.map((report) => ({
-                reportId: report.reportid,
-                reportTitle: report.reporttitle,
-                reportType: report.reporttype,
-                status: report.status,
-                reviewComments: report.reviewcomments,
-                reviewedAt: report.reviewedat,
-                reviewedByName: report.staff?.staffname || null,
-                created: report.created,
-                studentId: report.student.studentid,
-                studentName: report.student.studentname,
-                studentEmail: report.student.email,
-                file: report.projectfile
-                    ? {
-                        fileId: report.projectfile.fileid,
-                        fileName: report.projectfile.filename,
-                        fileUrl: report.projectfile.fileurl,
-                        fileType: report.projectfile.filetype,
-                        fileSize: report.projectfile.filesize,
-                    }
-                    : null,
-            })),
-        };
-    });
+    return {
+      groupId: group.projectgroupid,
+      groupName: group.projectgroupname,
+      projectTitle: group.projecttitle,
+      leaderName: leader?.student?.studentname || null,
+      memberCount: group.projectgroupmember.length,
+      totalMeetings: group.projectmeeting.length,
+      completedMeetings,
+      pendingMeetings,
+      meetings: group.projectmeeting.map((m) => ({
+        id: m.projectmeetingid,
+        status: m.meetingstatus,
+        purpose: m.meetingpurpose,
+        datetime: m.meetingdatetime,
+        location: m.meetinglocation,
+        notes: m.meetingnotes,
+      })),
+      proposalReports: group.projectreport.map((report) => ({
+        reportId: report.reportid,
+        reportTitle: report.reporttitle,
+        reportType: report.reporttype,
+        status: report.status,
+        reviewComments: report.reviewcomments,
+        reviewedAt: report.reviewedat,
+        reviewedByName: report.staff?.staffname || null,
+        created: report.created,
+        studentId: report.student.studentid,
+        studentName: report.student.studentname,
+        studentEmail: report.student.email,
+        file: report.projectfile
+          ? {
+              fileId: report.projectfile.fileid,
+              fileName: report.projectfile.filename,
+              fileUrl: report.projectfile.fileurl,
+              fileType: report.projectfile.filetype,
+              fileSize: report.projectfile.filesize,
+            }
+          : null,
+      })),
+    };
+  });
 }
 
 export async function reviewFacultyProposalReport(data: {
-    reportId: number;
-    status: 'ACCEPTED' | 'DECLINED';
-    feedback?: string;
+  reportId: number;
+  status: "ACCEPTED" | "DECLINED";
+  feedback?: string;
 }) {
-    const staff = await getStaffId();
-    if (!staff) {
-        return { success: false, error: "Unauthorized: Staff not found" };
-    }
+  const staff = await getStaffId();
+  if (!staff) {
+    return { success: false, error: "Unauthorized: Staff not found" };
+  }
 
-    const trimmedFeedback = data.feedback?.trim() || "";
-    if (data.status === 'DECLINED' && !trimmedFeedback) {
-        return { success: false, error: "Feedback is required when rejecting a proposal" };
-    }
+  const trimmedFeedback = data.feedback?.trim() || "";
+  if (data.status === "DECLINED" && !trimmedFeedback) {
+    return {
+      success: false,
+      error: "Feedback is required when rejecting a proposal",
+    };
+  }
 
-    const report = await prisma.projectreport.findUnique({
-        where: { reportid: data.reportId },
-        select: {
-            reportid: true,
-            reporttype: true,
-            projectgroupid: true,
+  const report = await prisma.projectreport.findUnique({
+    where: { reportid: data.reportId },
+    select: {
+      reportid: true,
+      reporttype: true,
+      projectgroupid: true,
+    },
+  });
+
+  if (!report) {
+    return { success: false, error: "Report not found" };
+  }
+
+  const isAssignedFaculty = await prisma.projectgroup.findFirst({
+    where: {
+      projectgroupid: report.projectgroupid,
+      OR: [
+        { convenerstaffid: staff.staffid },
+        { expertstaffid: staff.staffid },
+        {
+          projectmeeting: {
+            some: {
+              guidestaffid: staff.staffid,
+            },
+          },
         },
+      ],
+    },
+    select: { projectgroupid: true },
+  });
+
+  if (!isAssignedFaculty) {
+    return {
+      success: false,
+      error: "Unauthorized: You are not assigned to this project group",
+    };
+  }
+
+  if (report.reporttype.toLowerCase() !== "proposal") {
+    return {
+      success: false,
+      error: "Only proposal reports can be reviewed from this section",
+    };
+  }
+
+  try {
+    const updated = await prisma.projectreport.update({
+      where: { reportid: data.reportId },
+      data: {
+        status: data.status,
+        reviewcomments: trimmedFeedback || null,
+        reviewedby: staff.staffid,
+        reviewedat: new Date(),
+        modified: new Date(),
+      },
+      include: {
+        student: {
+          select: {
+            studentid: true,
+            studentname: true,
+          },
+        },
+        staff: {
+          select: {
+            staffid: true,
+            staffname: true,
+          },
+        },
+      },
     });
 
-    if (!report) {
-        return { success: false, error: "Report not found" };
-    }
+    revalidatePath("/faculty/reports");
+    revalidatePath("/student/reports");
 
-    const isAssignedFaculty = await prisma.projectgroup.findFirst({
-        where: {
-            projectgroupid: report.projectgroupid,
-            OR: [
-                { convenerstaffid: staff.staffid },
-                { expertstaffid: staff.staffid },
-                {
-                    projectmeeting: {
-                        some: {
-                            guidestaffid: staff.staffid,
-                        },
-                    },
-                },
-            ],
-        },
-        select: { projectgroupid: true },
-    });
-
-    if (!isAssignedFaculty) {
-        return { success: false, error: "Unauthorized: You are not assigned to this project group" };
-    }
-
-    if (report.reporttype.toLowerCase() !== 'proposal') {
-        return { success: false, error: "Only proposal reports can be reviewed from this section" };
-    }
-
-    try {
-        const updated = await prisma.projectreport.update({
-            where: { reportid: data.reportId },
-            data: {
-                status: data.status,
-                reviewcomments: trimmedFeedback || null,
-                reviewedby: staff.staffid,
-                reviewedat: new Date(),
-                modified: new Date(),
-            },
-            include: {
-                student: {
-                    select: {
-                        studentid: true,
-                        studentname: true,
-                    },
-                },
-                staff: {
-                    select: {
-                        staffid: true,
-                        staffname: true,
-                    },
-                },
-            },
-        });
-
-        revalidatePath('/faculty/reports');
-        revalidatePath('/student/reports');
-
-        return { success: true, report: updated };
-    } catch (error) {
-        console.error("Error reviewing proposal report:", error);
-        return { success: false, error: "Failed to review proposal report" };
-    }
+    return { success: true, report: updated };
+  } catch (error) {
+    console.error("Error reviewing proposal report:", error);
+    return { success: false, error: "Failed to review proposal report" };
+  }
 }
 
 // Get dashboard stats for faculty
 export async function getFacultyDashboardStats() {
-    const staff = await getStaffId();
-    if (!staff) return null;
+  const staff = await getStaffId();
+  if (!staff) return null;
 
-    const now = new Date();
+  const now = new Date();
 
-    const [groupCount, upcomingMeetingsCount, pendingReviewsCount, totalStudents] = await Promise.all([
-        prisma.projectgroup.count({
-            where: {
-                OR: [
-                    { convenerstaffid: staff.staffid },
-                    { expertstaffid: staff.staffid },
-                ],
-            },
-        }),
-        prisma.projectmeeting.count({
-            where: {
-                guidestaffid: staff.staffid,
-                meetingdatetime: {
-                    gte: now,
-                },
-            },
-        }),
-        prisma.projectmeeting.count({
-            where: {
-                guidestaffid: staff.staffid,
-                meetingdatetime: {
-                    lt: now,
-                },
-                OR: [
-                    { meetingstatus: null },
-                    { meetingstatus: { not: 'Completed' } },
-                ],
-            },
-        }),
-        prisma.projectgroupmember.count({
-            where: {
-                projectgroup: {
-                    OR: [
-                        { convenerstaffid: staff.staffid },
-                        { expertstaffid: staff.staffid },
-                    ],
-                },
-            },
-        }),
-    ]);
+  const [
+    groupCount,
+    upcomingMeetingsCount,
+    pendingReviewsCount,
+    totalStudents,
+  ] = await Promise.all([
+    prisma.projectgroup.count({
+      where: {
+        OR: [
+          { convenerstaffid: staff.staffid },
+          { expertstaffid: staff.staffid },
+        ],
+      },
+    }),
+    prisma.projectmeeting.count({
+      where: {
+        guidestaffid: staff.staffid,
+        meetingdatetime: {
+          gte: now,
+        },
+      },
+    }),
+    prisma.projectmeeting.count({
+      where: {
+        guidestaffid: staff.staffid,
+        meetingdatetime: {
+          lt: now,
+        },
+        OR: [{ meetingstatus: null }, { meetingstatus: { not: "Completed" } }],
+      },
+    }),
+    prisma.projectgroupmember.count({
+      where: {
+        projectgroup: {
+          OR: [
+            { convenerstaffid: staff.staffid },
+            { expertstaffid: staff.staffid },
+          ],
+        },
+      },
+    }),
+  ]);
 
-    return {
-        totalGroups: groupCount,
-        upcomingMeetings: upcomingMeetingsCount,
-        pendingReviews: pendingReviewsCount,
-        totalStudents,
-        staffName: staff.staffname,
-        staffEmail: staff.email,
-    };
+  return {
+    totalGroups: groupCount,
+    upcomingMeetings: upcomingMeetingsCount,
+    pendingReviews: pendingReviewsCount,
+    totalStudents,
+    staffName: staff.staffname,
+    staffEmail: staff.email,
+  };
 }
 
 // ============== CREATE FUNCTIONS (Upload to Database) ==============
 
 // Create a new meeting
 export async function createMeeting(data: {
-    groupId: number;
-    datetime: Date;
-    purpose: string;
-    location?: string;
-    description?: string;
-    sendNotification?: boolean;
+  groupId: number;
+  datetime: Date;
+  purpose: string;
+  location?: string;
+  description?: string;
+  sendNotification?: boolean;
 }) {
-    const staff = await getStaffId();
-    if (!staff) {
-        return { success: false, error: "Unauthorized: Staff not found" };
-    }
+  const staff = await getStaffId();
+  if (!staff) {
+    return { success: false, error: "Unauthorized: Staff not found" };
+  }
 
-    // Also check if faculty is guide for any meeting in this group
-    const isGuide = await prisma.projectmeeting.findFirst({
-        where: {
-            projectgroupid: data.groupId,
-            guidestaffid: staff.staffid,
-        },
-        select: { projectmeetingid: true },
-    });
+  // Also check if faculty is guide for any meeting in this group
+  const isGuide = await prisma.projectmeeting.findFirst({
+    where: {
+      projectgroupid: data.groupId,
+      guidestaffid: staff.staffid,
+    },
+    select: { projectmeetingid: true },
+  });
 
-    // Verify staff has access to the group
-    const group = await prisma.projectgroup.findFirst({
-        where: {
-            projectgroupid: data.groupId,
-            OR: [
-                { convenerstaffid: staff.staffid },
-                { expertstaffid: staff.staffid },
-                ...(isGuide ? [{ projectgroupid: data.groupId }] : []),
-            ],
-        },
+  // Verify staff has access to the group
+  const group = await prisma.projectgroup.findFirst({
+    where: {
+      projectgroupid: data.groupId,
+      OR: [
+        { convenerstaffid: staff.staffid },
+        { expertstaffid: staff.staffid },
+        ...(isGuide ? [{ projectgroupid: data.groupId }] : []),
+      ],
+    },
+    include: {
+      projectgroupmember: {
         include: {
-            projectgroupmember: {
-                include: {
-                    student: {
-                        select: {
-                            studentid: true,
-                            studentname: true,
-                            email: true,
-                        },
-                    },
-                },
+          student: {
+            select: {
+              studentid: true,
+              studentname: true,
+              email: true,
             },
+          },
         },
+      },
+    },
+  });
+
+  if (!group) {
+    return {
+      success: false,
+      error: "Unauthorized: You don't have access to this group",
+    };
+  }
+
+  try {
+    const meeting = await prisma.projectmeeting.create({
+      data: {
+        projectgroupid: data.groupId,
+        guidestaffid: staff.staffid,
+        meetingdatetime: data.datetime,
+        meetingpurpose: data.purpose,
+        meetinglocation: data.location || null,
+        description: data.description || null,
+        meetingstatus: "Scheduled",
+      },
     });
 
-    if (!group) {
-        return { success: false, error: "Unauthorized: You don't have access to this group" };
+    // Auto-create attendance records for all group members
+    const groupMembers = group.projectgroupmember;
+    if (groupMembers.length > 0) {
+      await prisma.projectmeetingattendance.createMany({
+        data: groupMembers.map((member) => ({
+          projectmeetingid: meeting.projectmeetingid,
+          studentid: member.studentid,
+          ispresent: false,
+          attendanceremarks: null,
+        })),
+        skipDuplicates: true,
+      });
     }
 
-    try {
-        const meeting = await prisma.projectmeeting.create({
-            data: {
-                projectgroupid: data.groupId,
-                guidestaffid: staff.staffid,
-                meetingdatetime: data.datetime,
-                meetingpurpose: data.purpose,
-                meetinglocation: data.location || null,
-                description: data.description || null,
-                meetingstatus: 'Scheduled',
-            },
+    // Send email notification to students if requested
+    if (data.sendNotification !== false) {
+      const studentEmails = group.projectgroupmember
+        .map((m) => m.student.email)
+        .filter((email): email is string => email !== null);
+
+      if (studentEmails.length > 0) {
+        // Import and call email function dynamically to avoid issues
+        const { sendMeetingNotification } = await import("@/lib/email");
+        await sendMeetingNotification({
+          studentEmails,
+          meetingDetails: {
+            datetime: data.datetime,
+            purpose: data.purpose,
+            location: data.location || null,
+            groupName: group.projectgroupname,
+            facultyName: staff.staffname,
+          },
         });
-
-        // Auto-create attendance records for all group members
-        const groupMembers = group.projectgroupmember;
-        if (groupMembers.length > 0) {
-            await prisma.projectmeetingattendance.createMany({
-                data: groupMembers.map(member => ({
-                    projectmeetingid: meeting.projectmeetingid,
-                    studentid: member.studentid,
-                    ispresent: false,
-                    attendanceremarks: null,
-                })),
-                skipDuplicates: true,
-            });
-        }
-
-        // Send email notification to students if requested
-        if (data.sendNotification !== false) {
-            const studentEmails = group.projectgroupmember
-                .map(m => m.student.email)
-                .filter((email): email is string => email !== null);
-
-            if (studentEmails.length > 0) {
-                // Import and call email function dynamically to avoid issues
-                const { sendMeetingNotification } = await import("@/lib/email");
-                await sendMeetingNotification({
-                    studentEmails,
-                    meetingDetails: {
-                        datetime: data.datetime,
-                        purpose: data.purpose,
-                        location: data.location || null,
-                        groupName: group.projectgroupname,
-                        facultyName: staff.staffname,
-                    },
-                });
-            }
-        }
-
-        revalidatePath('/faculty/meetings');
-        revalidatePath('/faculty/group');
-        revalidatePath('/faculty/dashboard');
-
-        return {
-            success: true,
-            meetingId: meeting.projectmeetingid,
-        };
-    } catch (error) {
-        console.error("Error creating meeting:", error);
-        return { success: false, error: "Failed to create meeting" };
+      }
     }
+
+    revalidatePath("/faculty/meetings");
+    revalidatePath("/faculty/group");
+    revalidatePath("/faculty/dashboard");
+
+    return {
+      success: true,
+      meetingId: meeting.projectmeetingid,
+    };
+  } catch (error) {
+    console.error("Error creating meeting:", error);
+    return { success: false, error: "Failed to create meeting" };
+  }
 }
 
 export async function completeMeetingReview(data: {
-    meetingId: number;
-    notes: string;
-    grade?: string;
-    attendance: { studentId: number; present: boolean; remarks?: string }[];
+  meetingId: number;
+  notes: string;
+  grade?: string;
+  attendance: { studentId: number; present: boolean; remarks?: string }[];
 }) {
-    const staff = await getStaffId();
-    if (!staff) throw new Error("Unauthorized: Staff not found");
+  const staff = await getStaffId();
+  if (!staff) throw new Error("Unauthorized: Staff not found");
 
-    // Verify staff owns this meeting
-    const meeting = await prisma.projectmeeting.findFirst({
+  // Verify staff owns this meeting
+  const meeting = await prisma.projectmeeting.findFirst({
+    where: {
+      projectmeetingid: data.meetingId,
+      guidestaffid: staff.staffid,
+    },
+  });
+
+  if (!meeting) throw new Error("Meeting not found or unauthorized");
+
+  // Update meeting status and notes
+  await prisma.projectmeeting.update({
+    where: { projectmeetingid: data.meetingId },
+    data: {
+      meetingstatus: "Completed",
+      meetingnotes: data.notes,
+      meetinggrade: data.grade || "D",
+      meetingstatusdatetime: new Date(),
+      modified: new Date(),
+    },
+  });
+
+  // Update or create attendance records
+  for (const att of data.attendance) {
+    const existingAttendance = await prisma.projectmeetingattendance.findFirst({
+      where: {
+        projectmeetingid: data.meetingId,
+        studentid: att.studentId,
+      },
+    });
+
+    if (existingAttendance) {
+      await prisma.projectmeetingattendance.update({
         where: {
-            projectmeetingid: data.meetingId,
-            guidestaffid: staff.staffid,
+          projectmeetingattendanceid:
+            existingAttendance.projectmeetingattendanceid,
         },
-    });
-
-    if (!meeting) throw new Error("Meeting not found or unauthorized");
-
-    // Update meeting status and notes
-    await prisma.projectmeeting.update({
-        where: { projectmeetingid: data.meetingId },
         data: {
-            meetingstatus: 'Completed',
-            meetingnotes: data.notes,
-            meetinggrade: data.grade || "D",
-            meetingstatusdatetime: new Date(),
-            modified: new Date(),
+          ispresent: att.present,
+          attendanceremarks: att.remarks || null,
+          modified: new Date(),
         },
-    });
-
-    // Update or create attendance records
-    for (const att of data.attendance) {
-        const existingAttendance = await prisma.projectmeetingattendance.findFirst({
-            where: {
-                projectmeetingid: data.meetingId,
-                studentid: att.studentId,
-            },
-        });
-
-        if (existingAttendance) {
-            await prisma.projectmeetingattendance.update({
-                where: { projectmeetingattendanceid: existingAttendance.projectmeetingattendanceid },
-                data: {
-                    ispresent: att.present,
-                    attendanceremarks: att.remarks || null,
-                    modified: new Date(),
-                },
-            });
-        } else {
-            await prisma.projectmeetingattendance.create({
-                data: {
-                    projectmeetingid: data.meetingId,
-                    studentid: att.studentId,
-                    ispresent: att.present,
-                    attendanceremarks: att.remarks || null,
-                },
-            });
-        }
+      });
+    } else {
+      await prisma.projectmeetingattendance.create({
+        data: {
+          projectmeetingid: data.meetingId,
+          studentid: att.studentId,
+          ispresent: att.present,
+          attendanceremarks: att.remarks || null,
+        },
+      });
     }
+  }
 
-    revalidatePath('/faculty/reviews');
-    revalidatePath('/faculty/meetings');
+  revalidatePath("/faculty/reviews");
+  revalidatePath("/faculty/meetings");
 
-    return { success: true };
+  return { success: true };
 }
 
 // Save attendance for any meeting (without completing review)
 export async function saveAttendance(data: {
-    meetingId: number;
-    attendance: { studentId: number; present: boolean; remarks?: string }[];
+  meetingId: number;
+  attendance: { studentId: number; present: boolean; remarks?: string }[];
 }) {
-    const staff = await getStaffId();
-    if (!staff) return { success: false, error: "Unauthorized: Staff not found" };
+  const staff = await getStaffId();
+  if (!staff) return { success: false, error: "Unauthorized: Staff not found" };
 
-    // Verify staff owns this meeting
-    const meeting = await prisma.projectmeeting.findFirst({
-        where: {
+  // Verify staff owns this meeting
+  const meeting = await prisma.projectmeeting.findFirst({
+    where: {
+      projectmeetingid: data.meetingId,
+      guidestaffid: staff.staffid,
+    },
+  });
+
+  if (!meeting)
+    return { success: false, error: "Meeting not found or unauthorized" };
+
+  try {
+    // Update or create attendance records
+    for (const att of data.attendance) {
+      const existingAttendance =
+        await prisma.projectmeetingattendance.findFirst({
+          where: {
             projectmeetingid: data.meetingId,
-            guidestaffid: staff.staffid,
-        },
-    });
+            studentid: att.studentId,
+          },
+        });
 
-    if (!meeting) return { success: false, error: "Meeting not found or unauthorized" };
-
-    try {
-        // Update or create attendance records
-        for (const att of data.attendance) {
-            const existingAttendance = await prisma.projectmeetingattendance.findFirst({
-                where: {
-                    projectmeetingid: data.meetingId,
-                    studentid: att.studentId,
-                },
-            });
-
-            if (existingAttendance) {
-                await prisma.projectmeetingattendance.update({
-                    where: { projectmeetingattendanceid: existingAttendance.projectmeetingattendanceid },
-                    data: {
-                        ispresent: att.present,
-                        attendanceremarks: att.remarks || null,
-                        modified: new Date(),
-                    },
-                });
-            } else {
-                await prisma.projectmeetingattendance.create({
-                    data: {
-                        projectmeetingid: data.meetingId,
-                        studentid: att.studentId,
-                        ispresent: att.present,
-                        attendanceremarks: att.remarks || null,
-                    },
-                });
-            }
-        }
-
-        revalidatePath('/faculty/meetings');
-        revalidatePath('/faculty/reviews');
-
-        return { success: true };
-    } catch (error) {
-        console.error("Error saving attendance:", error);
-        return { success: false, error: "Failed to save attendance" };
+      if (existingAttendance) {
+        await prisma.projectmeetingattendance.update({
+          where: {
+            projectmeetingattendanceid:
+              existingAttendance.projectmeetingattendanceid,
+          },
+          data: {
+            ispresent: att.present,
+            attendanceremarks: att.remarks || null,
+            modified: new Date(),
+          },
+        });
+      } else {
+        await prisma.projectmeetingattendance.create({
+          data: {
+            projectmeetingid: data.meetingId,
+            studentid: att.studentId,
+            ispresent: att.present,
+            attendanceremarks: att.remarks || null,
+          },
+        });
+      }
     }
+
+    revalidatePath("/faculty/meetings");
+    revalidatePath("/faculty/reviews");
+
+    return { success: true };
+  } catch (error) {
+    console.error("Error saving attendance:", error);
+    return { success: false, error: "Failed to save attendance" };
+  }
 }
 
 // ============== UPDATE FUNCTIONS ==============
 
 // Update meeting details
 export async function updateMeeting(data: {
-    meetingId: number;
-    datetime?: Date;
-    purpose?: string;
-    location?: string;
-    description?: string;
-    status?: string;
-    notes?: string;
-    sendNotification?: boolean;
+  meetingId: number;
+  datetime?: Date;
+  purpose?: string;
+  location?: string;
+  description?: string;
+  status?: string;
+  notes?: string;
+  sendNotification?: boolean;
 }) {
-    const staff = await getStaffId();
-    if (!staff) return { success: false, error: "Unauthorized: Staff not found" };
+  const staff = await getStaffId();
+  if (!staff) return { success: false, error: "Unauthorized: Staff not found" };
 
-    try {
-        // Verify staff owns this meeting
-        const meeting = await prisma.projectmeeting.findFirst({
-            where: {
-                projectmeetingid: data.meetingId,
-                guidestaffid: staff.staffid,
+  try {
+    // Verify staff owns this meeting
+    const meeting = await prisma.projectmeeting.findFirst({
+      where: {
+        projectmeetingid: data.meetingId,
+        guidestaffid: staff.staffid,
+      },
+      include: {
+        projectgroup: {
+          include: {
+            projectgroupmember: {
+              include: {
+                student: true,
+              },
             },
-            include: {
-                projectgroup: {
-                    include: {
-                        projectgroupmember: {
-                            include: {
-                                student: true,
-                            }
-                        }
-                    }
-                }
-            }
+          },
+        },
+      },
+    });
+
+    if (!meeting)
+      return { success: false, error: "Meeting not found or unauthorized" };
+
+    const updated = await prisma.projectmeeting.update({
+      where: { projectmeetingid: data.meetingId },
+      data: {
+        ...(data.datetime && { meetingdatetime: data.datetime }),
+        ...(data.purpose && { meetingpurpose: data.purpose }),
+        ...(data.location !== undefined && { meetinglocation: data.location }),
+        ...(data.description !== undefined && {
+          description: data.description,
+        }),
+        ...(data.status && {
+          meetingstatus: data.status,
+          meetingstatusdatetime: new Date(),
+        }),
+        ...(data.notes !== undefined && { meetingnotes: data.notes }),
+        modified: new Date(),
+      },
+    });
+
+    if (data.sendNotification && meeting.projectgroup) {
+      const studentEmails = meeting.projectgroup.projectgroupmember
+        .map((m) => m.student?.email)
+        .filter((email): email is string => email !== null);
+
+      if (studentEmails.length > 0) {
+        const { sendMeetingNotification } = await import("@/lib/email");
+        await sendMeetingNotification({
+          studentEmails,
+          meetingDetails: {
+            datetime: updated.meetingdatetime,
+            purpose: updated.meetingpurpose || "",
+            location: updated.meetinglocation || null,
+            groupName: meeting.projectgroup.projectgroupname,
+            facultyName: staff.staffname,
+          },
+          isUpdate: true,
         });
-
-        if (!meeting) return { success: false, error: "Meeting not found or unauthorized" };
-
-        const updated = await prisma.projectmeeting.update({
-            where: { projectmeetingid: data.meetingId },
-            data: {
-                ...(data.datetime && { meetingdatetime: data.datetime }),
-                ...(data.purpose && { meetingpurpose: data.purpose }),
-                ...(data.location !== undefined && { meetinglocation: data.location }),
-                ...(data.description !== undefined && { description: data.description }),
-                ...(data.status && {
-                    meetingstatus: data.status,
-                    meetingstatusdatetime: new Date(),
-                }),
-                ...(data.notes !== undefined && { meetingnotes: data.notes }),
-                modified: new Date(),
-            },
-        });
-
-        if (data.sendNotification && meeting.projectgroup) {
-            const studentEmails = meeting.projectgroup.projectgroupmember
-                .map(m => m.student?.email)
-                .filter((email): email is string => email !== null);
-
-            if (studentEmails.length > 0) {
-                const { sendMeetingNotification } = await import("@/lib/email");
-                await sendMeetingNotification({
-                    studentEmails,
-                    meetingDetails: {
-                        datetime: updated.meetingdatetime,
-                        purpose: updated.meetingpurpose || "",
-                        location: updated.meetinglocation || null,
-                        groupName: meeting.projectgroup.projectgroupname,
-                        facultyName: staff.staffname,
-                    },
-                    isUpdate: true,
-                });
-            }
-        }
-
-        revalidatePath('/faculty/meetings');
-        revalidatePath('/faculty/reviews');
-
-        return { success: true, meeting: updated };
-    } catch (error) {
-        console.error("Error updating meeting:", error);
-        return { success: false, error: "Failed to update meeting" };
+      }
     }
+
+    revalidatePath("/faculty/meetings");
+    revalidatePath("/faculty/reviews");
+
+    return { success: true, meeting: updated };
+  } catch (error) {
+    console.error("Error updating meeting:", error);
+    return { success: false, error: "Failed to update meeting" };
+  }
 }
 
 // Update group details (for convener only)
 export async function updateGroupDetails(data: {
-    groupId: number;
-    title?: string;
-    area?: string;
-    description?: string;
+  groupId: number;
+  title?: string;
+  area?: string;
+  description?: string;
 }) {
-    const staff = await getStaffId();
-    if (!staff) throw new Error("Unauthorized: Staff not found");
+  const staff = await getStaffId();
+  if (!staff) throw new Error("Unauthorized: Staff not found");
 
-    // Verify staff is convener of this group
-    const group = await prisma.projectgroup.findFirst({
-        where: {
-            projectgroupid: data.groupId,
-            convenerstaffid: staff.staffid,
-        },
-    });
+  // Verify staff is convener of this group
+  const group = await prisma.projectgroup.findFirst({
+    where: {
+      projectgroupid: data.groupId,
+      convenerstaffid: staff.staffid,
+    },
+  });
 
-    if (!group) throw new Error("Unauthorized: Only convener can update group details");
+  if (!group)
+    throw new Error("Unauthorized: Only convener can update group details");
 
-    const updated = await prisma.projectgroup.update({
-        where: { projectgroupid: data.groupId },
-        data: {
-            ...(data.title !== undefined && { projecttitle: data.title }),
-            ...(data.area !== undefined && { projectarea: data.area }),
-            ...(data.description !== undefined && { projectdescription: data.description }),
-            modified: new Date(),
-        },
-    });
+  const updated = await prisma.projectgroup.update({
+    where: { projectgroupid: data.groupId },
+    data: {
+      ...(data.title !== undefined && { projecttitle: data.title }),
+      ...(data.area !== undefined && { projectarea: data.area }),
+      ...(data.description !== undefined && {
+        projectdescription: data.description,
+      }),
+      modified: new Date(),
+    },
+  });
 
-    revalidatePath('/faculty/group');
+  revalidatePath("/faculty/group");
 
-    return {
-        success: true,
-        group: updated,
-    };
+  return {
+    success: true,
+    group: updated,
+  };
 }
 
 // ============== DELETE FUNCTIONS ==============
 
 // Cancel/Delete a meeting
 export async function deleteMeeting(meetingId: number) {
-    const staff = await getStaffId();
-    if (!staff) return { success: false, error: "Unauthorized: Staff not found" };
+  const staff = await getStaffId();
+  if (!staff) return { success: false, error: "Unauthorized: Staff not found" };
 
-    try {
-        // Verify staff owns this meeting
-        const meeting = await prisma.projectmeeting.findFirst({
-            where: {
-                projectmeetingid: meetingId,
-                guidestaffid: staff.staffid,
-            },
-        });
+  try {
+    // Verify staff owns this meeting
+    const meeting = await prisma.projectmeeting.findFirst({
+      where: {
+        projectmeetingid: meetingId,
+        guidestaffid: staff.staffid,
+      },
+    });
 
-        if (!meeting) return { success: false, error: "Meeting not found or unauthorized" };
+    if (!meeting)
+      return { success: false, error: "Meeting not found or unauthorized" };
 
-        // Delete associated attendance records first (cascade should handle this, but being explicit)
-        await prisma.projectmeetingattendance.deleteMany({
-            where: { projectmeetingid: meetingId },
-        });
+    // Delete associated attendance records first (cascade should handle this, but being explicit)
+    await prisma.projectmeetingattendance.deleteMany({
+      where: { projectmeetingid: meetingId },
+    });
 
-        await prisma.projectmeeting.delete({
-            where: { projectmeetingid: meetingId },
-        });
+    await prisma.projectmeeting.delete({
+      where: { projectmeetingid: meetingId },
+    });
 
-        revalidatePath('/faculty/meetings');
-        revalidatePath('/faculty/reviews');
-        return { success: true };
-    } catch (error) {
-        console.error("Error deleting meeting:", error);
-        return { success: false, error: "Failed to delete meeting" };
-    }
+    revalidatePath("/faculty/meetings");
+    revalidatePath("/faculty/reviews");
+    return { success: true };
+  } catch (error) {
+    console.error("Error deleting meeting:", error);
+    return { success: false, error: "Failed to delete meeting" };
+  }
 }
 
 // ============== UTILITY FUNCTIONS ==============
 
 // Get all project types (for dropdowns)
 export async function getProjectTypes() {
-    const types = await prisma.projecttype.findMany({
-        orderBy: { projecttypename: 'asc' },
-    });
+  const types = await prisma.projecttype.findMany({
+    orderBy: { projecttypename: "asc" },
+  });
 
-    return types.map((t) => ({
-        id: t.projecttypeid,
-        name: t.projecttypename,
-        description: t.description,
-    }));
+  return types.map((t) => ({
+    id: t.projecttypeid,
+    name: t.projecttypename,
+    description: t.description,
+  }));
 }
 
 // Get students in a group (for attendance)
 export async function getGroupStudents(groupId: number) {
-    const staff = await getStaffId();
-    if (!staff) return [];
+  const staff = await getStaffId();
+  if (!staff) return [];
 
-    // Verify access
-    const group = await prisma.projectgroup.findFirst({
-        where: {
-            projectgroupid: groupId,
-            OR: [
-                { convenerstaffid: staff.staffid },
-                { expertstaffid: staff.staffid },
-            ],
-        },
+  // Verify access
+  const group = await prisma.projectgroup.findFirst({
+    where: {
+      projectgroupid: groupId,
+      OR: [
+        { convenerstaffid: staff.staffid },
+        { expertstaffid: staff.staffid },
+      ],
+    },
+    include: {
+      projectgroupmember: {
         include: {
-            projectgroupmember: {
-                include: {
-                    student: true,
-                },
-            },
+          student: true,
         },
-    });
+      },
+    },
+  });
 
-    if (!group) return [];
+  if (!group) return [];
 
-    return group.projectgroupmember.map((m) => ({
-        id: m.student.studentid,
-        name: m.student.studentname,
-        email: m.student.email,
-        phone: m.student.phone,
-        isLeader: m.isgroupleader,
-        cgpa: m.studentcgpa ? m.studentcgpa.toNumber() : null,
-    }));
+  return group.projectgroupmember.map((m) => ({
+    id: m.student.studentid,
+    name: m.student.studentname,
+    email: m.student.email,
+    phone: m.student.phone,
+    isLeader: m.isgroupleader,
+    cgpa: m.studentcgpa ? m.studentcgpa.toNumber() : null,
+  }));
 }
 
 // Search faculty groups
 export async function searchFacultyGroups(query: string) {
-    const staff = await getStaffId();
-    if (!staff) return [];
+  const staff = await getStaffId();
+  if (!staff) return [];
 
-    const groups = await prisma.projectgroup.findMany({
-        where: {
-            OR: [
-                { convenerstaffid: staff.staffid },
-                { expertstaffid: staff.staffid },
-            ],
-            AND: [
-                {
-                    OR: [
-                        { projectgroupname: { contains: query, mode: 'insensitive' } },
-                        { projecttitle: { contains: query, mode: 'insensitive' } },
-                        { projectarea: { contains: query, mode: 'insensitive' } },
-                    ],
-                },
-            ],
+  const groups = await prisma.projectgroup.findMany({
+    where: {
+      OR: [
+        { convenerstaffid: staff.staffid },
+        { expertstaffid: staff.staffid },
+      ],
+      AND: [
+        {
+          OR: [
+            { projectgroupname: { contains: query, mode: "insensitive" } },
+            { projecttitle: { contains: query, mode: "insensitive" } },
+            { projectarea: { contains: query, mode: "insensitive" } },
+          ],
         },
-        select: {
-            projectgroupid: true,
-            projectgroupname: true,
-            projecttitle: true,
-            projectarea: true,
-        },
-        take: 10,
-    });
+      ],
+    },
+    select: {
+      projectgroupid: true,
+      projectgroupname: true,
+      projecttitle: true,
+      projectarea: true,
+    },
+    take: 10,
+  });
 
-    return groups.map((g) => ({
-        id: g.projectgroupid,
-        name: g.projectgroupname,
-        title: g.projecttitle,
-        area: g.projectarea,
-    }));
+  return groups.map((g) => ({
+    id: g.projectgroupid,
+    name: g.projectgroupname,
+    title: g.projecttitle,
+    area: g.projectarea,
+  }));
 }
 
 // ============== GROUP CREATION FUNCTIONS ==============
 
 // Get all available students (not in any group or all students for selection)
 export async function getAvailableStudents() {
-    const staff = await getStaffId();
-    if (!staff) return [];
+  const staff = await getStaffId();
+  if (!staff) return [];
 
-    const students = await prisma.student.findMany({
+  const students = await prisma.student.findMany({
+    select: {
+      studentid: true,
+      studentname: true,
+      email: true,
+      phone: true,
+      projectgroupmember: {
         select: {
-            studentid: true,
-            studentname: true,
-            email: true,
-            phone: true,
-            projectgroupmember: {
-                select: {
-                    projectgroupid: true,
-                },
-            },
+          projectgroupid: true,
         },
-        orderBy: { studentname: 'asc' },
-    });
+      },
+    },
+    orderBy: { studentname: "asc" },
+  });
 
-    return students.map((s) => ({
-        id: s.studentid,
-        name: s.studentname,
-        email: s.email,
-        phone: s.phone,
-        isInGroup: s.projectgroupmember.length > 0,
-        groupCount: s.projectgroupmember.length,
-    }));
+  return students.map((s) => ({
+    id: s.studentid,
+    name: s.studentname,
+    email: s.email,
+    phone: s.phone,
+    isInGroup: s.projectgroupmember.length > 0,
+    groupCount: s.projectgroupmember.length,
+  }));
 }
 
 // Get all staff members for convener/expert selection
 export async function getAllStaff() {
-    const staff = await getStaffId();
-    if (!staff) return [];
+  const staff = await getStaffId();
+  if (!staff) return [];
 
-    const allStaff = await prisma.staff.findMany({
-        select: {
-            staffid: true,
-            staffname: true,
-            email: true,
-        },
-        orderBy: { staffname: 'asc' },
-    });
+  const allStaff = await prisma.staff.findMany({
+    select: {
+      staffid: true,
+      staffname: true,
+      email: true,
+    },
+    orderBy: { staffname: "asc" },
+  });
 
-    return allStaff.map((s) => ({
-        id: s.staffid,
-        name: s.staffname,
-        email: s.email,
-    }));
+  return allStaff.map((s) => ({
+    id: s.staffid,
+    name: s.staffname,
+    email: s.email,
+  }));
 }
 
 // Create a new project group
 export async function createGroup(data: {
-    groupName: string;
-    projectTitle?: string;
-    projectArea?: string;
-    projectDescription?: string;
-    projectTypeId?: number;
-    projectTypeName?: string;
-    expertStaffId?: number;
-    members: {
-        studentId: number;
-        isLeader: boolean;
-        cgpa?: number;
-    }[];
+  groupName: string;
+  projectTitle?: string;
+  projectArea?: string;
+  projectDescription?: string;
+  projectTypeId?: number;
+  projectTypeName?: string;
+  expertStaffId?: number;
+  members: {
+    studentId: number;
+    isLeader: boolean;
+    cgpa?: number;
+  }[];
 }) {
-    const staff = await getStaffId();
-    if (!staff) {
-        return { success: false, error: "Unauthorized" };
-    }
+  const staff = await getStaffId();
+  if (!staff) {
+    return { success: false, error: "Unauthorized" };
+  }
 
-    try {
-        let finalProjectTypeId = data.projectTypeId;
-        
-        if (!finalProjectTypeId && data.projectTypeName) {
-            let pt = await prisma.projecttype.findFirst({
-                where: { projecttypename: data.projectTypeName }
-            });
-            if (!pt) {
-                pt = await prisma.projecttype.create({
-                    data: { projecttypename: data.projectTypeName }
-                });
-            }
-            finalProjectTypeId = pt.projecttypeid;
-        }
+  try {
+    let finalProjectTypeId = data.projectTypeId;
 
-        if (!finalProjectTypeId) {
-            return { success: false, error: "Project type is required" };
-        }
-
-        // Create the group with current staff as convener
-        const group = await prisma.projectgroup.create({
-            data: {
-                projectgroupname: data.groupName,
-                projecttitle: data.projectTitle || null,
-                projectarea: data.projectArea || null,
-                projectdescription: data.projectDescription || null,
-                projecttypeid: finalProjectTypeId,
-                convenerstaffid: staff.staffid,
-                expertstaffid: data.expertStaffId || null,
-                projectgroupmember: {
-                    create: data.members.map((m) => ({
-                        studentid: m.studentId,
-                        isgroupleader: m.isLeader,
-                        studentcgpa: m.cgpa || null,
-                    })),
-                },
-            },
-            include: {
-                projectgroupmember: true,
-            },
+    if (!finalProjectTypeId && data.projectTypeName) {
+      let pt = await prisma.projecttype.findFirst({
+        where: { projecttypename: data.projectTypeName },
+      });
+      if (!pt) {
+        pt = await prisma.projecttype.create({
+          data: { projecttypename: data.projectTypeName },
         });
-
-        revalidatePath("/faculty/group");
-        return { success: true, groupId: group.projectgroupid };
-    } catch (error) {
-        console.error("Error creating group:", error);
-        return { success: false, error: "Failed to create group" };
+      }
+      finalProjectTypeId = pt.projecttypeid;
     }
+
+    if (!finalProjectTypeId) {
+      return { success: false, error: "Project type is required" };
+    }
+
+    // Create the group with current staff as convener
+    const group = await prisma.projectgroup.create({
+      data: {
+        projectgroupname: data.groupName,
+        projecttitle: data.projectTitle || null,
+        projectarea: data.projectArea || null,
+        projectdescription: data.projectDescription || null,
+        projecttypeid: finalProjectTypeId,
+        convenerstaffid: staff.staffid,
+        expertstaffid: data.expertStaffId || null,
+        projectgroupmember: {
+          create: data.members.map((m) => ({
+            studentid: m.studentId,
+            isgroupleader: m.isLeader,
+            studentcgpa: m.cgpa || null,
+          })),
+        },
+      },
+      include: {
+        projectgroupmember: true,
+      },
+    });
+
+    // ── Stream Chat: create the group's channel and add all members ──────
+    // We fire this after the DB commit so groupId is guaranteed.
+    // silentStreamOp ensures a network failure never rolls back the DB op.
+    const facultyUser = await currentUser();
+    const facultyClerkId = facultyUser?.id;
+
+    if (facultyClerkId) {
+      const studentRecords = await prisma.student.findMany({
+        where: { studentid: { in: data.members.map((m) => m.studentId) } },
+        select: { users: { select: { clerkid: true } } },
+      });
+      const studentClerkIds = studentRecords
+        .map((s) => s.users?.clerkid)
+        .filter((id): id is string => Boolean(id));
+
+      await silentStreamOp(
+        () =>
+          ensureGroupChannel({
+            groupId: group.projectgroupid,
+            groupName: data.groupName,
+            projectTitle: data.projectTitle,
+            createdByClerkId: facultyClerkId,
+            memberClerkIds: studentClerkIds,
+          }),
+        `ensureGroupChannel(${group.projectgroupid})`,
+      );
+    }
+    // ─────────────────────────────────────────────────────────────────────
+
+    revalidatePath("/faculty/group");
+    return { success: true, groupId: group.projectgroupid };
+  } catch (error) {
+    console.error("Error creating group:", error);
+    return { success: false, error: "Failed to create group" };
+  }
 }
 
 // Update a project group
 export async function updateGroup(data: {
-    groupId: number;
-    groupName?: string;
-    projectTitle?: string;
-    projectArea?: string;
-    projectDescription?: string;
-    projectTypeId?: number;
-    projectTypeName?: string;
-    expertStaffId?: number;
+  groupId: number;
+  groupName?: string;
+  projectTitle?: string;
+  projectArea?: string;
+  projectDescription?: string;
+  projectTypeId?: number;
+  projectTypeName?: string;
+  expertStaffId?: number;
 }) {
-    const staff = await getStaffId();
-    if (!staff) {
-        return { success: false, error: "Unauthorized" };
+  const staff = await getStaffId();
+  if (!staff) {
+    return { success: false, error: "Unauthorized" };
+  }
+
+  // Check if the faculty is the convener
+  const group = await prisma.projectgroup.findFirst({
+    where: {
+      projectgroupid: data.groupId,
+      convenerstaffid: staff.staffid,
+    },
+  });
+
+  if (!group) {
+    return { success: false, error: "Not authorized to update this group" };
+  }
+
+  try {
+    let finalProjectTypeId = data.projectTypeId;
+    if (!finalProjectTypeId && data.projectTypeName) {
+      let pt = await prisma.projecttype.findFirst({
+        where: { projecttypename: data.projectTypeName },
+      });
+      if (!pt) {
+        pt = await prisma.projecttype.create({
+          data: { projecttypename: data.projectTypeName },
+        });
+      }
+      finalProjectTypeId = pt.projecttypeid;
     }
 
-    // Check if the faculty is the convener
-    const group = await prisma.projectgroup.findFirst({
-        where: {
-            projectgroupid: data.groupId,
-            convenerstaffid: staff.staffid,
-        },
+    await prisma.projectgroup.update({
+      where: { projectgroupid: data.groupId },
+      data: {
+        projectgroupname: data.groupName ?? group.projectgroupname,
+        projecttitle: data.projectTitle ?? group.projecttitle,
+        projectarea: data.projectArea ?? group.projectarea,
+        projectdescription: data.projectDescription ?? group.projectdescription,
+        projecttypeid: finalProjectTypeId ?? group.projecttypeid,
+        expertstaffid: data.expertStaffId ?? group.expertstaffid,
+        modified: new Date(),
+      },
     });
 
-    if (!group) {
-        return { success: false, error: "Not authorized to update this group" };
-    }
-
-    try {
-        let finalProjectTypeId = data.projectTypeId;
-        if (!finalProjectTypeId && data.projectTypeName) {
-            let pt = await prisma.projecttype.findFirst({
-                where: { projecttypename: data.projectTypeName }
-            });
-            if (!pt) {
-                pt = await prisma.projecttype.create({
-                    data: { projecttypename: data.projectTypeName }
-                });
-            }
-            finalProjectTypeId = pt.projecttypeid;
-        }
-
-        await prisma.projectgroup.update({
-            where: { projectgroupid: data.groupId },
-            data: {
-                projectgroupname: data.groupName ?? group.projectgroupname,
-                projecttitle: data.projectTitle ?? group.projecttitle,
-                projectarea: data.projectArea ?? group.projectarea,
-                projectdescription: data.projectDescription ?? group.projectdescription,
-                projecttypeid: finalProjectTypeId ?? group.projecttypeid,
-                expertstaffid: data.expertStaffId ?? group.expertstaffid,
-                modified: new Date(),
-            },
-        });
-
-        revalidatePath("/faculty/group");
-        return { success: true };
-    } catch (error) {
-        console.error("Error updating group:", error);
-        return { success: false, error: "Failed to update group" };
-    }
+    revalidatePath("/faculty/group");
+    return { success: true };
+  } catch (error) {
+    console.error("Error updating group:", error);
+    return { success: false, error: "Failed to update group" };
+  }
 }
 
 // Add member to a group
 export async function addGroupMember(data: {
-    groupId: number;
-    studentId: number;
-    isLeader?: boolean;
-    cgpa?: number;
+  groupId: number;
+  studentId: number;
+  isLeader?: boolean;
+  cgpa?: number;
 }) {
-    const staff = await getStaffId();
-    if (!staff) {
-        return { success: false, error: "Unauthorized" };
-    }
+  const staff = await getStaffId();
+  if (!staff) {
+    return { success: false, error: "Unauthorized" };
+  }
 
-    // Check if the faculty is the convener
-    const group = await prisma.projectgroup.findFirst({
-        where: {
-            projectgroupid: data.groupId,
-            convenerstaffid: staff.staffid,
-        },
+  // Check if the faculty is the convener
+  const group = await prisma.projectgroup.findFirst({
+    where: {
+      projectgroupid: data.groupId,
+      convenerstaffid: staff.staffid,
+    },
+  });
+
+  if (!group) {
+    return { success: false, error: "Not authorized to modify this group" };
+  }
+
+  try {
+    await prisma.projectgroupmember.create({
+      data: {
+        projectgroupid: data.groupId,
+        studentid: data.studentId,
+        isgroupleader: data.isLeader || false,
+        studentcgpa: data.cgpa || null,
+      },
     });
 
-    if (!group) {
-        return { success: false, error: "Not authorized to modify this group" };
+    // ── Stream Chat: add the new student to the group's channel ──────────
+    const studentRecord = await prisma.student.findFirst({
+      where: { studentid: data.studentId },
+      select: {
+        studentname: true,
+        users: { select: { clerkid: true } },
+      },
+    });
+    const studentClerkId = studentRecord?.users?.clerkid;
+    if (studentClerkId) {
+      await silentStreamOp(
+        () =>
+          addMemberToGroupChannel(
+            data.groupId,
+            studentClerkId,
+            studentRecord?.studentname ?? undefined,
+          ),
+        `addMemberToGroupChannel(${data.groupId}, ${studentClerkId})`,
+      );
     }
+    // ─────────────────────────────────────────────────────────────────────
 
-    try {
-        await prisma.projectgroupmember.create({
-            data: {
-                projectgroupid: data.groupId,
-                studentid: data.studentId,
-                isgroupleader: data.isLeader || false,
-                studentcgpa: data.cgpa || null,
-            },
-        });
-
-        revalidatePath("/faculty/group");
-        return { success: true };
-    } catch (error) {
-        console.error("Error adding member:", error);
-        return { success: false, error: "Failed to add member" };
-    }
+    revalidatePath("/faculty/group");
+    return { success: true };
+  } catch (error) {
+    console.error("Error adding member:", error);
+    return { success: false, error: "Failed to add member" };
+  }
 }
 
 // Remove member from a group
 export async function removeGroupMember(data: {
-    groupId: number;
-    studentId: number;
+  groupId: number;
+  studentId: number;
 }) {
-    const staff = await getStaffId();
-    if (!staff) {
-        return { success: false, error: "Unauthorized" };
-    }
+  const staff = await getStaffId();
+  if (!staff) {
+    return { success: false, error: "Unauthorized" };
+  }
 
-    // Check if the faculty is the convener
-    const group = await prisma.projectgroup.findFirst({
-        where: {
-            projectgroupid: data.groupId,
-            convenerstaffid: staff.staffid,
-        },
+  // Check if the faculty is the convener
+  const group = await prisma.projectgroup.findFirst({
+    where: {
+      projectgroupid: data.groupId,
+      convenerstaffid: staff.staffid,
+    },
+  });
+
+  if (!group) {
+    return { success: false, error: "Not authorized to modify this group" };
+  }
+
+  try {
+    // ── Stream Chat: look up Clerk ID before the DB row is deleted ───────
+    const studentRecord = await prisma.student.findFirst({
+      where: { studentid: data.studentId },
+      select: { users: { select: { clerkid: true } } },
+    });
+    const studentClerkId = studentRecord?.users?.clerkid;
+    // ─────────────────────────────────────────────────────────────────────
+
+    await prisma.projectgroupmember.deleteMany({
+      where: {
+        projectgroupid: data.groupId,
+        studentid: data.studentId,
+      },
     });
 
-    if (!group) {
-        return { success: false, error: "Not authorized to modify this group" };
+    // ── Stream Chat: remove the student from the group's channel ─────────
+    if (studentClerkId) {
+      await silentStreamOp(
+        () => removeMemberFromGroupChannel(data.groupId, studentClerkId),
+        `removeMemberFromGroupChannel(${data.groupId}, ${studentClerkId})`,
+      );
     }
+    // ─────────────────────────────────────────────────────────────────────
 
-    try {
-        await prisma.projectgroupmember.deleteMany({
-            where: {
-                projectgroupid: data.groupId,
-                studentid: data.studentId,
-            },
-        });
-
-        revalidatePath("/faculty/group");
-        return { success: true };
-    } catch (error) {
-        console.error("Error removing member:", error);
-        return { success: false, error: "Failed to remove member" };
-    }
+    revalidatePath("/faculty/group");
+    return { success: true };
+  } catch (error) {
+    console.error("Error removing member:", error);
+    return { success: false, error: "Failed to remove member" };
+  }
 }
 
 // Delete a project group
 export async function deleteGroup(groupId: number) {
-    const staff = await getStaffId();
-    if (!staff) {
-        return { success: false, error: "Unauthorized" };
-    }
+  const staff = await getStaffId();
+  if (!staff) {
+    return { success: false, error: "Unauthorized" };
+  }
 
-    // Check if the faculty is the convener
-    const group = await prisma.projectgroup.findFirst({
-        where: {
-            projectgroupid: groupId,
-            convenerstaffid: staff.staffid,
-        },
+  // Check if the faculty is the convener
+  const group = await prisma.projectgroup.findFirst({
+    where: {
+      projectgroupid: groupId,
+      convenerstaffid: staff.staffid,
+    },
+  });
+
+  if (!group) {
+    return { success: false, error: "Not authorized to delete this group" };
+  }
+
+  try {
+    // Delete the group (cascade will handle members and meetings)
+    await prisma.projectgroup.delete({
+      where: { projectgroupid: groupId },
     });
 
-    if (!group) {
-        return { success: false, error: "Not authorized to delete this group" };
-    }
-
-    try {
-        // Delete the group (cascade will handle members and meetings)
-        await prisma.projectgroup.delete({
-            where: { projectgroupid: groupId },
-        });
-
-        revalidatePath("/faculty/group");
-        return { success: true };
-    } catch (error) {
-        console.error("Error deleting group:", error);
-        return { success: false, error: "Failed to delete group" };
-    }
+    revalidatePath("/faculty/group");
+    return { success: true };
+  } catch (error) {
+    console.error("Error deleting group:", error);
+    return { success: false, error: "Failed to delete group" };
+  }
 }
 
 // Mark group as completed
 export async function markGroupComplete(groupId: number) {
-    const staff = await getStaffId();
-    if (!staff) return { success: false, error: "Unauthorized" };
+  const staff = await getStaffId();
+  if (!staff) return { success: false, error: "Unauthorized" };
 
-    const group = await prisma.projectgroup.findFirst({
-        where: { projectgroupid: groupId, convenerstaffid: staff.staffid }
+  const group = await prisma.projectgroup.findFirst({
+    where: { projectgroupid: groupId, convenerstaffid: staff.staffid },
+  });
+
+  if (!group)
+    return {
+      success: false,
+      error: "Unauthorized to mark this group complete",
+    };
+
+  try {
+    await prisma.projectgroup.update({
+      where: { projectgroupid: groupId },
+      data: { projectstatus: "Completed", modified: new Date() },
     });
-
-    if (!group) return { success: false, error: "Unauthorized to mark this group complete" };
-
-    try {
-        await prisma.projectgroup.update({
-            where: { projectgroupid: groupId },
-            data: { projectstatus: "Completed", modified: new Date() }
-        });
-        revalidatePath("/faculty/group");
-        return { success: true };
-    } catch (error) {
-        console.error("Error completing group:", error);
-        return { success: false, error: "Failed to complete group" };
-    }
+    revalidatePath("/faculty/group");
+    return { success: true };
+  } catch (error) {
+    console.error("Error completing group:", error);
+    return { success: false, error: "Failed to complete group" };
+  }
 }

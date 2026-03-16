@@ -7,11 +7,11 @@ export default function FacultyLayout({
   children: React.ReactNode;
 }) {
   return (
-    <>
+    <div className="min-h-screen bg-[#050A14]">
       <FacultyNavbar />
       <main className="pt-16">
         {children}
       </main>
-    </>
+    </div>
   );
 }

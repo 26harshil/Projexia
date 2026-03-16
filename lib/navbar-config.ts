@@ -11,6 +11,7 @@ export const NAVBAR_CONFIG: Record<Role, {
             { name: "My Group", href: "/student/group" },
             { name: "Meetings", href: "/student/meetings" },
             { name: "Reports", href: "/student/reports" },
+            { name: "Chat", href: "/chat" },
         ]
     }, FACULTY: {
         title: "Projexia - Faculty",
@@ -20,7 +21,7 @@ export const NAVBAR_CONFIG: Record<Role, {
             { name: "Project Reviews", href: "/faculty/reviews" },
             { name: "Meetings", href: "/faculty/meetings" },
             { name: "Reports", href: "/faculty/reports" },
-
+            { name: "Chat", href: "/chat" },
         ]
     }, ADMIN: {
         title: "Projexia - Admin",
@@ -30,6 +31,7 @@ export const NAVBAR_CONFIG: Record<Role, {
             { name: "Students", href: "/admin/students" },
             { name: "Projects", href: "/admin/projects" },
             { name: "Reports", href: "/admin/reports" },
+            { name: "Chat", href: "/chat" },
         ]
     }
 }
