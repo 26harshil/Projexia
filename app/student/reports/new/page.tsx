@@ -2,7 +2,8 @@ import { getUserRole } from '@/app/actions/getUserRole';
 import { redirect } from 'next/navigation';
 import { StudentNewReportForm } from '@/components/student/StudentNewReportForm';
 
-import { Role } from '@/app/generated/prisma/enums';
+
+import { Role } from "@/app/generated/prisma/client";  
 
 export default async function NewReportPage() {
   const userRole = await getUserRole();

@@ -1,5 +1,5 @@
-import { Role } from "@/app/generated/prisma/enums";
 
+import { Role } from "@/app/generated/prisma/client";  
 /**
  * Role utility functions for consistent role handling across the application
  */

@@ -2,7 +2,8 @@ import { getStudentReportById } from "@/app/actions/reportActions";
 import { getUserRole } from "@/app/actions/getUserRole";
 import { redirect, notFound } from "next/navigation";
 import { ReportDetailView } from "@/components/student/ReportDetailView";
-import { Role } from "@/app/generated/prisma/enums";
+
+import { Role } from "@/app/generated/prisma/client";  
 
 interface ReportDetailPageProps {
   params: {

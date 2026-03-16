@@ -1,4 +1,5 @@
-import { Role } from "@/app/generated/prisma/enums";
+
+import { Role } from "@/app/generated/prisma/client";  
 import { getRoleColors } from "@/lib/roleUtils";
 import { Badge } from "@/components/ui/badge";
 
@@ -15,7 +16,7 @@ export function RoleBadge({ role, className = "" }: RoleBadgeProps) {
 
   return (
     <Badge
-      className={`bg-gradient-to-r ${colors.gradient} text-white px-3 py-1 text-sm font-semibold ${className}`}
+      className={`bg-linear-to-r ${colors.gradient} text-white px-3 py-1 text-sm font-semibold ${className}`}
     >
       {role}
     </Badge>

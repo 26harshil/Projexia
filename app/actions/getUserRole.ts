@@ -2,7 +2,7 @@
 
 import { auth, clerkClient, currentUser } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
-import { Role } from "../generated/prisma/enums";
+import { Role } from "@/app/generated/prisma/client";  
 
 /**
  * Gets user role from Prisma database with Clerk sync.

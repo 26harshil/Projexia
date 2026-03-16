@@ -2,7 +2,7 @@
 
 import { auth, clerkClient } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
-import { Role } from "@/app/generated/prisma/enums";
+import { Role } from "@/app/generated/prisma/client";  
 
 /**
  * Verify the current user is an admin
