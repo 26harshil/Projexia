@@ -30,6 +30,7 @@ export default function PublicNavbar() {
               className="h-10 w-auto"
               priority
             />
+            <span className="text-white text-lg font-semibold">Projexia</span>
           </Link>
           <nav className="hidden md:flex gap-6">
             <Link href="#features" className="text-sm font-medium text-slate-300 hover:text-cyan-400 transition">Features</Link>

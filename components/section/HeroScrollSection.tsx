@@ -211,9 +211,9 @@ export function HeroScrollSection() {
           animation: "pulse 2s ease-in-out infinite",
         }}>
           <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
-            <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="#00C6FF" strokeWidth="2" strokeLinejoin="round"/>
-            <path d="M2 17L12 22L22 17" stroke="#7B5FF5" strokeWidth="2" strokeLinejoin="round"/>
-            <path d="M2 12L12 17L22 12" stroke="#00C6FF" strokeWidth="2" strokeLinejoin="round" opacity="0.6"/>
+            <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="#00C6FF" strokeWidth="2" strokeLinejoin="round" />
+            <path d="M2 17L12 22L22 17" stroke="#7B5FF5" strokeWidth="2" strokeLinejoin="round" />
+            <path d="M2 12L12 17L22 12" stroke="#00C6FF" strokeWidth="2" strokeLinejoin="round" opacity="0.6" />
           </svg>
         </div>
 
@@ -294,19 +294,25 @@ export function HeroScrollSection() {
             {/* Wordmark */}
             <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
               <div style={{
-                width: 36, height: 36,
+                width: 38, height: 38,
                 borderRadius: "50%",
                 border: "1.5px solid #00C6FF",
                 display: "flex", alignItems: "center", justifyContent: "center",
                 boxShadow: "0 0 16px rgba(0,198,255,0.3)",
               }}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                  <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="#00C6FF" strokeWidth="2.5" strokeLinejoin="round"/>
-                  <path d="M2 17L12 22L22 17" stroke="#7B5FF5" strokeWidth="2.5" strokeLinejoin="round"/>
-                </svg>
+                <img
+                  src="/Logo.png"
+                  alt="Projexia Logo"
+                  style={{
+                    width: "92%",
+                    height: "92%",
+                    objectFit: "contain"
+                  }}
+                />
               </div>
+
               <span style={{ fontFamily: "'Inter', sans-serif", fontWeight: 700, fontSize: 15, color: "#E8F4FF", letterSpacing: "0.04em" }}>
-                SPMS
+                Projexia
               </span>
             </div>
 
@@ -476,7 +482,7 @@ export function HeroScrollSection() {
                   <button className="hero-cta-primary">
                     START PROJECT
                     <svg style={{ marginLeft: 10 }} width="16" height="16" viewBox="0 0 24 24" fill="none">
-                      <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
                   </button>
                 </SignUpButton>
