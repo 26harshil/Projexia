@@ -392,12 +392,11 @@ export function ProfileContent({ profile }: ProfileContentProps) {
                   )}
                   {nameSaveMessage && (
                     <p
-                      className={`text-xs mt-1 ${
-                        nameSaveMessage.includes("Error") ||
-                        nameSaveMessage.includes("required")
+                      className={`text-xs mt-1 ${nameSaveMessage.includes("Error") ||
+                          nameSaveMessage.includes("required")
                           ? "text-red-600"
                           : "text-cyan-400"
-                      }`}
+                        }`}
                     >
                       {nameSaveMessage}
                     </p>
@@ -413,10 +412,10 @@ export function ProfileContent({ profile }: ProfileContentProps) {
                     className={cn(
                       "text-sm px-3 py-1",
                       role.color === "emerald" &&
-                        "bg-blue-500/15 text-cyan-400",
+                      "bg-blue-500/15 text-cyan-400",
                       role.color === "blue" && "bg-blue-500/15 text-blue-700",
                       role.color === "violet" &&
-                        "bg-violet-100 text-violet-700",
+                      "bg-violet-100 text-violet-700",
                     )}
                   >
                     <RoleIcon className="h-3.5 w-3.5 mr-1.5" />
@@ -492,7 +491,7 @@ export function ProfileContent({ profile }: ProfileContentProps) {
 
               {/* Phone - Editable for Students and Faculty */}
               {(profile.role === "STUDENT" || profile.role === "FACULTY") &&
-              (profile.student || profile.staff) ? (
+                (profile.student || profile.staff) ? (
                 <div className="bg-white/5 rounded-xl p-4 flex items-start gap-3">
                   <div className="bg-blue-500/15 p-2 rounded-lg">
                     <Phone className="h-4 w-4 text-cyan-400" />
@@ -539,11 +538,10 @@ export function ProfileContent({ profile }: ProfileContentProps) {
                     )}
                     {saveMessage && (
                       <p
-                        className={`text-xs mt-1 ${
-                          saveMessage.includes("Error")
+                        className={`text-xs mt-1 ${saveMessage.includes("Error")
                             ? "text-red-600"
                             : "text-cyan-400"
-                        }`}
+                          }`}
                       >
                         {saveMessage}
                       </p>
@@ -614,11 +612,10 @@ export function ProfileContent({ profile }: ProfileContentProps) {
                     )}
                     {enrollmentSaveMessage && (
                       <p
-                        className={`text-xs mt-1 ${
-                          enrollmentSaveMessage.includes("Error")
+                        className={`text-xs mt-1 ${enrollmentSaveMessage.includes("Error")
                             ? "text-red-600"
                             : "text-violet-600"
-                        }`}
+                          }`}
                       >
                         {enrollmentSaveMessage}
                       </p>
@@ -729,7 +726,7 @@ export function ProfileContent({ profile }: ProfileContentProps) {
             className="p-6 md:p-8 bg-white/5/50"
           >
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-              <p className="text-xs text-slate-400">{}</p>
+              <p className="text-xs text-slate-400">{ }</p>
               <div className="flex gap-3">
                 <Link href={dashboardHref}>
                   <Button

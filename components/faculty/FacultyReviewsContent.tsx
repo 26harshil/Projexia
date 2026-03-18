@@ -110,18 +110,22 @@ export function FacultyReviewsContent({ reviews }: FacultyReviewsContentProps) {
 
     const filterPending = (list: PendingReview[]) =>
         list.filter(
-            (r) =>
-                r.purpose?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                r.groupName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                r.projectTitle?.toLowerCase().includes(searchQuery.toLowerCase())
+            (r) => {
+                const query = searchQuery.toLowerCase();
+                return (r.purpose || "").toLowerCase().includes(query) ||
+                    (r.groupName || "").toLowerCase().includes(query) ||
+                    (r.projectTitle || "").toLowerCase().includes(query);
+            }
         );
 
     const filterCompleted = (list: CompletedReview[]) =>
         list.filter(
-            (r) =>
-                r.purpose?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                r.groupName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                r.projectTitle?.toLowerCase().includes(searchQuery.toLowerCase())
+            (r) => {
+                const query = searchQuery.toLowerCase();
+                return (r.purpose || "").toLowerCase().includes(query) ||
+                    (r.groupName || "").toLowerCase().includes(query) ||
+                    (r.projectTitle || "").toLowerCase().includes(query);
+            }
         );
 
     const filteredPending = filterPending(reviews.pending);
@@ -149,7 +153,7 @@ export function FacultyReviewsContent({ reviews }: FacultyReviewsContentProps) {
     ];
 
     return (
-        <div className="min-h-screen bg-slate-50">
+        <div className="min-h-screen bg-[#050A14]">
             <div className="max-w-7xl mx-auto px-4 md:px-6 py-8">
                 {/* Page Header */}
                 <motion.div
@@ -157,10 +161,10 @@ export function FacultyReviewsContent({ reviews }: FacultyReviewsContentProps) {
                     animate={{ opacity: 1, y: 0 }}
                     className="mb-8"
                 >
-                    <h1 className="text-2xl md:text-3xl font-bold text-slate-900 mb-1">
+                    <h1 className="text-2xl md:text-3xl font-bold text-white">
                         Project Reviews
                     </h1>
-                    <p className="text-slate-500">
+                    <p className="text-slate-400">
                         Review and grade student project submissions
                     </p>
                 </motion.div>
@@ -176,33 +180,30 @@ export function FacultyReviewsContent({ reviews }: FacultyReviewsContentProps) {
                         <motion.div
                             key={stat.label}
                             whileHover={{ y: -2 }}
-                            className={`bg-white rounded-xl border p-4 flex items-center gap-4 ${stat.color === "amber"
-                                ? "border-amber-100"
-                                : stat.color === "emerald"
-                                    ? "border-emerald-100"
-                                    : "border-emerald-100"
-                                }`}
+                            className={`bg-white/5 backdrop-blur-md rounded-2xl border p-4 flex items-center gap-4 ${
+                                stat.color === "amber"
+                                    ? "border-amber-500/20"
+                                    : "border-emerald-500/20"
+                            }`}
                         >
                             <div
-                                className={`p-3 rounded-xl ${stat.color === "amber"
-                                    ? "bg-amber-100"
-                                    : stat.color === "emerald"
-                                        ? "bg-emerald-100"
-                                        : "bg-emerald-100"
-                                    }`}
+                                className={`p-3 rounded-xl ${
+                                    stat.color === "amber"
+                                        ? "bg-amber-500/15"
+                                        : "bg-emerald-500/15"
+                                }`}
                             >
                                 <stat.icon
-                                    className={`h-5 w-5 ${stat.color === "amber"
-                                        ? "text-amber-600"
-                                        : stat.color === "emerald"
-                                            ? "text-emerald-600"
-                                            : "text-emerald-600"
-                                        }`}
+                                    className={`h-5 w-5 ${
+                                        stat.color === "amber"
+                                            ? "text-amber-400"
+                                            : "text-emerald-400"
+                                    }`}
                                 />
                             </div>
                             <div>
-                                <p className="text-2xl font-bold text-slate-900">{stat.count}</p>
-                                <p className="text-sm text-slate-500">{stat.label}</p>
+                                <p className="text-2xl font-bold text-white">{stat.count}</p>
+                                <p className="text-sm text-slate-400">{stat.label}</p>
                             </div>
                         </motion.div>
                     ))}
@@ -213,7 +214,7 @@ export function FacultyReviewsContent({ reviews }: FacultyReviewsContentProps) {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.2 }}
-                    className="bg-white rounded-xl border border-slate-200 p-4 mb-6"
+                    className="bg-white/5 backdrop-blur-md rounded-xl border border-blue-500/20 p-4 mb-6"
                 >
                     <div className="flex flex-col sm:flex-row gap-4">
                         <div className="relative flex-1">
@@ -222,13 +223,10 @@ export function FacultyReviewsContent({ reviews }: FacultyReviewsContentProps) {
                                 placeholder="Search reviews..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="pl-10 bg-slate-50 border-slate-200 focus:bg-white"
+                                className="pl-10 bg-white/5 border-blue-500/20 text-white placeholder:text-slate-400 focus:bg-white/10"
                             />
                         </div>
-                        <Button variant="outline" className="border-slate-200">
-                            <Filter className="h-4 w-4 mr-2" />
-                            Filter
-                        </Button>
+
                     </div>
                 </motion.div>
 
@@ -239,17 +237,17 @@ export function FacultyReviewsContent({ reviews }: FacultyReviewsContentProps) {
                     transition={{ delay: 0.3 }}
                 >
                     <Tabs defaultValue="pending" className="w-full">
-                        <TabsList className="bg-white border border-slate-200 p-1 mb-6">
+                        <TabsList className="bg-white/5 border border-blue-500/20 p-1 mb-6">
                             <TabsTrigger
                                 value="pending"
-                                className="data-[state=active]:bg-amber-50 data-[state=active]:text-amber-700"
+                                className="data-[state=active]:bg-amber-500/10 data-[state=active]:text-amber-400 text-slate-400"
                             >
                                 <Clock className="h-4 w-4 mr-2" />
                                 Pending ({filteredPending.length})
                             </TabsTrigger>
                             <TabsTrigger
                                 value="completed"
-                                className="data-[state=active]:bg-emerald-50 data-[state=active]:text-emerald-700"
+                                className="data-[state=active]:bg-emerald-500/10 data-[state=active]:text-emerald-400 text-slate-400"
                             >
                                 <CheckCircle2 className="h-4 w-4 mr-2" />
                                 Completed ({filteredCompleted.length})
@@ -349,23 +347,23 @@ function PendingReviewCard({ review, onReviewNow }: { review: PendingReview; onR
     return (
         <motion.div variants={itemVariants}>
             <div
-                className={`bg-white rounded-xl border p-4 hover:shadow-md transition-all ${isUrgent
-                    ? "border-emerald-200 bg-gradient-to-r from-emerald-50/50 to-white"
-                    : "border-amber-200 bg-gradient-to-r from-amber-50/50 to-white"
+                className={`bg-white/5 backdrop-blur-md rounded-2xl border p-4 hover:shadow-lg transition-all ${isUrgent
+                    ? "border-amber-500/30 bg-gradient-to-r from-amber-500/10 to-transparent"
+                    : "border-blue-500/20 bg-gradient-to-r from-blue-500/5 to-transparent"
                     }`}
             >
                 <div className="flex flex-col md:flex-row md:items-center gap-4">
                     {/* Urgency Indicator */}
                     <div
-                        className={`shrink-0 text-center p-3 rounded-xl ${isUrgent ? "bg-emerald-100" : "bg-amber-100"
+                        className={`shrink-0 text-center p-3 rounded-xl ${isUrgent ? "bg-amber-500/15" : "bg-blue-500/15"
                             }`}
                     >
                         <Clock
-                            className={`h-6 w-6 mx-auto ${isUrgent ? "text-emerald-600" : "text-amber-600"
+                            className={`h-6 w-6 mx-auto ${isUrgent ? "text-amber-400" : "text-blue-400"
                                 }`}
                         />
                         <p
-                            className={`text-xs font-medium mt-1 ${isUrgent ? "text-emerald-600" : "text-amber-600"
+                            className={`text-xs font-medium mt-1 ${isUrgent ? "text-amber-400" : "text-blue-400"
                                 }`}
                         >
                             {daysSince === 0
@@ -379,17 +377,17 @@ function PendingReviewCard({ review, onReviewNow }: { review: PendingReview; onR
                     {/* Review Info */}
                     <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1 flex-wrap">
-                            <h3 className="font-semibold text-slate-900">
+                            <h3 className="font-semibold text-white">
                                 {review.purpose || "Meeting Review"}
                             </h3>
                             {isUrgent && (
-                                <Badge className="bg-emerald-600 text-white text-xs">Urgent</Badge>
+                                <Badge className="bg-amber-500/20 text-amber-400 border border-amber-500/30 text-xs">Urgent</Badge>
                             )}
                         </div>
-                        <p className="text-sm text-emerald-600 font-medium mb-2">
+                        <p className="text-sm text-cyan-400 font-medium mb-2">
                             {review.groupName || review.projectTitle}
                         </p>
-                        <div className="flex items-center gap-4 text-sm text-slate-500 flex-wrap">
+                        <div className="flex items-center gap-4 text-sm text-slate-400 flex-wrap">
                             <span className="flex items-center gap-1">
                                 <Calendar className="h-3 w-3" />
                                 {reviewDate.toLocaleDateString("en-IN", {
@@ -408,7 +406,7 @@ function PendingReviewCard({ review, onReviewNow }: { review: PendingReview; onR
                     {/* Actions */}
                     <div className="flex items-center gap-2 shrink-0">
                         <Button
-                            className="bg-amber-600 hover:bg-amber-700 text-white"
+                            className="bg-blue-600 hover:bg-emerald-700 text-white border border-blue-500"
                             size="sm"
                             onClick={onReviewNow}
                         >
@@ -427,13 +425,13 @@ function CompletedReviewCard({ review, onViewDetails }: { review: CompletedRevie
 
     return (
         <motion.div variants={itemVariants}>
-            <div className="bg-white rounded-xl border border-slate-200 p-4 hover:shadow-md transition-all">
+            <div className="bg-white/5 backdrop-blur-md rounded-2xl border border-blue-500/20 p-4 hover:shadow-lg transition-all">
                 <div className="flex flex-col md:flex-row md:items-center gap-4">
                     {/* Completed Indicator */}
-                    <div className="shrink-0 text-center p-3 rounded-xl bg-emerald-100 flex flex-col items-center justify-center gap-1 min-w-[70px]">
-                        <CheckCircle2 className="h-6 w-6 text-emerald-600" />
+                    <div className="shrink-0 text-center p-3 rounded-xl bg-emerald-500/15 flex flex-col items-center justify-center gap-1 min-w-[70px]">
+                        <CheckCircle2 className="h-6 w-6 text-emerald-400" />
                         {review.grade && (
-                            <span className="text-xs font-bold text-emerald-700 bg-emerald-200/50 px-2 py-0.5 rounded-full mt-1">
+                            <span className="text-xs font-bold text-emerald-400 bg-emerald-500/20 border border-emerald-500/30 px-2 py-0.5 rounded-full mt-1">
                                 {review.grade}
                             </span>
                         )}
@@ -442,17 +440,17 @@ function CompletedReviewCard({ review, onViewDetails }: { review: CompletedRevie
                     {/* Review Info */}
                     <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1 flex-wrap">
-                            <h3 className="font-semibold text-slate-900">
+                            <h3 className="font-semibold text-white">
                                 {review.purpose || "Meeting Review"}
                             </h3>
-                            <Badge className="bg-emerald-100 text-emerald-700 text-xs">
+                            <Badge className="bg-emerald-500/15 text-emerald-400 border border-emerald-500/20 text-xs">
                                 Completed
                             </Badge>
                         </div>
-                        <p className="text-sm text-emerald-600 font-medium mb-2">
+                        <p className="text-sm text-cyan-400 font-medium mb-2">
                             {review.groupName || review.projectTitle}
                         </p>
-                        <div className="flex items-center gap-4 text-sm text-slate-500 flex-wrap">
+                        <div className="flex items-center gap-4 text-sm text-slate-400 flex-wrap">
                             <span className="flex items-center gap-1">
                                 <Calendar className="h-3 w-3" />
                                 {reviewDate.toLocaleDateString("en-IN", {
@@ -463,7 +461,7 @@ function CompletedReviewCard({ review, onViewDetails }: { review: CompletedRevie
                             </span>
                         </div>
                         {review.notes && (
-                            <p className="text-sm text-slate-600 mt-2 line-clamp-2 italic">
+                            <p className="text-sm text-slate-300 mt-2 line-clamp-2 italic">
                                 &quot;{review.notes}&quot;
                             </p>
                         )}
@@ -471,7 +469,7 @@ function CompletedReviewCard({ review, onViewDetails }: { review: CompletedRevie
 
                     {/* Actions */}
                     <div className="flex items-center gap-2 shrink-0">
-                        <Button variant="outline" size="sm" className="border-slate-200" onClick={onViewDetails}>
+                        <Button variant="outline" size="sm" className="border-cyan-500/25 text-cyan-400 hover:bg-blue-500/10" onClick={onViewDetails}>
                             <FileText className="h-4 w-4 mr-1" />
                             View Details
                         </Button>
@@ -484,7 +482,7 @@ function CompletedReviewCard({ review, onViewDetails }: { review: CompletedRevie
 
 function EmptyState({ type }: { type: "pending" | "completed" }) {
     return (
-        <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center">
+        <div className="bg-white/5 backdrop-blur-md rounded-2xl border border-blue-500/20 p-12 text-center">
             <motion.div
                 animate={{ scale: [1, 1.05, 1] }}
                 transition={{ duration: 2, repeat: Infinity }}
@@ -492,13 +490,13 @@ function EmptyState({ type }: { type: "pending" | "completed" }) {
             >
                 <div className="relative">
                     <div
-                        className={`absolute inset-0 rounded-2xl blur-xl opacity-40 ${type === "pending" ? "bg-amber-200" : "bg-emerald-200"
+                        className={`absolute inset-0 rounded-2xl blur-xl opacity-20 ${type === "pending" ? "bg-amber-400" : "bg-emerald-400"
                             }`}
                     />
                     <div
                         className={`relative border p-8 rounded-2xl ${type === "pending"
-                            ? "bg-amber-50 border-amber-100"
-                            : "bg-emerald-50 border-emerald-100"
+                            ? "bg-amber-500/10 border-amber-500/20"
+                            : "bg-emerald-500/10 border-emerald-500/20"
                             }`}
                     >
                         <ClipboardCheck
@@ -508,10 +506,10 @@ function EmptyState({ type }: { type: "pending" | "completed" }) {
                     </div>
                 </div>
             </motion.div>
-            <h3 className="text-xl font-semibold text-slate-900 mb-2">
+            <h3 className="text-xl font-semibold text-white mb-2">
                 {type === "pending" ? "No Pending Reviews" : "No Completed Reviews"}
             </h3>
-            <p className="text-slate-500 max-w-md mx-auto">
+            <p className="text-slate-400 max-w-md mx-auto">
                 {type === "pending"
                     ? "All caught up! There are no project submissions waiting for your review."
                     : "Your completed reviews will appear here."}
@@ -596,15 +594,15 @@ function ReviewDialog({
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto bg-[#0A1020] border-blue-500/20 text-white">
                 <DialogHeader>
-                    <DialogTitle className="flex items-center gap-2">
-                        <Edit3 className="h-5 w-5 text-amber-600" />
+                    <DialogTitle className="flex items-center gap-2 text-white">
+                        <Edit3 className="h-5 w-5 text-cyan-400" />
                         Complete Review
                     </DialogTitle>
-                    <DialogDescription>
+                    <DialogDescription className="text-slate-400">
                         Review meeting for{" "}
-                        <span className="font-medium text-slate-900">
+                        <span className="font-medium text-white">
                             {review.groupName}
                         </span>{" "}
                         &mdash;{" "}
@@ -618,24 +616,24 @@ function ReviewDialog({
 
                 <div className="space-y-6 py-4">
                     {/* Meeting Info */}
-                    <div className="bg-slate-50 rounded-lg border border-slate-200 p-4 space-y-2">
+                    <div className="bg-white/5 rounded-lg border border-blue-500/20 p-4 space-y-2">
                         <div className="flex items-center gap-2 text-sm">
-                            <FileText className="h-4 w-4 text-slate-500" />
-                            <span className="font-medium text-slate-700">Purpose:</span>
-                            <span className="text-slate-600">{review.purpose || "N/A"}</span>
+                            <FileText className="h-4 w-4 text-cyan-400" />
+                            <span className="font-medium text-white">Purpose:</span>
+                            <span className="text-slate-300">{review.purpose || "N/A"}</span>
                         </div>
                         {review.location && (
                             <div className="flex items-center gap-2 text-sm">
-                                <MapPin className="h-4 w-4 text-slate-500" />
-                                <span className="font-medium text-slate-700">Location:</span>
-                                <span className="text-slate-600">{review.location}</span>
+                                <MapPin className="h-4 w-4 text-cyan-400" />
+                                <span className="font-medium text-white">Location:</span>
+                                <span className="text-slate-300">{review.location}</span>
                             </div>
                         )}
                         {review.projectTitle && (
                             <div className="flex items-center gap-2 text-sm">
-                                <ClipboardCheck className="h-4 w-4 text-slate-500" />
-                                <span className="font-medium text-slate-700">Project:</span>
-                                <span className="text-slate-600">{review.projectTitle}</span>
+                                <ClipboardCheck className="h-4 w-4 text-cyan-400" />
+                                <span className="font-medium text-white">Project:</span>
+                                <span className="text-slate-300">{review.projectTitle}</span>
                             </div>
                         )}
                     </div>
@@ -644,7 +642,7 @@ function ReviewDialog({
                     {attendance.length > 0 && (
                         <div>
                             <div className="flex items-center justify-between mb-3">
-                                <h4 className="text-sm font-semibold text-slate-900 flex items-center gap-2">
+                                <h4 className="text-sm font-semibold text-white flex items-center gap-2">
                                     <Users className="h-4 w-4" />
                                     Attendance ({presentCount}/{attendance.length})
                                 </h4>
@@ -652,7 +650,7 @@ function ReviewDialog({
                                     <Button
                                         variant="outline"
                                         size="sm"
-                                        className="text-xs h-7"
+                                        className="text-xs h-7 bg-transparent border-blue-500/30 text-cyan-400 hover:bg-blue-500/10"
                                         onClick={() =>
                                             setAttendance((prev) =>
                                                 prev.map((a) => ({ ...a, present: true }))
@@ -665,7 +663,7 @@ function ReviewDialog({
                                     <Button
                                         variant="outline"
                                         size="sm"
-                                        className="text-xs h-7"
+                                        className="text-xs h-7 bg-transparent border-blue-500/30 text-cyan-400 hover:bg-blue-500/10"
                                         onClick={() =>
                                             setAttendance((prev) =>
                                                 prev.map((a) => ({ ...a, present: false }))
@@ -681,26 +679,24 @@ function ReviewDialog({
                                 {attendance.map((student, index) => (
                                     <div
                                         key={student.studentId}
-                                        className={`flex items-center gap-3 p-3 rounded-lg border transition-colors ${
-                                            student.present
-                                                ? "bg-emerald-50/50 border-emerald-200"
-                                                : "bg-red-50/50 border-red-200"
-                                        }`}
+                                        className={`flex items-center gap-3 p-3 rounded-lg border transition-colors ${student.present
+                                            ? "bg-emerald-500/10 border-emerald-500/30"
+                                            : "bg-red-500/10 border-red-500/30"
+                                            }`}
                                     >
                                         <Switch
                                             checked={student.present}
                                             onCheckedChange={() => toggleAttendance(index)}
                                         />
                                         <div className="flex-1 min-w-0">
-                                            <p className="text-sm font-medium text-slate-900">
+                                            <p className="text-sm font-medium text-white">
                                                 {student.name}
                                             </p>
                                             <Badge
-                                                className={`text-xs mt-1 ${
-                                                    student.present
-                                                        ? "bg-emerald-100 text-emerald-700"
-                                                        : "bg-red-100 text-red-700"
-                                                }`}
+                                                className={`text-xs mt-1 ${student.present
+                                                    ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
+                                                    : "bg-red-500/20 text-red-400 border border-red-500/30"
+                                                    }`}
                                             >
                                                 {student.present ? "Present" : "Absent"}
                                             </Badge>
@@ -709,7 +705,7 @@ function ReviewDialog({
                                             placeholder="Remarks..."
                                             value={student.remarks}
                                             onChange={(e) => updateRemarks(index, e.target.value)}
-                                            className="w-40 h-8 text-xs"
+                                            className="w-40 h-8 text-xs bg-white/5 border-blue-500/30 text-white placeholder:text-slate-500"
                                         />
                                     </div>
                                 ))}
@@ -720,7 +716,7 @@ function ReviewDialog({
                     {/* Review Notes and Grade */}
                     <div className="grid grid-cols-1 md:grid-cols-[1fr_200px] gap-4">
                         <div>
-                            <Label htmlFor="review-notes" className="text-sm font-semibold text-slate-900 mb-2 block">
+                            <Label htmlFor="review-notes" className="text-sm font-semibold text-white mb-2 block">
                                 Review Notes *
                             </Label>
                             <Textarea
@@ -732,32 +728,32 @@ function ReviewDialog({
                                     if (error) setError(null);
                                 }}
                                 rows={4}
-                                className="resize-none"
+                                className="resize-none bg-white/5 border-blue-500/20 text-white placeholder:text-slate-500"
                             />
                         </div>
                         <div>
-                            <Label htmlFor="review-grade" className="text-sm font-semibold text-slate-900 mb-2 flex items-center gap-2 block">
+                            <Label htmlFor="review-grade" className="text-sm font-semibold text-white mb-2 flex items-center gap-2 block">
                                 <Star className="h-4 w-4 text-amber-500" /> Grade / Score
                             </Label>
                             <Select value={grade} onValueChange={setGrade}>
-                                <SelectTrigger id="review-grade" className="h-10">
+                                <SelectTrigger id="review-grade" className="h-10 bg-white/5 border-blue-500/20 text-white">
                                     <SelectValue placeholder="Select Grade" />
                                 </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="A">Grade A</SelectItem>
-                                    <SelectItem value="B">Grade B</SelectItem>
-                                    <SelectItem value="C">Grade C</SelectItem>
-                                    <SelectItem value="D">Grade D</SelectItem>
+                                <SelectContent className="bg-[#0A1020] border-blue-500/20 text-white">
+                                    <SelectItem value="A" className="hover:bg-white/10 dark:hover:bg-white/10">Grade A</SelectItem>
+                                    <SelectItem value="B" className="hover:bg-white/10 dark:hover:bg-white/10">Grade B</SelectItem>
+                                    <SelectItem value="C" className="hover:bg-white/10 dark:hover:bg-white/10">Grade C</SelectItem>
+                                    <SelectItem value="D" className="hover:bg-white/10 dark:hover:bg-white/10">Grade D</SelectItem>
                                 </SelectContent>
                             </Select>
-                            <p className="text-xs text-slate-500 mt-2">
+                            <p className="text-xs text-slate-400 mt-2">
                                 Track continuous progress manually at each review step.
                             </p>
                         </div>
                     </div>
 
                     {error && (
-                        <div className="flex items-center gap-2 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg p-3">
+                        <div className="flex items-center gap-2 text-sm text-red-400 bg-red-500/10 border border-red-500/30 rounded-lg p-3">
                             <AlertCircle className="h-4 w-4 shrink-0" />
                             {error}
                         </div>
@@ -769,13 +765,14 @@ function ReviewDialog({
                         variant="outline"
                         onClick={() => onOpenChange(false)}
                         disabled={isPending}
+                        className="border-blue-500/30 text-white hover:bg-white/10"
                     >
                         Cancel
                     </Button>
                     <Button
                         onClick={handleSubmit}
                         disabled={isPending}
-                        className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                        className="bg-emerald-600 hover:bg-emerald-700 text-white border-0"
                     >
                         {isPending ? (
                             <>
@@ -832,24 +829,24 @@ function DetailsDialog({
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-lg">
+            <DialogContent className="sm:max-w-lg bg-[#0A1020] border-blue-500/20 text-white">
                 <DialogHeader>
                     <div className="flex items-start justify-between">
                         <div>
-                            <DialogTitle className="flex items-center gap-2">
-                                <CheckCircle2 className="h-5 w-5 text-emerald-600" />
+                            <DialogTitle className="flex items-center gap-2 text-white">
+                                <CheckCircle2 className="h-5 w-5 text-emerald-400" />
                                 Review Details
                             </DialogTitle>
-                            <DialogDescription>
+                            <DialogDescription className="text-slate-400">
                                 Completed review for{" "}
-                                <span className="font-medium text-slate-900">
+                                <span className="font-medium text-white">
                                     {review.groupName}
                                 </span>
                             </DialogDescription>
                         </div>
                         {!isEditing && (
-                            <Button variant="ghost" size="icon" onClick={() => setIsEditing(true)}>
-                                <Edit3 className="h-4 w-4 text-slate-500 hover:text-emerald-600" />
+                            <Button variant="ghost" size="icon" className="hover:bg-white/10" onClick={() => setIsEditing(true)}>
+                                <Edit3 className="h-4 w-4 text-slate-400 hover:text-emerald-400" />
                             </Button>
                         )}
                     </div>
@@ -861,7 +858,7 @@ function DetailsDialog({
                             <p className="text-xs font-medium text-slate-500 uppercase tracking-wider">
                                 Group
                             </p>
-                            <p className="text-sm font-medium text-slate-900">
+                            <p className="text-sm font-medium text-white">
                                 {review.groupName || "N/A"}
                             </p>
                         </div>
@@ -869,7 +866,7 @@ function DetailsDialog({
                             <p className="text-xs font-medium text-slate-500 uppercase tracking-wider">
                                 Project
                             </p>
-                            <p className="text-sm font-medium text-slate-900">
+                            <p className="text-sm font-medium text-white">
                                 {review.projectTitle || "N/A"}
                             </p>
                         </div>
@@ -877,7 +874,7 @@ function DetailsDialog({
                             <p className="text-xs font-medium text-slate-500 uppercase tracking-wider">
                                 Date
                             </p>
-                            <p className="text-sm font-medium text-slate-900">
+                            <p className="text-sm font-medium text-white">
                                 {reviewDate.toLocaleDateString("en-IN", {
                                     day: "numeric",
                                     month: "long",
@@ -885,24 +882,24 @@ function DetailsDialog({
                                 })}
                             </p>
                         </div>
-                        <div className="space-y-1 p-2 bg-emerald-50 rounded-lg border border-emerald-100">
-                            <Label htmlFor="edit-grade" className="text-xs font-medium text-emerald-600 uppercase tracking-wider flex items-center gap-1 mb-1">
+                        <div className="space-y-1 p-2 bg-emerald-500/10 rounded-lg border border-emerald-500/20">
+                            <Label htmlFor="edit-grade" className="text-xs font-medium text-emerald-400 uppercase tracking-wider flex items-center gap-1 mb-1">
                                 <Star className="h-3 w-3" /> Grade
                             </Label>
                             {isEditing ? (
                                 <Select value={grade} onValueChange={setGrade}>
-                                    <SelectTrigger id="edit-grade" className="h-8 bg-white text-emerald-800">
+                                    <SelectTrigger id="edit-grade" className="h-8 bg-white/10 text-emerald-400 border-emerald-500/30">
                                         <SelectValue placeholder="Grade" />
                                     </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="A">Grade A</SelectItem>
-                                        <SelectItem value="B">Grade B</SelectItem>
-                                        <SelectItem value="C">Grade C</SelectItem>
-                                        <SelectItem value="D">Grade D</SelectItem>
+                                    <SelectContent className="bg-[#0A1020] border-emerald-500/30 text-emerald-400">
+                                        <SelectItem value="A" className="hover:bg-white/10 focus:bg-white/10">Grade A</SelectItem>
+                                        <SelectItem value="B" className="hover:bg-white/10 focus:bg-white/10">Grade B</SelectItem>
+                                        <SelectItem value="C" className="hover:bg-white/10 focus:bg-white/10">Grade C</SelectItem>
+                                        <SelectItem value="D" className="hover:bg-white/10 focus:bg-white/10">Grade D</SelectItem>
                                     </SelectContent>
                                 </Select>
                             ) : (
-                                <p className="text-sm font-bold text-emerald-700">
+                                <p className="text-sm font-bold text-emerald-400">
                                     {review.grade || "No Grade Assigned"}
                                 </p>
                             )}
@@ -911,7 +908,7 @@ function DetailsDialog({
                             <p className="text-xs font-medium text-slate-500 uppercase tracking-wider">
                                 Purpose
                             </p>
-                            <p className="text-sm text-slate-700">
+                            <p className="text-sm text-slate-300">
                                 {review.purpose || "N/A"}
                             </p>
                         </div>
@@ -920,7 +917,7 @@ function DetailsDialog({
                                 <p className="text-xs font-medium text-slate-500 uppercase tracking-wider">
                                     Project
                                 </p>
-                                <p className="text-sm text-slate-700">
+                                <p className="text-sm text-slate-300">
                                     {review.projectTitle}
                                 </p>
                             </div>
@@ -937,11 +934,11 @@ function DetailsDialog({
                                 value={notes}
                                 onChange={(e) => setNotes(e.target.value)}
                                 rows={4}
-                                className="resize-none"
+                                className="resize-none bg-white/5 border-blue-500/20 text-white"
                             />
                         ) : review.notes ? (
-                            <div className="bg-slate-50 rounded-lg border border-slate-200 p-4">
-                                <p className="text-sm text-slate-700 whitespace-pre-wrap">
+                            <div className="bg-white/5 rounded-lg border border-blue-500/20 p-4">
+                                <p className="text-sm text-slate-300 whitespace-pre-wrap">
                                     {review.notes}
                                 </p>
                             </div>
@@ -954,11 +951,11 @@ function DetailsDialog({
                 <DialogFooter>
                     {isEditing ? (
                         <>
-                            <Button variant="outline" onClick={() => setIsEditing(false)}>
+                            <Button variant="outline" className="border-blue-500/30 hover:bg-white/10 text-white" onClick={() => setIsEditing(false)}>
                                 Cancel
                             </Button>
                             <Button
-                                className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                                className="bg-emerald-600 hover:bg-emerald-700 text-white border-0"
                                 onClick={handleSave}
                                 disabled={isPending}
                             >
@@ -972,7 +969,7 @@ function DetailsDialog({
                             </Button>
                         </>
                     ) : (
-                        <Button variant="outline" onClick={() => onOpenChange(false)}>
+                        <Button variant="outline" className="border-blue-500/30 hover:bg-white/10 text-white" onClick={() => onOpenChange(false)}>
                             Close
                         </Button>
                     )}

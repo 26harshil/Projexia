@@ -91,25 +91,8 @@ export function AdminHeader({ userName, userEmail, role }: AdminHeaderProps) {
               Here's an overview of your system. Manage users, monitor activity, and configure settings.
             </motion.p>
 
-            {/* Quick Actions */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
-              className="flex flex-wrap gap-3 pt-2"
-            >
-              <Button className="bg-gradient-to-r from-blue-600 to-cyan-500 text-white hover:from-blue-700 hover:to-cyan-600 shadow-lg shadow-blue-500/25 border-0">
-                <Settings className="h-4 w-4 mr-2" />
-                System Settings
-              </Button>
-              <Button
-                variant="outline"
-                className="border-blue-500/30 text-slate-300 hover:bg-blue-500/10 hover:text-white hover:border-blue-400/50 backdrop-blur-sm"
-              >
-                View Activity Log
-                <ChevronRight className="h-4 w-4 ml-1" />
-              </Button>
-            </motion.div>
+
+
           </div>
 
           {/* Right Section - System Status */}
@@ -119,23 +102,7 @@ export function AdminHeader({ userName, userEmail, role }: AdminHeaderProps) {
             transition={{ delay: 0.3 }}
             className="flex flex-col gap-3"
           >
-            {/* Status Cards */}
-            <div className="grid grid-cols-2 gap-3">
-              <div className="bg-white/5 backdrop-blur-sm border border-blue-500/20 rounded-xl p-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse shadow-sm shadow-cyan-400/50" />
-                  <span className="text-xs text-slate-400">Database</span>
-                </div>
-                <p className="text-white font-semibold">Connected</p>
-              </div>
-              <div className="bg-white/5 backdrop-blur-sm border border-blue-500/20 rounded-xl p-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse shadow-sm shadow-cyan-400/50" />
-                  <span className="text-xs text-slate-400">Auth Service</span>
-                </div>
-                <p className="text-white font-semibold">Active</p>
-              </div>
-            </div>
+
 
             {/* Date */}
             <div className="bg-white/5 backdrop-blur-sm border border-blue-500/20 rounded-xl p-4 flex items-center gap-3">

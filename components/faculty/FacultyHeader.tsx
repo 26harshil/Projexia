@@ -134,7 +134,7 @@ export function FacultyHeader({ userName, userEmail, role }: FacultyHeaderProps)
               </div>
               <div>
                 <p className="text-xs text-cyan-400">Current Session</p>
-                <p className="text-sm font-medium text-white">Academic 2024-25</p>
+                <p className="text-sm font-medium text-white">Academic 2025-26</p>
               </div>
             </div>
           </motion.div>

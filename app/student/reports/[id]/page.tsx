@@ -3,12 +3,12 @@ import { getUserRole } from "@/app/actions/getUserRole";
 import { redirect, notFound } from "next/navigation";
 import { ReportDetailView } from "@/components/student/ReportDetailView";
 
-import { Role } from "@/app/generated/prisma/client";  
+import { Role } from "@/app/generated/prisma/client";
 
 interface ReportDetailPageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 export default async function ReportDetailPage({
@@ -20,7 +20,13 @@ export default async function ReportDetailPage({
     redirect("/check-role");
   }
 
-  const reportId = parseInt(params.id);
+  const { id } = await params;
+  const reportId = parseInt(id);
+
+  if (isNaN(reportId)) {
+    notFound();
+  }
+
   const report = await getStudentReportById(reportId);
 
   if (!report) {

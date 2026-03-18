@@ -69,7 +69,7 @@ export function StudentMeetingsContent({ meetings }: StudentMeetingsContentProps
   const allMeetings = [...meetings.upcoming, ...meetings.past];
   const totalMeetings = allMeetings.length;
   const attendedMeetings = allMeetings.filter(m => m.attendance.isPresent === true).length;
-  const attendancePercentage = totalMeetings > 0 
+  const attendancePercentage = totalMeetings > 0
     ? Math.round((attendedMeetings / totalMeetings) * 100)
     : 0;
   const completedMeetings = meetings.past.filter(m => m.status === "Completed").length;
@@ -86,31 +86,35 @@ export function StudentMeetingsContent({ meetings }: StudentMeetingsContentProps
       meetingDateOnly.setHours(0, 0, 0, 0);
 
       if (meetingDateOnly.getTime() === today.getTime()) {
-        return <Badge className="bg-red-100 text-red-700 border-0">Today</Badge>;
+        return <Badge className="bg-red-500/20 border border-red-500/40 text-red-400">🔴 Today</Badge>;
       } else if (meetingDateOnly.getTime() === tomorrow.getTime()) {
-        return <Badge className="bg-orange-100 text-orange-700 border-0">Tomorrow</Badge>;
+        return <Badge className="bg-orange-500/20 border border-orange-500/40 text-orange-400">⏰ Tomorrow</Badge>;
       }
-      return <Badge className="bg-blue-100 text-blue-700 border-0">Scheduled</Badge>;
+      return <Badge className="bg-cyan-500/20 border border-cyan-500/40 text-cyan-400">📅 Scheduled</Badge>;
     }
 
     if (meeting.status === "Completed") {
-      return <Badge className="bg-green-100 text-green-700 border-0">Completed</Badge>;
+      return <Badge className="bg-emerald-500/20 border border-emerald-500/40 text-emerald-400">✓ Completed</Badge>;
     }
-    return <Badge className="bg-amber-100 text-amber-700 border-0">Pending Review</Badge>;
+    return <Badge className="bg-amber-500/20 border border-amber-500/40 text-amber-400">⏳ Pending</Badge>;
   };
 
   const getAttendanceBadge = (meeting: Meeting) => {
     if (meeting.attendance.isPresent === null) {
-      return <Badge className="bg-slate-100 text-slate-700 border-0">Not Marked</Badge>;
+      return <Badge className="bg-slate-500/20 border border-slate-500/40 text-slate-400">— Not Marked</Badge>;
     }
     return meeting.attendance.isPresent
-      ? <Badge className="bg-green-100 text-green-700 border-0">Present</Badge>
-      : <Badge className="bg-red-100 text-red-700 border-0">Absent</Badge>;
+      ? <Badge className="bg-emerald-500/20 border border-emerald-500/40 text-emerald-400">✓ Present</Badge>
+      : <Badge className="bg-red-500/20 border border-red-500/40 text-red-400">✗ Absent</Badge>;
   };
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-slate-50 via-white to-slate-50">
-      <div className="max-w-7xl mx-auto px-4 md:px-6 py-8">
+    <div className="min-h-screen" style={{ background: "linear-gradient(135deg, #050A14 0%, #07111F 50%, #050A14 100%)" }}>
+      {/* Ambient glow orbs */}
+      <div className="fixed top-0 left-1/4 w-96 h-96 rounded-full pointer-events-none" style={{ background: "rgba(0,198,255,0.06)", filter: "blur(80px)" }} />
+      <div className="fixed bottom-0 right-1/4 w-96 h-96 rounded-full pointer-events-none" style={{ background: "rgba(123,95,245,0.06)", filter: "blur(80px)" }} />
+
+      <div className="max-w-7xl mx-auto px-4 md:px-6 py-8 relative z-10">
         {/* Page Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -118,13 +122,13 @@ export function StudentMeetingsContent({ meetings }: StudentMeetingsContentProps
           className="mb-8"
         >
           <div>
-            <h1 className="text-4xl font-bold text-slate-900 mb-2">
+            <h1 className="text-4xl font-bold mb-2" style={{ color: "#E8F4FF" }}>
               My{" "}
-              <span className="bg-linear-to-r from-blue-600 to-indigo-500 bg-clip-text text-transparent">
+              <span style={{ background: "linear-gradient(90deg, #00C6FF, #7B5FF5)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
                 Meetings
               </span>
             </h1>
-            <p className="text-slate-600">Schedule and track your meetings with guides</p>
+            <p style={{ color: "rgba(180,210,255,0.65)" }}>Track and manage all your meetings with faculty guides</p>
           </div>
         </motion.div>
 
@@ -140,80 +144,52 @@ export function StudentMeetingsContent({ meetings }: StudentMeetingsContentProps
               label: "Upcoming",
               count: meetings.upcoming.length,
               icon: Calendar,
-              color: "blue",
+              accent: "#00C6FF",
+              glow: "rgba(0,198,255,0.15)",
             },
             {
               label: "Completed",
               count: completedMeetings,
               icon: CheckCircle2,
-              color: "green",
+              accent: "#34d399",
+              glow: "rgba(52,211,153,0.15)",
             },
             {
               label: "Attendance",
               count: `${attendancePercentage}%`,
               icon: Users,
-              color: "purple",
+              accent: "#7B5FF5",
+              glow: "rgba(123,95,245,0.15)",
             },
             {
               label: "Total",
               count: totalMeetings,
               icon: FileText,
-              color: "slate",
+              accent: "rgba(180,210,255,0.7)",
+              glow: "rgba(180,210,255,0.08)",
             },
           ].map((stat, idx) => (
             <motion.div
               key={stat.label}
               variants={itemVariants}
-              whileHover={{ y: -2 }}
-              className={`bg-white rounded-xl border p-4 shadow-sm hover:shadow-md transition-all ${
-                stat.color === "blue"
-                  ? "border-blue-100 bg-blue-50/30"
-                  : stat.color === "green"
-                  ? "border-green-100 bg-green-50/30"
-                  : stat.color === "purple"
-                  ? "border-purple-100 bg-purple-50/30"
-                  : "border-slate-100"
-              }`}
+              whileHover={{ y: -4, scale: 1.02 }}
+              className="rounded-xl p-6 transition-all"
+              style={{
+                background: "rgba(255,255,255,0.04)",
+                border: "1px solid rgba(0,198,255,0.15)",
+                backdropFilter: "blur(12px)",
+                boxShadow: `0 4px 24px ${stat.glow}`,
+              }}
             >
-              <div className="flex items-center gap-3">
-                <div
-                  className={`p-3 rounded-lg ${
-                    stat.color === "blue"
-                      ? "bg-blue-100"
-                      : stat.color === "green"
-                      ? "bg-green-100"
-                      : stat.color === "purple"
-                      ? "bg-purple-100"
-                      : "bg-slate-100"
-                  }`}
-                >
-                  <stat.icon
-                    className={`h-5 w-5 ${
-                      stat.color === "blue"
-                        ? "text-blue-600"
-                        : stat.color === "green"
-                        ? "text-green-600"
-                        : stat.color === "purple"
-                        ? "text-purple-600"
-                        : "text-slate-600"
-                    }`}
-                  />
-                </div>
+              <div className="flex items-center justify-between mb-4">
                 <div>
-                  <p
-                    className={`text-2xl font-bold ${
-                      stat.color === "blue"
-                        ? "text-blue-900"
-                        : stat.color === "green"
-                        ? "text-green-900"
-                        : stat.color === "purple"
-                        ? "text-purple-900"
-                        : "text-slate-900"
-                    }`}
-                  >
+                  <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: "rgba(180,210,255,0.5)" }}>{stat.label}</p>
+                  <p className="text-3xl font-bold mt-2" style={{ color: stat.accent }}>
                     {stat.count}
                   </p>
-                  <p className="text-xs text-slate-500">{stat.label}</p>
+                </div>
+                <div className="p-3 rounded-lg" style={{ background: stat.glow, border: `1px solid ${stat.accent}30` }}>
+                  <stat.icon className="h-6 w-6" style={{ color: stat.accent }} />
                 </div>
               </div>
             </motion.div>
@@ -227,17 +203,26 @@ export function StudentMeetingsContent({ meetings }: StudentMeetingsContentProps
           transition={{ delay: 0.2 }}
         >
           <Tabs defaultValue="upcoming" className="w-full">
-            <TabsList className="bg-white border border-slate-200 p-1 mb-6 shadow-sm">
+            <TabsList
+              className="p-1.5 mb-6 rounded-lg"
+              style={{
+                background: "rgba(255,255,255,0.04)",
+                border: "1px solid rgba(0,198,255,0.15)",
+                backdropFilter: "blur(12px)",
+              }}
+            >
               <TabsTrigger
                 value="upcoming"
-                className="data-[state=active]:bg-blue-50 data-[state=active]:text-blue-700"
+                className="data-[state=active]:text-white data-[state=active]:shadow-sm transition-all"
+                style={{ color: "rgba(180,210,255,0.6)" }}
               >
                 <Calendar className="h-4 w-4 mr-2" />
                 Upcoming ({meetings.upcoming.length})
               </TabsTrigger>
               <TabsTrigger
                 value="past"
-                className="data-[state=active]:bg-slate-100 data-[state=active]:text-slate-700"
+                className="data-[state=active]:text-white data-[state=active]:shadow-sm transition-all"
+                style={{ color: "rgba(180,210,255,0.6)" }}
               >
                 <CheckCircle2 className="h-4 w-4 mr-2" />
                 Past ({meetings.past.length})
@@ -270,22 +255,28 @@ export function StudentMeetingsContent({ meetings }: StudentMeetingsContentProps
                   ))}
                 </motion.div>
               ) : (
-                <div className="bg-white rounded-xl border border-slate-200 p-12 text-center shadow-sm">
+                <div
+                  className="rounded-xl p-12 text-center"
+                  style={{
+                    background: "rgba(255,255,255,0.04)",
+                    border: "1px solid rgba(0,198,255,0.15)",
+                    backdropFilter: "blur(12px)",
+                  }}
+                >
                   <motion.div
                     animate={{ scale: [1, 1.05, 1] }}
                     transition={{ duration: 2, repeat: Infinity }}
                     className="inline-block mb-4"
                   >
-                    <div className="bg-blue-100 p-6 rounded-full">
-                      <Calendar className="h-12 w-12 text-blue-400 mx-auto" />
+                    <div className="p-6 rounded-full" style={{ background: "rgba(0,198,255,0.1)", border: "1px solid rgba(0,198,255,0.2)" }}>
+                      <Calendar className="h-12 w-12 mx-auto" style={{ color: "#00C6FF" }} />
                     </div>
                   </motion.div>
-                  <h3 className="text-lg font-semibold text-slate-900 mb-2">
+                  <h3 className="text-lg font-semibold mb-2" style={{ color: "#E8F4FF" }}>
                     No Upcoming Meetings
                   </h3>
-                  <p className="text-slate-500 max-w-md mx-auto">
-                    You don't have any scheduled meetings. Your guide will schedule
-                    meetings as needed to discuss your project progress.
+                  <p className="max-w-md mx-auto" style={{ color: "rgba(180,210,255,0.6)" }}>
+                    You don't have any scheduled meetings yet. Your faculty guide will schedule meetings when they're ready to discuss your project progress.
                   </p>
                 </div>
               )}
@@ -317,22 +308,28 @@ export function StudentMeetingsContent({ meetings }: StudentMeetingsContentProps
                   ))}
                 </motion.div>
               ) : (
-                <div className="bg-white rounded-xl border border-slate-200 p-12 text-center shadow-sm">
+                <div
+                  className="rounded-xl p-12 text-center"
+                  style={{
+                    background: "rgba(255,255,255,0.04)",
+                    border: "1px solid rgba(0,198,255,0.15)",
+                    backdropFilter: "blur(12px)",
+                  }}
+                >
                   <motion.div
                     animate={{ scale: [1, 1.05, 1] }}
                     transition={{ duration: 2, repeat: Infinity }}
                     className="inline-block mb-4"
                   >
-                    <div className="bg-slate-100 p-6 rounded-full">
-                      <CheckCircle2 className="h-12 w-12 text-slate-400 mx-auto" />
+                    <div className="p-6 rounded-full" style={{ background: "rgba(180,210,255,0.06)", border: "1px solid rgba(180,210,255,0.15)" }}>
+                      <CheckCircle2 className="h-12 w-12 mx-auto" style={{ color: "rgba(180,210,255,0.5)" }} />
                     </div>
                   </motion.div>
-                  <h3 className="text-lg font-semibold text-slate-900 mb-2">
+                  <h3 className="text-lg font-semibold mb-2" style={{ color: "#E8F4FF" }}>
                     No Past Meetings
                   </h3>
-                  <p className="text-slate-500 max-w-md mx-auto">
-                    You haven't had any meetings yet. Start scheduling meetings with your
-                    guide to get started.
+                  <p className="max-w-md mx-auto" style={{ color: "rgba(180,210,255,0.6)" }}>
+                    You haven't had any meetings yet. Start scheduling meetings with your guide to get started.
                   </p>
                 </div>
               )}
@@ -362,6 +359,7 @@ function MeetingCard({
   getAttendanceBadge: (meeting: Meeting) => React.ReactNode;
 }) {
   const meetingDate = new Date(meeting.datetime);
+  const isToday = type === "upcoming" && format(meetingDate, "yyyy-MM-dd") === format(new Date(), "yyyy-MM-dd");
 
   return (
     <motion.div
@@ -370,34 +368,38 @@ function MeetingCard({
       whileHover={{ y: -2 }}
     >
       <div
-        className={`bg-white rounded-xl border transition-all cursor-pointer shadow-sm hover:shadow-md ${
-          type === "upcoming" && format(meetingDate, "yyyy-MM-dd") === format(new Date(), "yyyy-MM-dd")
-            ? "border-red-200 bg-red-50/40"
-            : "border-slate-200"
-        }`}
+        className="rounded-xl transition-all cursor-pointer"
+        style={{
+          background: isToday ? "rgba(239,68,68,0.06)" : "rgba(255,255,255,0.04)",
+          border: isToday ? "1px solid rgba(239,68,68,0.3)" : "1px solid rgba(0,198,255,0.15)",
+          backdropFilter: "blur(12px)",
+          boxShadow: isToday ? "0 4px 24px rgba(239,68,68,0.1)" : "0 4px 24px rgba(0,198,255,0.05)",
+        }}
         onClick={onToggleExpand}
       >
         {/* Summary */}
-        <div className="p-5">
+        <div className="p-6">
           <div className="flex flex-col md:flex-row md:items-center gap-4">
             {/* Date & Time */}
             <div className="flex items-center gap-4 shrink-0">
               <div
-                className={`p-3 rounded-lg ${
-                  type === "upcoming" ? "bg-blue-100" : "bg-slate-100"
-                }`}
+                className="p-3 rounded-lg"
+                style={{
+                  background: type === "upcoming" ? "rgba(0,198,255,0.1)" : "rgba(180,210,255,0.06)",
+                  border: type === "upcoming" ? "1px solid rgba(0,198,255,0.2)" : "1px solid rgba(180,210,255,0.12)",
+                }}
               >
                 <Calendar
-                  className={`h-5 w-5 ${
-                    type === "upcoming" ? "text-blue-600" : "text-slate-600"
-                  }`}
+                  className="h-5 w-5"
+                  style={{ color: type === "upcoming" ? "#00C6FF" : "rgba(180,210,255,0.6)" }}
                 />
               </div>
               <div>
-                <p className="font-bold text-slate-900">
-                  {format(meetingDate, "d MMM")}
+                <p className="font-bold" style={{ color: "#E8F4FF" }}>
+                  {format(meetingDate, "d MMM yyyy")}
                 </p>
-                <p className="text-sm text-slate-500">
+                <p className="text-sm flex items-center gap-1" style={{ color: "rgba(180,210,255,0.5)" }}>
+                  <Clock className="h-3 w-3" />
                   {format(meetingDate, "HH:mm")}
                 </p>
               </div>
@@ -405,29 +407,29 @@ function MeetingCard({
 
             {/* Meeting Info */}
             <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 mb-1 flex-wrap">
-                <h3 className="font-bold text-slate-900 truncate">
+              <div className="flex items-center gap-3 mb-2 flex-wrap">
+                <h3 className="font-bold truncate text-base" style={{ color: "#E8F4FF" }}>
                   {meeting.purpose}
                 </h3>
                 {getStatusBadge(meeting, type)}
               </div>
 
-              <div className="flex flex-wrap items-center gap-3 text-sm text-slate-600">
+              <div className="flex flex-wrap items-center gap-3 text-sm" style={{ color: "rgba(180,210,255,0.6)" }}>
                 {meeting.guide && (
-                  <span className="flex items-center gap-1">
-                    <User className="h-3 w-3" />
+                  <span className="flex items-center gap-1.5 px-2 py-1 rounded" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(180,210,255,0.1)" }}>
+                    <User className="h-3.5 w-3.5" />
                     {meeting.guide}
                   </span>
                 )}
                 {meeting.projectTitle && (
-                  <span className="flex items-center gap-1">
-                    <Zap className="h-3 w-3" />
+                  <span className="flex items-center gap-1.5 px-2 py-1 rounded" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(180,210,255,0.1)" }}>
+                    <Zap className="h-3.5 w-3.5" />
                     {meeting.projectTitle}
                   </span>
                 )}
                 {meeting.location && (
-                  <span className="flex items-center gap-1">
-                    <MapPin className="h-3 w-3" />
+                  <span className="flex items-center gap-1.5 px-2 py-1 rounded" style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(180,210,255,0.1)" }}>
+                    <MapPin className="h-3.5 w-3.5" />
                     {meeting.location}
                   </span>
                 )}
@@ -435,13 +437,13 @@ function MeetingCard({
             </div>
 
             {/* Attendance & Expand */}
-            <div className="flex items-center gap-2 shrink-0">
+            <div className="flex items-center gap-3 shrink-0">
               {type === "past" && getAttendanceBadge(meeting)}
               <motion.div
                 animate={{ rotate: isExpanded ? 90 : 0 }}
-                transition={{ duration: 0.2 }}
+                transition={{ duration: 0.3 }}
               >
-                <ChevronRight className="h-5 w-5 text-slate-400" />
+                <ChevronRight className="h-5 w-5" style={{ color: "rgba(180,210,255,0.4)" }} />
               </motion.div>
             </div>
           </div>
@@ -454,35 +456,36 @@ function MeetingCard({
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: "auto", opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              className="overflow-hidden border-t border-slate-100"
+              transition={{ duration: 0.3 }}
+              className="overflow-hidden"
+              style={{ borderTop: "1px solid rgba(0,198,255,0.1)" }}
             >
-              <div className="p-5 space-y-4 bg-linear-to-b from-white via-slate-50/50 to-white">
+              <div className="p-6 space-y-5" style={{ background: "rgba(0,198,255,0.02)" }}>
                 {/* Attendance Information */}
                 {type === "past" && (
-                  <div className="grid grid-cols-2 gap-4 p-4 bg-blue-50 rounded-lg">
-                    <div>
-                      <p className="text-xs text-slate-600 font-medium">Attendance Status</p>
-                      <div className="mt-1">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="p-4 rounded-lg" style={{ background: "rgba(0,198,255,0.06)", border: "1px solid rgba(0,198,255,0.2)" }}>
+                      <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: "rgba(180,210,255,0.5)" }}>Attendance</p>
+                      <div className="mt-3">
                         {meeting.attendance.isPresent === null ? (
-                          <p className="text-sm text-slate-700 font-semibold">Not Marked</p>
+                          <p className="text-sm font-semibold" style={{ color: "rgba(180,210,255,0.7)" }}>Not Marked Yet</p>
                         ) : meeting.attendance.isPresent ? (
                           <div className="flex items-center gap-2">
-                            <CheckCircle2 className="h-4 w-4 text-green-600" />
-                            <p className="text-sm text-green-700 font-semibold">Present</p>
+                            <CheckCircle2 className="h-5 w-5" style={{ color: "#34d399" }} />
+                            <p className="text-sm font-semibold" style={{ color: "#34d399" }}>Present</p>
                           </div>
                         ) : (
                           <div className="flex items-center gap-2">
-                            <AlertCircle className="h-4 w-4 text-red-600" />
-                            <p className="text-sm text-red-700 font-semibold">Absent</p>
+                            <AlertCircle className="h-5 w-5 text-red-400" />
+                            <p className="text-sm font-semibold text-red-400">Absent</p>
                           </div>
                         )}
                       </div>
                     </div>
                     {meeting.attendance.remarks && (
-                      <div>
-                        <p className="text-xs text-slate-600 font-medium">Remarks</p>
-                        <p className="text-sm text-slate-700 mt-1 line-clamp-2">
+                      <div className="p-4 rounded-lg" style={{ background: "rgba(251,191,36,0.06)", border: "1px solid rgba(251,191,36,0.2)" }}>
+                        <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: "rgba(180,210,255,0.5)" }}>Remarks</p>
+                        <p className="text-sm mt-3 line-clamp-3" style={{ color: "rgba(180,210,255,0.8)" }}>
                           {meeting.attendance.remarks}
                         </p>
                       </div>
@@ -493,11 +496,11 @@ function MeetingCard({
                 {/* Meeting Notes */}
                 {meeting.notes && (
                   <div>
-                    <h4 className="font-semibold text-slate-900 mb-2 flex items-center gap-2">
-                      <FileText className="h-4 w-4 text-slate-600" />
+                    <h4 className="font-semibold mb-3 flex items-center gap-2 text-sm" style={{ color: "#E8F4FF" }}>
+                      <FileText className="h-4 w-4" style={{ color: "#00C6FF" }} />
                       Meeting Notes
                     </h4>
-                    <p className="text-sm text-slate-700 bg-slate-50 p-3 rounded-lg">
+                    <p className="text-sm p-4 rounded-lg" style={{ color: "rgba(180,210,255,0.8)", background: "rgba(0,198,255,0.06)", border: "1px solid rgba(0,198,255,0.15)" }}>
                       {meeting.notes}
                     </p>
                   </div>
@@ -506,17 +509,17 @@ function MeetingCard({
                 {/* Grade (for completed meetings) */}
                 {type === "past" && meeting.grade && (
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="p-3 bg-purple-50 rounded-lg">
-                      <p className="text-xs text-slate-600 font-medium">Meeting Grade</p>
-                      <p className="text-xl font-bold text-purple-700 mt-1">
+                    <div className="p-4 rounded-lg" style={{ background: "rgba(123,95,245,0.1)", border: "1px solid rgba(123,95,245,0.25)" }}>
+                      <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: "rgba(180,210,255,0.5)" }}>Meeting Grade</p>
+                      <p className="text-2xl font-bold mt-2" style={{ color: "#7B5FF5" }}>
                         {meeting.grade}
                       </p>
                     </div>
                     {meeting.status === "Completed" && (
-                      <div className="p-3 bg-green-50 rounded-lg">
-                        <p className="text-xs text-slate-600 font-medium">Status</p>
-                        <p className="text-sm font-semibold text-green-700 mt-1">
-                          Completed & Reviewed
+                      <div className="p-4 rounded-lg" style={{ background: "rgba(52,211,153,0.08)", border: "1px solid rgba(52,211,153,0.2)" }}>
+                        <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: "rgba(180,210,255,0.5)" }}>Status</p>
+                        <p className="text-sm font-semibold mt-2" style={{ color: "#34d399" }}>
+                          ✓ Completed
                         </p>
                       </div>
                     )}
@@ -526,30 +529,30 @@ function MeetingCard({
                 {/* Additional Description */}
                 {meeting.description && (
                   <div>
-                    <h4 className="font-semibold text-slate-900 mb-2">Additional Info</h4>
-                    <p className="text-sm text-slate-700 bg-slate-50 p-3 rounded-lg">
+                    <h4 className="font-semibold mb-3 text-sm" style={{ color: "#E8F4FF" }}>Additional Information</h4>
+                    <p className="text-sm p-4 rounded-lg" style={{ color: "rgba(180,210,255,0.8)", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(180,210,255,0.1)" }}>
                       {meeting.description}
                     </p>
                   </div>
                 )}
 
                 {/* Meeting Details Summary */}
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-3 pt-3 border-t border-slate-100">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4 pt-4" style={{ borderTop: "1px solid rgba(0,198,255,0.1)" }}>
                   <div>
-                    <p className="text-xs text-slate-600 font-medium">Group</p>
-                    <p className="text-sm text-slate-900 font-semibold mt-1">
+                    <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: "rgba(180,210,255,0.45)" }}>Group</p>
+                    <p className="text-sm font-semibold mt-2" style={{ color: "#E8F4FF" }}>
                       {meeting.groupName}
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs text-slate-600 font-medium">Guide</p>
-                    <p className="text-sm text-slate-900 font-semibold mt-1">
+                    <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: "rgba(180,210,255,0.45)" }}>Guide</p>
+                    <p className="text-sm font-semibold mt-2" style={{ color: "#E8F4FF" }}>
                       {meeting.guide || "N/A"}
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs text-slate-600 font-medium">Time</p>
-                    <p className="text-sm text-slate-900 font-semibold mt-1">
+                    <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: "rgba(180,210,255,0.45)" }}>Time</p>
+                    <p className="text-sm font-semibold mt-2" style={{ color: "#E8F4FF" }}>
                       {format(meetingDate, "HH:mm")}
                     </p>
                   </div>

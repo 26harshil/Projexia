@@ -129,36 +129,7 @@ export default function FacultyNavbar() {
 
         {/* Right Section */}
         <div className="flex items-center gap-2">
-          {/* Search Button - Desktop */}
-          <motion.div
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="hidden md:flex"
-          >
-            <Button
-              variant="ghost"
-              size="icon"
-              className="text-slate-400 hover:text-white hover:bg-blue-500/10"
-            >
-              <Search className="h-5 w-5" />
-            </Button>
-          </motion.div>
 
-          {/* Notifications */}
-          <motion.div
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="relative"
-          >
-            <Button
-              variant="ghost"
-              size="icon"
-              className="text-slate-400 hover:text-white hover:bg-blue-500/10"
-            >
-              <Bell className="h-5 w-5" />
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-cyan-400 rounded-full shadow-sm shadow-cyan-400/50 animate-pulse" />
-            </Button>
-          </motion.div>
 
           {/* Divider */}
           <div className="hidden md:block w-px h-8 bg-blue-500/20 mx-2" />

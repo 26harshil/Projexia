@@ -31,7 +31,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useState, useTransition } from "react";
+import { useState, useMemo, useTransition, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -124,16 +124,41 @@ export function FacultyGroupsContent({ groups, students, projectTypes, staffList
     const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
     const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
     const [showCreateModal, setShowCreateModal] = useState(false);
+    const [debouncedQuery, setDebouncedQuery] = useState(searchQuery);
 
-    const filteredGroups = groups.filter(
-        (group) =>
-            group.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            group.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            group.area?.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setDebouncedQuery(searchQuery);
+        }, 300);
 
-    const activeGroups = filteredGroups.filter((g) => g.status !== "Completed");
-    const completedGroups = filteredGroups.filter((g) => g.status === "Completed");
+        return () => clearTimeout(timer);
+    }, [searchQuery]);
+    const filteredGroups = useMemo(() => {
+        const query = searchQuery.trim().toLowerCase();
+
+        if (!query) return groups;
+
+        return groups.filter((group) => {
+            const membersStr = (group.members || [])
+                .map((m) => m.name || "")
+                .join(" ")
+                .toLowerCase();
+
+            return (
+                (group.name || "").toLowerCase().includes(query) ||
+                (group.title || "").toLowerCase().includes(query) ||
+                (group.area || "").toLowerCase().includes(query) ||
+                (group.description || "").toLowerCase().includes(query) ||
+                (group.projectType || "").toLowerCase().includes(query) ||
+                membersStr.includes(query)
+            );
+        });
+    }, [groups, searchQuery]);
+
+
+    // ✅ THEN split
+    const activeGroups = filteredGroups.filter(g => g.status === "ACTIVE");
+    const completedGroups = filteredGroups.filter(g => g.status === "COMPLETED");
 
     return (
         <div className="min-h-screen bg-[#050A14]">
@@ -170,19 +195,29 @@ export function FacultyGroupsContent({ groups, students, projectTypes, staffList
                 >
                     <div className="flex flex-col sm:flex-row gap-4">
                         <div className="relative flex-1">
+                            {/* Search Icon */}
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+
+                            {/* Input */}
                             <Input
-                                placeholder="Search groups..."
+                                placeholder="Search by name, title, area, members, or type..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="pl-10 bg-white/5 border-blue-500/20 focus:bg-white/10"
+                                className="pl-10 pr-10 bg-white/5 border-blue-500/20 text-white placeholder:text-slate-400 focus:bg-white/10"
                             />
+
+                            {/* Clear Button */}
+                            {searchQuery && (
+                                <button
+                                    onClick={() => setSearchQuery("")}
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white transition-colors"
+                                >
+                                    <X className="h-4 w-4" />
+                                </button>
+                            )}
                         </div>
                         <div className="flex gap-2">
-                            <Button variant="outline" className="border-blue-500/20">
-                                <Filter className="h-4 w-4 mr-2" />
-                                Filter
-                            </Button>
+
                             <div className="flex border border-blue-500/20 rounded-lg p-1">
                                 <Button
                                     variant="ghost"
@@ -236,6 +271,7 @@ export function FacultyGroupsContent({ groups, students, projectTypes, staffList
                         <TabsContent value="all">
                             {filteredGroups.length > 0 ? (
                                 <motion.div
+                                    key={searchQuery}
                                     variants={containerVariants}
                                     initial="hidden"
                                     animate="show"
@@ -366,23 +402,23 @@ function GroupCard({
     if (viewMode === "list") {
         return (
             <motion.div variants={itemVariants}>
-                <div className="bg-white/5 backdrop-blur-md rounded-xl border border-blue-500/20 p-4 hover:shadow-md transition-all">
+                <div className="bg-[#0A1020]/60 backdrop-blur-md rounded-xl border border-blue-500/20 p-4 hover:shadow-lg hover:shadow-blue-500/10 hover:border-blue-500/40 hover:bg-white/10 transition-all">
                     <div className="flex items-center gap-4">
-                        <div className="p-3 bg-amber-500/15 rounded-xl shrink-0">
+                        <div className="p-3 bg-amber-500/15 border border-amber-500/20 rounded-xl shrink-0">
                             <Users className="h-6 w-6 text-amber-400" />
                         </div>
                         <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 mb-1">
-                                <h3 className="font-semibold text-white truncate">
-                                    {group.title || group.name}
+                                <h3 className="font-semibold text-white truncate group-hover:text-cyan-400 transition-colors">
+                                    {group.name} {group.title ? `- ${group.title}` : ""}
                                 </h3>
                                 {group.projectType && (
-                                    <Badge className="bg-blue-500/15 text-cyan-400 text-xs">
+                                    <Badge className="bg-blue-500/15 text-cyan-400 border border-blue-500/30 text-xs">
                                         {group.projectType}
                                     </Badge>
                                 )}
                             </div>
-                            <div className="flex items-center gap-4 text-sm text-slate-500">
+                            <div className="flex items-center gap-4 text-sm text-slate-400">
                                 <span className="flex items-center gap-1">
                                     <Users className="h-3 w-3" />
                                     {group.memberCount} members
@@ -398,7 +434,7 @@ function GroupCard({
                         <Button
                             variant="ghost"
                             size="sm"
-                            className="text-cyan-400"
+                            className="bg-transparent text-cyan-400 hover:text-cyan-300 hover:bg-blue-500/10 border border-blue-500/30"
                             onClick={onViewDetails}
                         >
                             View <ChevronRight className="h-4 w-4 ml-1" />
@@ -410,15 +446,16 @@ function GroupCard({
     }
 
     return (
-        <motion.div variants={itemVariants}>
-            <div className="bg-white/5 backdrop-blur-md rounded-2xl border border-blue-500/20 p-6 hover:shadow-lg transition-all h-full flex flex-col">
+        <motion.div variants={itemVariants} className="h-full">
+            <div className="bg-[#0A1020]/60 backdrop-blur-md rounded-2xl border border-blue-500/20 p-6 hover:shadow-lg hover:shadow-blue-500/10 hover:border-blue-500/40 hover:bg-white/10 transition-all h-full flex flex-col group/card">
                 {/* Header */}
                 <div className="flex items-start justify-between mb-4">
-                    <div className="p-3 bg-amber-500/15 rounded-xl">
-                        <FolderKanban className="h-5 w-5 text-amber-400" />
+                    <div className="p-3 bg-blue-500/10 border border-blue-500/20 rounded-xl group-hover/card:bg-blue-500/20 transition-colors">
+                        <FolderKanban className="h-5 w-5 text-cyan-400" />
                     </div>
+
                     {group.projectType && (
-                        <Badge className="bg-blue-500/15 text-cyan-400 text-xs">
+                        <Badge className="bg-blue-500/15 text-cyan-400 border border-blue-500/30 text-xs">
                             {group.projectType}
                         </Badge>
                     )}
@@ -426,17 +463,17 @@ function GroupCard({
 
                 {/* Content */}
                 <div className="flex-1">
-                    <h3 className="font-semibold text-white mb-1 line-clamp-1">
-                        {group.title || group.name}
+                    <h3 className="font-semibold text-white mb-1 line-clamp-1 group-hover/card:text-cyan-400 transition-colors title-font">
+                        {group.name} {group.title ? `- ${group.title}` : ""}
                     </h3>
                     {group.area && (
-                        <p className="text-sm text-slate-500 flex items-center gap-1 mb-2">
-                            <MapPin className="h-3 w-3" />
+                        <p className="text-sm text-slate-400 flex items-center gap-1 mb-2">
+                            <MapPin className="h-3 w-3 text-slate-500" />
                             {group.area}
                         </p>
                     )}
                     {group.description && (
-                        <p className="text-sm text-slate-300 line-clamp-2 mb-4">
+                        <p className="text-sm text-slate-400/80 line-clamp-2 mb-4">
                             {group.description}
                         </p>
                     )}
@@ -447,7 +484,7 @@ function GroupCard({
                             {group.members.slice(0, 3).map((member, index) => (
                                 <div
                                     key={member.id || index}
-                                    className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-full border-2 border-white flex items-center justify-center"
+                                    className="w-8 h-8 bg-gradient-to-br from-emerald-600 to-teal-500 rounded-full border-2 border-[#0A1020] flex items-center justify-center shadow-sm"
                                 >
                                     <span className="text-white text-xs font-medium">
                                         {member.name?.charAt(0) || "?"}
@@ -455,21 +492,21 @@ function GroupCard({
                                 </div>
                             ))}
                             {group.memberCount > 3 && (
-                                <div className="w-8 h-8 bg-slate-200 rounded-full border-2 border-white flex items-center justify-center">
-                                    <span className="text-slate-300 text-xs font-medium">
+                                <div className="w-8 h-8 bg-gradient-to-br from-slate-700 to-slate-600 rounded-full border-2 border-[#0A1020] flex items-center justify-center shadow-sm">
+                                    <span className="text-white text-xs font-medium">
                                         +{group.memberCount - 3}
                                     </span>
                                 </div>
                             )}
                         </div>
-                        <span className="text-sm text-slate-500">{group.memberCount} members</span>
+                        <span className="text-sm text-slate-400">{group.memberCount} members</span>
                     </div>
 
                     {/* Leader */}
                     {leader && (
-                        <div className="flex items-center gap-2 p-2 bg-amber-500/10 rounded-lg mb-4">
+                        <div className="flex items-center gap-2 p-2 bg-amber-500/10 border border-amber-500/20 rounded-lg mb-4">
                             <Crown className="h-4 w-4 text-amber-400" />
-                            <span className="text-sm text-amber-400 font-medium">
+                            <span className="text-sm text-amber-400 font-medium truncate">
                                 Leader: {leader.name}
                             </span>
                         </div>
@@ -477,11 +514,11 @@ function GroupCard({
 
                     {/* Next Meeting */}
                     {group.nextMeeting && (
-                        <div className="flex items-center gap-2 p-2 bg-blue-500/10 rounded-lg">
-                            <Calendar className="h-4 w-4 text-blue-400" />
+                        <div className="flex items-center gap-2 p-2 bg-blue-500/10 border border-blue-500/20 rounded-lg mt-auto">
+                            <Calendar className="h-4 w-4 text-cyan-400" />
                             <div className="text-sm">
-                                <span className="text-blue-700 font-medium">Next Meeting: </span>
-                                <span className="text-blue-400">
+                                <span className="text-cyan-400 font-medium">Next Meeting: </span>
+                                <span className="text-slate-300">
                                     {new Date(group.nextMeeting.meetingdatetime).toLocaleDateString("en-IN", {
                                         day: "numeric",
                                         month: "short",
@@ -495,10 +532,10 @@ function GroupCard({
                 </div>
 
                 {/* Footer */}
-                <div className="mt-4 pt-4 border-t border-blue-500/15">
+                <div className="mt-4 pt-4 border-t border-blue-500/20">
                     <Button
                         variant="outline"
-                        className="w-full border-cyan-500/25 text-cyan-400 hover:bg-blue-500/10"
+                        className="w-full bg-blue-600 hover:bg-emerald-600 text-white border-blue-500/30 hover:border-emerald-500 transition-colors"
                         onClick={onViewDetails}
                     >
                         View Details
@@ -631,40 +668,44 @@ function GroupDetailsModal({
                 onClick={(e) => e.stopPropagation()}
             >
                 {/* Header */}
-                <div className="p-6 border-b border-blue-500/15 bg-gradient-to-r from-emerald-50 to-amber-50">
-                    <div className="flex items-start justify-between">
+                <div className="p-6 border-b border-blue-500/20 bg-gradient-to-r from-[#0A1020] to-[#050A14] relative overflow-hidden">
+                    {/* Subtle glow effect behind header */}
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/5 rounded-full blur-[80px]" />
+                    <div className="absolute top-0 left-0 w-64 h-64 bg-blue-500/5 rounded-full blur-[80px]" />
+
+                    <div className="flex items-start justify-between relative z-10">
                         <div className="flex items-center gap-4">
-                            <div className="p-3 bg-white/5 backdrop-blur-md rounded-xl shadow-sm">
-                                <FolderKanban className="h-6 w-6 text-cyan-400" />
+                            <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl shadow-sm">
+                                <FolderKanban className="h-6 w-6 text-emerald-400" />
                             </div>
                             <div>
                                 {isEditing ? (
                                     <Input
                                         value={editData.groupName}
                                         onChange={(e) => setEditData({ ...editData, groupName: e.target.value })}
-                                        className="font-bold text-lg"
+                                        className="font-bold text-lg bg-white/5 border-blue-500/30 text-white focus-visible:ring-cyan-500/50"
                                     />
                                 ) : (
-                                    <h2 className="text-xl font-bold text-white">
-                                        {group.title || group.name}
+                                    <h2 className="text-xl font-bold text-white title-font tracking-tight">
+                                        {group.name} {group.title ? `- ${group.title}` : ""}
                                     </h2>
                                 )}
                                 <div className="flex items-center gap-2 mt-1">
                                     {group.projectType && (
-                                        <Badge className="bg-blue-500/15 text-cyan-400">
+                                        <Badge className="bg-blue-500/15 text-cyan-400 border border-blue-500/30">
                                             {group.projectType}
                                         </Badge>
                                     )}
                                     {group.area && !isEditing && (
-                                        <span className="text-sm text-slate-500 flex items-center gap-1">
-                                            <MapPin className="h-3 w-3" />
+                                        <span className="text-sm text-slate-400 flex items-center gap-1">
+                                            <MapPin className="h-4 w-4 text-slate-500" />
                                             {group.area}
                                         </span>
                                     )}
                                 </div>
                             </div>
                         </div>
-                        <Button variant="ghost" size="icon" onClick={onClose}>
+                        <Button variant="ghost" size="icon" onClick={onClose} className="text-slate-400 hover:text-white hover:bg-white/10 transition-colors">
                             <X className="h-5 w-5" />
                         </Button>
                     </div>
@@ -674,30 +715,33 @@ function GroupDetailsModal({
                 <div className="p-6 overflow-y-auto max-h-[calc(90vh-200px)]">
                     {/* Edit Mode Fields */}
                     {isEditing && (
-                        <div className="space-y-4 mb-6 p-4 bg-blue-500/10 rounded-xl">
+                        <div className="space-y-4 mb-6 p-4 bg-white/5 border border-blue-500/20 rounded-xl">
                             <div className="space-y-2">
-                                <Label>Project Title</Label>
+                                <Label className="text-slate-400 font-semibold">Project Title</Label>
                                 <Input
                                     value={editData.projectTitle}
                                     onChange={(e) => setEditData({ ...editData, projectTitle: e.target.value })}
                                     placeholder="Enter project title"
+                                    className="bg-[#0A1020]/50 border-blue-500/30 text-white placeholder:text-slate-500"
                                 />
                             </div>
                             <div className="space-y-2">
-                                <Label>Project Area</Label>
+                                <Label className="text-slate-400 font-semibold">Project Area</Label>
                                 <Input
                                     value={editData.projectArea}
                                     onChange={(e) => setEditData({ ...editData, projectArea: e.target.value })}
                                     placeholder="e.g., Web Development, ML"
+                                    className="bg-[#0A1020]/50 border-blue-500/30 text-white placeholder:text-slate-500"
                                 />
                             </div>
                             <div className="space-y-2">
-                                <Label>Description</Label>
+                                <Label className="text-slate-400 font-semibold">Description</Label>
                                 <Textarea
                                     value={editData.projectDescription}
                                     onChange={(e) => setEditData({ ...editData, projectDescription: e.target.value })}
                                     rows={3}
                                     placeholder="Project description..."
+                                    className="bg-[#0A1020]/50 border-blue-500/30 text-white placeholder:text-slate-500"
                                 />
                             </div>
                         </div>
@@ -798,8 +842,8 @@ function GroupDetailsModal({
                                         </SelectContent>
                                     </Select>
                                 </div>
-                                <Button 
-                                    className="bg-blue-600 hover:bg-emerald-700 text-white" 
+                                <Button
+                                    className="bg-blue-600 hover:bg-emerald-700 text-white"
                                     onClick={handleAddMember}
                                     disabled={!newStudentId || isPending}
                                 >
@@ -941,10 +985,10 @@ function GroupDetailsModal({
                             PDF
                         </Button>
                         {isEditing && (
-                            <Button 
-                                variant="destructive" 
+                            <Button
+                                variant="destructive"
                                 className="bg-red-500/10 text-red-600 hover:bg-red-500/15 border-red-200"
-                                onClick={handleDeleteGroup} 
+                                onClick={handleDeleteGroup}
                                 disabled={isPending}
                             >
                                 <Trash2 className="h-4 w-4 mr-2" />
@@ -952,10 +996,10 @@ function GroupDetailsModal({
                             </Button>
                         )}
                         {!isEditing && group.status !== "Completed" && (
-                            <Button 
-                                variant="outline" 
+                            <Button
+                                variant="outline"
                                 className="bg-blue-500/10 text-cyan-400 hover:bg-blue-500/15 border-cyan-500/25"
-                                onClick={handleCompleteGroup} 
+                                onClick={handleCompleteGroup}
                                 disabled={isPending}
                             >
                                 <Check className="h-4 w-4 mr-2" />
@@ -1053,9 +1097,13 @@ function CreateGroupModal({
     }[]>([]);
 
     const filteredStudents = students.filter(
-        (s) =>
-            s.name.toLowerCase().includes(searchStudent.toLowerCase()) ||
-            s.email?.toLowerCase().includes(searchStudent.toLowerCase())
+        (s) => {
+            const query = searchStudent.toLowerCase();
+            return (
+                (s.name || "").toLowerCase().includes(query) ||
+                (s.email || "").toLowerCase().includes(query)
+            );
+        }
     );
 
     const toggleMember = (student: Student) => {
