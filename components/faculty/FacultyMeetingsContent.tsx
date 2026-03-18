@@ -106,10 +106,12 @@ export function FacultyMeetingsContent({ meetings, groups }: FacultyMeetingsCont
 
     const filterMeetings = (meetingList: Meeting[]) =>
         meetingList.filter(
-            (meeting) =>
-                meeting.purpose?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                meeting.groupName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                meeting.projectTitle?.toLowerCase().includes(searchQuery.toLowerCase())
+            (meeting) => {
+                const query = searchQuery.toLowerCase();
+                return (meeting.purpose || "").toLowerCase().includes(query) ||
+                       (meeting.groupName || "").toLowerCase().includes(query) ||
+                       (meeting.projectTitle || "").toLowerCase().includes(query);
+            }
         );
 
     const filteredUpcoming = filterMeetings(meetings.upcoming);
@@ -238,10 +240,7 @@ export function FacultyMeetingsContent({ meetings, groups }: FacultyMeetingsCont
                                 className="pl-10 bg-white/5 border-blue-500/20 focus:bg-white/10"
                             />
                         </div>
-                        <Button variant="outline" className="border-blue-500/20">
-                            <Filter className="h-4 w-4 mr-2" />
-                            Filter
-                        </Button>
+
                     </div>
                 </motion.div>
 
@@ -581,7 +580,7 @@ function ScheduleMeetingModal({
                                             selected={date}
                                             onSelect={setDate}
                                             initialFocus
-                                            disabled={(date) => date < new Date(new Date().setHours(0,0,0,0))}
+                                            disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
                                             className="border-none rounded-xl"
                                         />
                                     </PopoverContent>
@@ -699,7 +698,7 @@ function MeetingDetailsModal({
     const isPast = meetingDate < new Date();
     const needsReview = isPast && meeting.status !== "Completed";
     const isCompleted = meeting.status === "Completed";
-    
+
     // Edit state
     const [isEditing, setIsEditing] = useState(false);
     const [isEditingReview, setIsEditingReview] = useState(false);
@@ -737,13 +736,13 @@ function MeetingDetailsModal({
         if (!confirm("Are you sure you want to delete this meeting?")) return;
         setIsDeleting(true);
         startTransition(async () => {
-             const result = await deleteMeeting(meeting.id);
-             setIsDeleting(false);
-             if (result.success) {
-                 onClose();
-             } else {
-                 alert(result.error);
-             }
+            const result = await deleteMeeting(meeting.id);
+            setIsDeleting(false);
+            if (result.success) {
+                onClose();
+            } else {
+                alert(result.error);
+            }
         });
     };
 
@@ -861,8 +860,8 @@ function MeetingDetailsModal({
             >
                 {/* Header */}
                 <div className={`p-6 border-b border-blue-500/15 ${needsReview
-                        ? "bg-gradient-to-r from-amber-50 to-orange-50"
-                        : "bg-gradient-to-r from-blue-500/10 to-cyan-500/10"
+                    ? "bg-gradient-to-r from-amber-50 to-orange-50"
+                    : "bg-gradient-to-r from-blue-500/10 to-cyan-500/10"
                     }`}>
                     <div className="flex items-start justify-between">
                         <div className="flex items-center gap-4">
@@ -952,7 +951,7 @@ function MeetingDetailsModal({
                                 <Label>Location</Label>
                                 <Input value={editLocation} onChange={e => setEditLocation(e.target.value)} />
                             </div>
-                             <div className="flex items-center gap-3 p-3 bg-blue-500/10 rounded-lg">
+                            <div className="flex items-center gap-3 p-3 bg-blue-500/10 rounded-lg">
                                 <Checkbox
                                     id="edit-notification"
                                     checked={sendNotification}
@@ -1048,8 +1047,8 @@ function MeetingDetailsModal({
                                 <div
                                     key={attendee.studentId || index}
                                     className={`p-3 rounded-lg ${isCompleted
-                                            ? attendee.present ? "bg-blue-500/10" : "bg-red-500/10"
-                                            : attendance[attendee.studentId!]?.present ? "bg-blue-500/10/70" : "bg-white/5"
+                                        ? attendee.present ? "bg-blue-500/10" : "bg-red-500/10"
+                                        : attendance[attendee.studentId!]?.present ? "bg-blue-500/10/70" : "bg-white/5"
                                         }`}
                                 >
                                     <div className="flex items-center justify-between">
@@ -1143,46 +1142,46 @@ function MeetingDetailsModal({
                         <div>
                             <Label htmlFor="notes" className="flex items-center gap-2 mb-2">
                                 <FileText className="h-4 w-4" />
-                            Meeting Notes
-                        </Label>
-                        {(needsReview || isEditingReview) ? (
-                            <Textarea
-                                id="notes"
-                                placeholder="Add your meeting notes here..."
-                                rows={4}
-                                value={notes}
-                                onChange={(e) => setNotes(e.target.value)}
-                                className="resize-none"
-                            />
-                        ) : (
-                            <div className="p-4 bg-white/5 rounded-lg text-slate-200 whitespace-pre-wrap border border-blue-500/15">
-                                {meeting.notes || "No notes available"}
-                            </div>
-                        )}
-                    </div>
-                    <div>
-                        <Label htmlFor="grade" className="flex items-center gap-2 mb-2 border-slate-700">
-                            <Star className="h-4 w-4 text-amber-400" />
-                            Grade / Score
-                        </Label>
-                        {(needsReview || isEditingReview) ? (
-                            <Select value={grade} onValueChange={setGrade}>
-                                <SelectTrigger id="grade" className="h-10">
-                                    <SelectValue placeholder="Select Grade" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="A">Grade A</SelectItem>
-                                    <SelectItem value="B">Grade B</SelectItem>
-                                    <SelectItem value="C">Grade C</SelectItem>
-                                    <SelectItem value="D">Grade D</SelectItem>
-                                </SelectContent>
-                            </Select>
-                        ) : (
-                            <div className="p-4 bg-blue-500/10 rounded-lg border border-blue-500/20 flex items-center justify-center font-bold text-cyan-400">
-                                {meeting.grade || "No Grade"}
-                            </div>
-                        )}
-                        {(needsReview || isEditingReview) && (
+                                Meeting Notes
+                            </Label>
+                            {(needsReview || isEditingReview) ? (
+                                <Textarea
+                                    id="notes"
+                                    placeholder="Add your meeting notes here..."
+                                    rows={4}
+                                    value={notes}
+                                    onChange={(e) => setNotes(e.target.value)}
+                                    className="resize-none"
+                                />
+                            ) : (
+                                <div className="p-4 bg-white/5 rounded-lg text-slate-200 whitespace-pre-wrap border border-blue-500/15">
+                                    {meeting.notes || "No notes available"}
+                                </div>
+                            )}
+                        </div>
+                        <div>
+                            <Label htmlFor="grade" className="flex items-center gap-2 mb-2 border-slate-700">
+                                <Star className="h-4 w-4 text-amber-400" />
+                                Grade / Score
+                            </Label>
+                            {(needsReview || isEditingReview) ? (
+                                <Select value={grade} onValueChange={setGrade}>
+                                    <SelectTrigger id="grade" className="h-10">
+                                        <SelectValue placeholder="Select Grade" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="A">Grade A</SelectItem>
+                                        <SelectItem value="B">Grade B</SelectItem>
+                                        <SelectItem value="C">Grade C</SelectItem>
+                                        <SelectItem value="D">Grade D</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            ) : (
+                                <div className="p-4 bg-blue-500/10 rounded-lg border border-blue-500/20 flex items-center justify-center font-bold text-cyan-400">
+                                    {meeting.grade || "No Grade"}
+                                </div>
+                            )}
+                            {(needsReview || isEditingReview) && (
                                 <p className="text-xs text-slate-500 mt-2">
                                     Track continuous progress at this review step.
                                 </p>

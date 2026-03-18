@@ -6,16 +6,10 @@ import Link from "next/link";
 import {
   Users,
   BookOpen,
-  Shield,
   Activity,
   ArrowRight,
-  CheckCircle2,
   Clock,
-  AlertTriangle,
   Server,
-  Database,
-  Lock,
-  MoreHorizontal,
   TrendingUp,
   FolderKanban,
   GraduationCap,
@@ -68,11 +62,7 @@ const itemVariants = {
 };
 
 export function AdminDashboardContent({ firstName, stats, projectStats, studentStats }: AdminDashboardContentProps) {
-  const systemStatuses = [
-    { name: "All systems operational", status: "success", icon: CheckCircle2 },
-    { name: "Database connected", status: "success", icon: Database },
-    { name: "Auth service active", status: "success", icon: Lock },
-  ];
+
 
   return (
     <motion.div
@@ -219,21 +209,31 @@ export function AdminDashboardContent({ firstName, stats, projectStats, studentS
             </div>
 
             {/* Group participation rate */}
-            <div className="mt-4 p-4 bg-violet-50 rounded-xl">
+            <div className="mt-4 p-4 bg-blue-500/10 backdrop-blur-md rounded-xl border border-blue-500/20">
+
+              {/* Header */}
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-medium text-violet-700">Group Participation</span>
-                <span className="text-xs font-bold text-violet-600">
+                <span className="text-xs font-medium text-cyan-400">
+                  Group Participation
+                </span>
+
+                <span className="text-xs font-bold text-cyan-300">
                   {studentStats.totalStudents > 0
                     ? Math.round((studentStats.studentsInGroups / studentStats.totalStudents) * 100)
                     : 0}%
                 </span>
               </div>
+
+              {/* Progress */}
               <Progress
-                value={studentStats.totalStudents > 0
-                  ? (studentStats.studentsInGroups / studentStats.totalStudents) * 100
-                  : 0}
-                className="h-2 bg-violet-100"
+                value={
+                  studentStats.totalStudents > 0
+                    ? (studentStats.studentsInGroups / studentStats.totalStudents) * 100
+                    : 0
+                }
+                className="h-2 bg-white/10 [&>div]:bg-gradient-to-r [&>div]:from-cyan-400 [&>div]:to-blue-500"
               />
+
             </div>
 
             <Link href="/admin/students">
@@ -246,70 +246,63 @@ export function AdminDashboardContent({ firstName, stats, projectStats, studentS
         </div>
       </motion.div>
 
-      {/* System Overview Card */}
+      {/* Quick Stats Card - DYNAMIC */}
       <motion.div variants={itemVariants}>
         <div className="bg-white/5 backdrop-blur-md rounded-2xl border border-blue-500/20 overflow-hidden h-full">
-          <div className="flex items-center justify-between p-6 border-b border-blue-500/15">
+          <div className="p-6 border-b border-blue-500/15">
             <div className="flex items-center gap-3">
-              <div className="p-2.5 bg-blue-500/15 rounded-xl">
-                <Server className="h-5 w-5 text-cyan-400" />
+              <div className="p-2.5 bg-white/5 rounded-xl">
+                <TrendingUp className="h-5 w-5 text-slate-300" />
               </div>
               <div>
-                <h3 className="font-semibold text-white">System Overview</h3>
-                <p className="text-sm text-slate-500">Monitor activity</p>
+                <h3 className="font-semibold text-white">Quick Stats</h3>
+                <p className="text-sm text-slate-500">System overview</p>
               </div>
             </div>
-            <Badge className="bg-blue-500/15 text-cyan-400 border-cyan-500/25">
-              <span className="w-1.5 h-1.5 bg-blue-500 rounded-full mr-1.5 animate-pulse" />
-              Online
-            </Badge>
           </div>
 
-          <div className="p-6">
-            <div className="space-y-3">
-              {systemStatuses.map((status, index) => (
-                <motion.div
-                  key={status.name}
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.3 + index * 0.1 }}
-                  className={cn(
-                    "flex items-center gap-3 p-3 rounded-xl",
-                    status.status === "success" ? "bg-blue-500/10" : "bg-amber-500/10"
-                  )}
-                >
-                  <status.icon className={cn(
-                    "h-4 w-4",
-                    status.status === "success" ? "text-cyan-400" : "text-amber-400"
-                  )} />
-                  <span className={cn(
-                    "text-sm font-medium",
-                    status.status === "success" ? "text-cyan-400" : "text-amber-400"
+          <div className="p-6 space-y-4">
+            {[
+              { label: "Total Users", value: String(stats.totalUsers), icon: Users, color: "emerald" },
+              { label: "Active Users", value: String(stats.activeCount), icon: Activity, color: "blue" },
+              { label: "Total Projects", value: String(projectStats.totalProjects), icon: FolderKanban, color: "amber" },
+              { label: "Total Meetings", value: String(projectStats.totalMeetings), icon: Clock, color: "emerald" },
+            ].map((stat, index) => (
+              <motion.div
+                key={stat.label}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.4 + index * 0.1 }}
+                className="flex items-center justify-between p-3 bg-white/5 rounded-xl"
+              >
+                <div className="flex items-center gap-3">
+                  <div className={cn(
+                    "p-2 rounded-lg",
+                    stat.color === "emerald" && "bg-blue-500/15",
+                    stat.color === "blue" && "bg-blue-500/15",
+                    stat.color === "amber" && "bg-amber-500/15",
                   )}>
-                    {status.name}
-                  </span>
-                </motion.div>
-              ))}
-            </div>
+                    <stat.icon className={cn(
+                      "h-4 w-4",
+                      stat.color === "emerald" && "text-cyan-400",
+                      stat.color === "blue" && "text-blue-400",
+                      stat.color === "amber" && "text-amber-400",
+                    )} />
+                  </div>
+                  <span className="text-sm text-slate-300">{stat.label}</span>
+                </div>
+                <span className="font-bold text-white">{stat.value}</span>
+              </motion.div>
+            ))}
 
-            {/* System Health */}
-            <div className="mt-4 p-4 bg-gradient-to-r from-blue-500/10 to-blue-500/10 rounded-xl border border-blue-500/20">
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-sm font-medium text-cyan-400">System Health</span>
-                <span className="text-lg font-bold text-cyan-400">100%</span>
-              </div>
-              <div className="flex gap-1">
-                {Array.from({ length: 10 }).map((_, i) => (
-                  <motion.div
-                    key={i}
-                    initial={{ scaleY: 0 }}
-                    animate={{ scaleY: 1 }}
-                    transition={{ delay: 0.5 + i * 0.05 }}
-                    className="flex-1 h-8 bg-blue-500 rounded origin-bottom"
-                  />
-                ))}
-              </div>
-            </div>
+            {/* Reports shortcut */}
+            <Link href="/admin/reports">
+              <Button variant="outline" className="w-full border-blue-500/20 hover:bg-white/5 mt-2">
+                <FileText className="h-4 w-4 mr-2" />
+                View Reports
+                <ArrowRight className="h-4 w-4 ml-auto" />
+              </Button>
+            </Link>
           </div>
         </div>
       </motion.div>
@@ -382,65 +375,7 @@ export function AdminDashboardContent({ firstName, stats, projectStats, studentS
       </motion.div>
 
       {/* Quick Stats Card - DYNAMIC */}
-      <motion.div variants={itemVariants}>
-        <div className="bg-white/5 backdrop-blur-md rounded-2xl border border-blue-500/20 overflow-hidden h-full">
-          <div className="p-6 border-b border-blue-500/15">
-            <div className="flex items-center gap-3">
-              <div className="p-2.5 bg-white/5 rounded-xl">
-                <TrendingUp className="h-5 w-5 text-slate-300" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-white">Quick Stats</h3>
-                <p className="text-sm text-slate-500">System overview</p>
-              </div>
-            </div>
-          </div>
 
-          <div className="p-6 space-y-4">
-            {[
-              { label: "Total Users", value: String(stats.totalUsers), icon: Users, color: "emerald" },
-              { label: "Active Users", value: String(stats.activeCount), icon: Activity, color: "blue" },
-              { label: "Total Projects", value: String(projectStats.totalProjects), icon: FolderKanban, color: "amber" },
-              { label: "Total Meetings", value: String(projectStats.totalMeetings), icon: Clock, color: "emerald" },
-            ].map((stat, index) => (
-              <motion.div
-                key={stat.label}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.4 + index * 0.1 }}
-                className="flex items-center justify-between p-3 bg-white/5 rounded-xl"
-              >
-                <div className="flex items-center gap-3">
-                  <div className={cn(
-                    "p-2 rounded-lg",
-                    stat.color === "emerald" && "bg-blue-500/15",
-                    stat.color === "blue" && "bg-blue-500/15",
-                    stat.color === "amber" && "bg-amber-500/15",
-                  )}>
-                    <stat.icon className={cn(
-                      "h-4 w-4",
-                      stat.color === "emerald" && "text-cyan-400",
-                      stat.color === "blue" && "text-blue-400",
-                      stat.color === "amber" && "text-amber-400",
-                    )} />
-                  </div>
-                  <span className="text-sm text-slate-300">{stat.label}</span>
-                </div>
-                <span className="font-bold text-white">{stat.value}</span>
-              </motion.div>
-            ))}
-
-            {/* Reports shortcut */}
-            <Link href="/admin/reports">
-              <Button variant="outline" className="w-full border-blue-500/20 hover:bg-white/5 mt-2">
-                <FileText className="h-4 w-4 mr-2" />
-                View Reports
-                <ArrowRight className="h-4 w-4 ml-auto" />
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </motion.div>
     </motion.div>
   );
 }

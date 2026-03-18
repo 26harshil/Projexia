@@ -328,9 +328,9 @@ export function FacultyDashboardContent({
                               : isTomorrow
                                 ? "Tomorrow"
                                 : meetingDate.toLocaleDateString("en-IN", {
-                                    day: "numeric",
-                                    month: "short",
-                                  })}
+                                  day: "numeric",
+                                  month: "short",
+                                })}
                           </p>
                           <p className="text-sm font-bold text-white">
                             {meetingDate.toLocaleTimeString("en-IN", {
@@ -596,10 +596,10 @@ export function FacultyDashboardContent({
                     const attendancePercent =
                       activity.totalAttendees > 0
                         ? Math.round(
-                            (activity.presentCount /
-                              activity.totalAttendees) *
-                              100
-                          )
+                          (activity.presentCount /
+                            activity.totalAttendees) *
+                          100
+                        )
                         : 0;
                     return (
                       <motion.div
@@ -757,7 +757,7 @@ export function FacultyDashboardContent({
               </div>
 
               {/* Attendance Rate */}
-              <div className="mt-4 p-4 bg-gradient-to-r from-emerald-50 to-amber-50 rounded-xl border border-blue-500/20">
+              <div className="mt-4 p-4 bg-blue-500/10 rounded-xl border border-blue-500/20">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-sm font-medium text-slate-200">
                     Attendance Rate
@@ -775,12 +775,12 @@ export function FacultyDashboardContent({
               </div>
 
               {/* Meeting Completion Rate */}
-              <div className="mt-3 p-4 bg-gradient-to-r from-blue-50 to-violet-50 rounded-xl border border-blue-500/20">
+              <div className="mt-4 p-4 bg-blue-500/10 rounded-xl border border-blue-500/20">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-sm font-medium text-slate-200">
                     Meeting Completion
                   </span>
-                  <span className="text-sm font-bold text-blue-400">
+                  <span className="text-sm font-bold text-cyan-400">
                     {stats?.meetingCompletionRate !== undefined
                       ? `${stats.meetingCompletionRate}%`
                       : "N/A"}

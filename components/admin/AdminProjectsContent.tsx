@@ -2,6 +2,8 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 import { motion, AnimatePresence } from "framer-motion";
 import {
     FolderKanban,
@@ -74,6 +76,238 @@ export function AdminProjectsContent({ initialProjects, initialStats }: AdminPro
     const [searchQuery, setSearchQuery] = useState("");
     const [expandedProjectId, setExpandedProjectId] = useState<number | null>(null);
 
+    // ── PDF Export ───────────────────────────────────────────────────────────
+    function downloadProjectsPDF(projectList: ProjectGroup[]) {
+        const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+        const pageW = doc.internal.pageSize.getWidth();
+        const pageH = doc.internal.pageSize.getHeight();
+        const now = new Date().toLocaleDateString("en-IN", {
+            day: "2-digit", month: "long", year: "numeric",
+        });
+
+        /* ── helpers ── */
+        const addPageBg = () => {
+            doc.setFillColor(5, 10, 20);
+            doc.rect(0, 0, pageW, pageH, "F");
+        };
+
+        const sectionTitle = (text: string, y: number) => {
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(11);
+            doc.setTextColor(0, 198, 255);
+            doc.text(text, 14, y);
+            doc.setDrawColor(0, 198, 255, 0.4);
+            doc.setLineWidth(0.3);
+            doc.line(14, y + 1.5, pageW - 14, y + 1.5);
+        };
+
+        /* ── Cover section ── */
+        addPageBg();
+
+        // Gradient header bar
+        doc.setFillColor(0, 120, 200);
+        doc.rect(0, 0, pageW, 42, "F");
+        doc.setFillColor(0, 80, 160);
+        doc.rect(0, 0, pageW / 2, 42, "F");
+
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(22);
+        doc.setTextColor(255, 255, 255);
+        doc.text("Project Groups Report", 14, 20);
+
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(10);
+        doc.setTextColor(180, 220, 255);
+        doc.text("SPMS — Admin Portal", 14, 29);
+        doc.text(`Generated: ${now}`, 14, 35.5);
+
+        // Stats summary row
+        const statBoxes = [
+            { label: "Projects", val: String(stats.totalProjects) },
+            { label: "Types", val: String(stats.totalProjectTypes) },
+            { label: "Members", val: String(stats.totalMembers) },
+            { label: "Meetings", val: String(stats.totalMeetings) },
+        ];
+        const boxW = (pageW - 28) / 4;
+        statBoxes.forEach((b, i) => {
+            const x = 14 + i * (boxW + 2);
+            doc.setFillColor(10, 25, 55);
+            doc.roundedRect(x, 48, boxW, 16, 2, 2, "F");
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(14);
+            doc.setTextColor(0, 198, 255);
+            doc.text(b.val, x + boxW / 2, 57, { align: "center" });
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(7);
+            doc.setTextColor(140, 170, 200);
+            doc.text(b.label, x + boxW / 2, 61.5, { align: "center" });
+        });
+
+        let curY = 74;
+
+        /* ── Summary table ── */
+        sectionTitle(`All Projects (${projectList.length})`, curY);
+        curY += 4;
+
+        autoTable(doc, {
+            startY: curY,
+            head: [["#", "Group Name", "Project Title", "Type", "Guide", "Members"]],
+            body: projectList.map((p, idx) => [
+                idx + 1,
+                p.projectgroupname,
+                p.projecttitle || "—",
+                p.projecttype.projecttypename,
+                p.guidestaffname || "—",
+                p.projectgroupmember.length,
+            ]),
+            styles: {
+                font: "helvetica",
+                fontSize: 8,
+                textColor: [220, 235, 255],
+                fillColor: [10, 20, 40],
+                lineColor: [0, 80, 140],
+                lineWidth: 0.2,
+                cellPadding: 2.5,
+            },
+            headStyles: {
+                fillColor: [0, 80, 160],
+                textColor: [0, 198, 255],
+                fontStyle: "bold",
+                fontSize: 8.5,
+            },
+            alternateRowStyles: { fillColor: [8, 18, 38] },
+            columnStyles: {
+                0: { halign: "center", cellWidth: 8 },
+                5: { halign: "center", cellWidth: 16 },
+            },
+            margin: { left: 14, right: 14 },
+            tableLineColor: [0, 80, 140],
+            tableLineWidth: 0.2,
+        });
+
+        /* ── Detailed section per project ── */
+        projectList.forEach((p, idx) => {
+            doc.addPage();
+            addPageBg();
+
+            // Project header strip
+            doc.setFillColor(0, 60, 130);
+            doc.rect(0, 0, pageW, 18, "F");
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(13);
+            doc.setTextColor(255, 255, 255);
+            doc.text(`${idx + 1}. ${p.projectgroupname}`, 14, 11);
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(8);
+            doc.setTextColor(180, 210, 255);
+            doc.text(p.projecttype.projecttypename, pageW - 14, 11, { align: "right" });
+
+            let y = 24;
+
+            // Info block
+            sectionTitle("Project Info", y);
+            y += 5;
+
+            autoTable(doc, {
+                startY: y,
+                body: [
+                    ["Project ID", p.projectgroupid, "Project Title", p.projecttitle || "—"],
+                    ["Project Area", p.projectarea || "—", "Avg CPI", p.averagecpi ? Number(p.averagecpi).toFixed(2) : "—"],
+                    ["Guide", p.guidestaffname || "—", "Created", new Date(p.created).toLocaleDateString("en-IN")],
+                    ["Convener", p.staff_projectgroup_convenerstaffidTostaff?.staffname || "—", "Expert", p.staff_projectgroup_expertstaffidTostaff?.staffname || "—"],
+                ],
+                styles: {
+                    font: "helvetica",
+                    fontSize: 8,
+                    textColor: [220, 235, 255],
+                    fillColor: [10, 20, 40],
+                    lineColor: [0, 80, 140],
+                    lineWidth: 0.2,
+                    cellPadding: 2.5,
+                },
+                columnStyles: {
+                    0: { fontStyle: "bold", textColor: [0, 198, 255], cellWidth: 28 },
+                    1: { cellWidth: 50 },
+                    2: { fontStyle: "bold", textColor: [0, 198, 255], cellWidth: 28 },
+                    3: { cellWidth: 50 },
+                },
+                margin: { left: 14, right: 14 },
+                tableLineColor: [0, 80, 140],
+                tableLineWidth: 0.2,
+            });
+
+            y = (doc as any).lastAutoTable.finalY + 6;
+
+            // Description
+            const desc = p.projectdescription || p.description;
+            if (desc) {
+                sectionTitle("Description", y);
+                y += 5;
+                doc.setFont("helvetica", "normal");
+                doc.setFontSize(8);
+                doc.setTextColor(180, 210, 245);
+                const lines = doc.splitTextToSize(desc, pageW - 28);
+                doc.text(lines, 14, y);
+                y += lines.length * 4.5 + 4;
+            }
+
+            // Members
+            if (p.projectgroupmember.length > 0) {
+                sectionTitle(`Group Members (${p.projectgroupmember.length})`, y);
+                y += 4;
+
+                autoTable(doc, {
+                    startY: y,
+                    head: [["#", "Student Name", "Email", "Role"]],
+                    body: p.projectgroupmember.map((m, mi) => [
+                        mi + 1,
+                        m.student.studentname,
+                        m.student.email || "—",
+                        m.isgroupleader ? "Group Leader" : "Member",
+                    ]),
+                    styles: {
+                        font: "helvetica",
+                        fontSize: 8,
+                        textColor: [220, 235, 255],
+                        fillColor: [10, 20, 40],
+                        lineColor: [0, 80, 140],
+                        lineWidth: 0.2,
+                        cellPadding: 2.5,
+                    },
+                    headStyles: {
+                        fillColor: [0, 80, 160],
+                        textColor: [0, 198, 255],
+                        fontStyle: "bold",
+                    },
+                    alternateRowStyles: { fillColor: [8, 18, 38] },
+                    columnStyles: {
+                        0: { halign: "center", cellWidth: 8 },
+                        3: { halign: "center", cellWidth: 24 },
+                    },
+                    margin: { left: 14, right: 14 },
+                    bodyStyles: {
+                        didParseCell: (data: any) => {
+                            if (data.column.index === 3 && data.cell.raw === "Group Leader") {
+                                data.cell.styles.textColor = [251, 191, 36];
+                                data.cell.styles.fontStyle = "bold";
+                            }
+                        },
+                    } as any,
+                    tableLineColor: [0, 80, 140],
+                    tableLineWidth: 0.2,
+                });
+            }
+
+            // Page footer
+            const pgNum = doc.getNumberOfPages();
+            doc.setFontSize(7);
+            doc.setTextColor(80, 110, 150);
+            doc.text(`Page ${pgNum} • SPMS Project Report • ${now}`, pageW / 2, pageH - 6, { align: "center" });
+        });
+
+        doc.save(`SPMS_Projects_${new Date().toISOString().slice(0, 10)}.pdf`);
+    }
+
     const filteredProjects = useMemo(() => {
         if (!searchQuery) return projects;
         const query = searchQuery.toLowerCase();
@@ -112,9 +346,13 @@ export function AdminProjectsContent({ initialProjects, initialStats }: AdminPro
                         </p>
                     </div>
                     <div className="flex gap-2">
-                        <Button variant="outline" className="border-blue-500/20">
+                        <Button
+                            variant="outline"
+                            className="border-blue-500/20 text-cyan-400 hover:bg-blue-500/10 hover:text-white hover:border-cyan-400/50 transition-all"
+                            onClick={() => downloadProjectsPDF(filteredProjects)}
+                        >
                             <Download className="h-4 w-4 mr-2" />
-                            Export
+                            Export PDF
                         </Button>
                     </div>
                 </motion.div>

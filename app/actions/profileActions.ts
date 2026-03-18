@@ -178,3 +178,39 @@ export async function updateFacultyPhone(phone: string) {
 
     return updated;
 }
+
+/**
+ * Update admin phone number.
+ * Admins may have a linked staff record; if so, phone is stored there.
+ * If no staff record is linked, a new one is created and linked to the user.
+ */
+export async function updateAdminPhone(phone: string) {
+    const { userId } = await auth();
+    if (!userId) throw new Error("Not authenticated");
+
+    const dbUser = await prisma.users.findUnique({
+        where: { clerkid: userId },
+        include: { staff: true },
+    });
+
+    if (!dbUser) throw new Error("User not found");
+
+    if (dbUser.staff) {
+        // Update existing staff record
+        return await prisma.staff.update({
+            where: { staffid: dbUser.staff.staffid },
+            data: { phone },
+        });
+    } else {
+        // Create a staff record and link it to the user
+        const newStaff = await prisma.staff.create({
+            data: {
+                staffname: dbUser.name || dbUser.email,
+                email: dbUser.email,
+                phone,
+                userid: dbUser.userid,
+            },
+        });
+        return newStaff;
+    }
+}

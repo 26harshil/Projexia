@@ -124,43 +124,10 @@ export default function AdminNavbar() {
 
         {/* Right Section */}
         <div className="flex items-center gap-2">
-          {/* Search Button */}
-          <motion.div
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            className="hidden md:flex"
-          >
-            <Button
-              variant="outline"
-              size="sm"
-              className="text-slate-400 border-blue-500/20 bg-white/5 hover:bg-blue-500/10 hover:text-white hover:border-blue-400/40 gap-2 backdrop-blur-sm"
-            >
-              <Search className="h-4 w-4" />
-              <span className="text-xs">Search...</span>
-              <kbd className="pointer-events-none hidden sm:inline-flex h-5 select-none items-center gap-1 rounded border border-blue-500/20 bg-white/5 px-1.5 font-mono text-[10px] font-medium text-slate-400">
-                <Command className="h-3 w-3" />K
-              </kbd>
-            </Button>
-          </motion.div>
 
-          {/* Notifications */}
-          <motion.div
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="relative"
-          >
-            <Button
-              variant="ghost"
-              size="icon"
-              className="text-slate-400 hover:text-white hover:bg-blue-500/10 relative"
-            >
-              <Bell className="h-5 w-5" />
-              <span className="absolute top-1 right-1 flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
-              </span>
-            </Button>
-          </motion.div>
+
+
+
 
           {/* Divider */}
           <div className="hidden md:block w-px h-8 bg-blue-500/20 mx-2" />
