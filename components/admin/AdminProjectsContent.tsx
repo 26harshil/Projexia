@@ -1,7 +1,7 @@
 // /components/admin/AdminProjectsContent.tsx
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useTransition } from "react";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { motion, AnimatePresence } from "framer-motion";
@@ -24,7 +24,10 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
+import { updateProjectGroupByAdmin } from "@/app/actions/adminActions";
 
 type ProjectGroup = {
     projectgroupid: number;
@@ -34,6 +37,10 @@ type ProjectGroup = {
     projecttitle: string | null;
     projectarea: string | null;
     projectdescription: string | null;
+    projectdeadline: Date | null;
+    projectprogress: number;
+    projectmarks: any;
+    projectfeedback: string | null;
     averagecpi: any;
     convenerstaffid: number | null;
     expertstaffid: number | null;
@@ -75,6 +82,14 @@ export function AdminProjectsContent({ initialProjects, initialStats }: AdminPro
     const [stats] = useState<Stats>(initialStats);
     const [searchQuery, setSearchQuery] = useState("");
     const [expandedProjectId, setExpandedProjectId] = useState<number | null>(null);
+    const [editingProjectId, setEditingProjectId] = useState<number | null>(null);
+    const [isPending, startTransition] = useTransition();
+    const [editForm, setEditForm] = useState({
+        projectDeadline: "",
+        projectProgress: "0",
+        projectMarks: "",
+        projectFeedback: "",
+    });
 
     // ── PDF Export ───────────────────────────────────────────────────────────
     function downloadProjectsPDF(projectList: ProjectGroup[]) {
@@ -578,6 +593,31 @@ export function AdminProjectsContent({ initialProjects, initialStats }: AdminPro
                                                             </div>
                                                         </div>
 
+                                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-3">
+                                                            <div className="bg-white/5 rounded-lg p-3">
+                                                                <p className="text-[10px] font-medium text-slate-400 uppercase mb-1">Deadline</p>
+                                                                <p className="text-sm text-slate-200">
+                                                                    {project.projectdeadline
+                                                                        ? new Date(project.projectdeadline).toLocaleDateString("en-US", {
+                                                                            year: "numeric", month: "short", day: "numeric"
+                                                                        })
+                                                                        : "Not set"}
+                                                                </p>
+                                                            </div>
+                                                            <div className="bg-white/5 rounded-lg p-3">
+                                                                <p className="text-[10px] font-medium text-slate-400 uppercase mb-1">Progress</p>
+                                                                <p className="text-sm text-slate-200">{project.projectprogress ?? 0}%</p>
+                                                            </div>
+                                                            <div className="bg-white/5 rounded-lg p-3">
+                                                                <p className="text-[10px] font-medium text-slate-400 uppercase mb-1">Marks</p>
+                                                                <p className="text-sm text-slate-200">
+                                                                    {project.projectmarks !== null && project.projectmarks !== undefined
+                                                                        ? Number(project.projectmarks).toFixed(2)
+                                                                        : "Pending"}
+                                                                </p>
+                                                            </div>
+                                                        </div>
+
                                                         {/* Staff info */}
                                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
                                                             {project.staff_projectgroup_convenerstaffidTostaff && (
@@ -634,6 +674,106 @@ export function AdminProjectsContent({ initialProjects, initialStats }: AdminPro
                                                                 <p className="text-sm text-slate-200">
                                                                     {project.projectdescription || project.description}
                                                                 </p>
+                                                            </div>
+                                                        )}
+
+                                                        <div className="mt-3 bg-white/5 rounded-lg p-3">
+                                                            <div className="flex items-center justify-between gap-3 mb-3">
+                                                                <p className="text-[10px] font-medium text-slate-400 uppercase">Feedback</p>
+                                                                <Button
+                                                                    variant="outline"
+                                                                    size="sm"
+                                                                    className="border-blue-500/20 text-cyan-400 hover:bg-blue-500/10"
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        setEditingProjectId(project.projectgroupid);
+                                                                        setEditForm({
+                                                                            projectDeadline: project.projectdeadline
+                                                                                ? new Date(project.projectdeadline).toISOString().slice(0, 10)
+                                                                                : "",
+                                                                            projectProgress: String(project.projectprogress ?? 0),
+                                                                            projectMarks:
+                                                                                project.projectmarks !== null && project.projectmarks !== undefined
+                                                                                    ? String(project.projectmarks)
+                                                                                    : "",
+                                                                            projectFeedback: project.projectfeedback || "",
+                                                                        });
+                                                                    }}
+                                                                >
+                                                                    Edit
+                                                                </Button>
+                                                            </div>
+                                                            <p className="text-sm text-slate-200">
+                                                                {project.projectfeedback || "No feedback added yet."}
+                                                            </p>
+                                                        </div>
+
+                                                        {editingProjectId === project.projectgroupid && (
+                                                            <div className="mt-3 rounded-lg border border-blue-500/20 bg-[#08111f] p-4 space-y-4">
+                                                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                                                    <div className="space-y-2">
+                                                                        <Label>Deadline</Label>
+                                                                        <Input
+                                                                            type="date"
+                                                                            value={editForm.projectDeadline}
+                                                                            onChange={(e) => setEditForm((prev) => ({ ...prev, projectDeadline: e.target.value }))}
+                                                                        />
+                                                                    </div>
+                                                                    <div className="space-y-2">
+                                                                        <Label>Progress (%)</Label>
+                                                                        <Input
+                                                                            type="number"
+                                                                            min="0"
+                                                                            max="100"
+                                                                            value={editForm.projectProgress}
+                                                                            onChange={(e) => setEditForm((prev) => ({ ...prev, projectProgress: e.target.value }))}
+                                                                        />
+                                                                    </div>
+                                                                    <div className="space-y-2">
+                                                                        <Label>Marks</Label>
+                                                                        <Input
+                                                                            type="number"
+                                                                            min="0"
+                                                                            step="0.01"
+                                                                            value={editForm.projectMarks}
+                                                                            onChange={(e) => setEditForm((prev) => ({ ...prev, projectMarks: e.target.value }))}
+                                                                        />
+                                                                    </div>
+                                                                </div>
+                                                                <div className="space-y-2">
+                                                                    <Label>Feedback</Label>
+                                                                    <Textarea
+                                                                        rows={4}
+                                                                        value={editForm.projectFeedback}
+                                                                        onChange={(e) => setEditForm((prev) => ({ ...prev, projectFeedback: e.target.value }))}
+                                                                    />
+                                                                </div>
+                                                                <div className="flex justify-end gap-2">
+                                                                    <Button
+                                                                        variant="outline"
+                                                                        onClick={() => setEditingProjectId(null)}
+                                                                    >
+                                                                        Cancel
+                                                                    </Button>
+                                                                    <Button
+                                                                        className="bg-blue-600 hover:bg-blue-700 text-white"
+                                                                        disabled={isPending}
+                                                                        onClick={() => {
+                                                                            startTransition(async () => {
+                                                                                await updateProjectGroupByAdmin({
+                                                                                    groupId: project.projectgroupid,
+                                                                                    projectDeadline: editForm.projectDeadline ? new Date(editForm.projectDeadline) : null,
+                                                                                    projectProgress: Number(editForm.projectProgress || 0),
+                                                                                    projectMarks: editForm.projectMarks ? Number(editForm.projectMarks) : null,
+                                                                                    projectFeedback: editForm.projectFeedback || null,
+                                                                                });
+                                                                                window.location.reload();
+                                                                            });
+                                                                        }}
+                                                                    >
+                                                                        Save
+                                                                    </Button>
+                                                                </div>
                                                             </div>
                                                         )}
                                                     </div>

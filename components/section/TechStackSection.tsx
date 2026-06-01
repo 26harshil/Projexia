@@ -13,7 +13,6 @@ const techStack = [
   { name: "Framer Motion", category: "Animation" },
   { name: "PostgreSQL", category: "Database" },
   { name: "Prisma", category: "ORM" },
-  { name: ".NET API", category: "Backend" },
 ];
 
 const categoryColors = {
@@ -72,11 +71,10 @@ export function TechStackSection() {
                   >
                     <div className="flex flex-col items-center space-y-2">
                       <span
-                        className={`text-sm font-semibold px-4 py-2 rounded-lg border backdrop-blur-sm ${
-                          categoryColors[
-                            tech.category as keyof typeof categoryColors
+                        className={`text-sm font-semibold px-4 py-2 rounded-lg border backdrop-blur-sm ${categoryColors[
+                          tech.category as keyof typeof categoryColors
                           ]
-                        }`}
+                          }`}
                       >
                         {tech.name}
                       </span>

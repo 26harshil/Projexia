@@ -15,6 +15,10 @@ model projectgroup {
   projecttitle                              String?              @db.VarChar(200)
   projectarea                               String?              @db.VarChar(150)
   projectdescription                        String?
+  projectdeadline                           DateTime?            @default(dbgenerated("(CURRENT_TIMESTAMP + '3 mons'::interval)")) @db.Timestamp(6)
+  projectprogress                           Int                  @default(0)
+  projectmarks                              Decimal?             @db.Decimal(5, 2)
+  projectfeedback                           String?
   averagecpi                                Decimal?             @db.Decimal(4, 2)
   convenerstaffid                           Int?
   expertstaffid                             Int?

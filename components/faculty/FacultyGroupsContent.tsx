@@ -61,6 +61,10 @@ interface Group {
     title: string | null;
     area: string | null;
     description: string | null;
+    deadline: Date | null;
+    progress: number;
+    marks: number | null;
+    feedback: string | null;
     projectType: string | null;
     status: string;
     averageCpi: number | null;
@@ -571,6 +575,12 @@ function GroupDetailsModal({
         projectTitle: group.title || "",
         projectArea: group.area || "",
         projectDescription: group.description || "",
+        projectDeadline: group.deadline
+            ? new Date(group.deadline).toISOString().slice(0, 10)
+            : "",
+        projectProgress: String(group.progress ?? 0),
+        projectMarks: group.marks?.toString() || "",
+        projectFeedback: group.feedback || "",
     });
 
     const leader = group.members.find((m) => m.isLeader);
@@ -590,6 +600,14 @@ function GroupDetailsModal({
                 projectTitle: editData.projectTitle || undefined,
                 projectArea: editData.projectArea || undefined,
                 projectDescription: editData.projectDescription || undefined,
+                projectDeadline: editData.projectDeadline
+                    ? new Date(editData.projectDeadline)
+                    : null,
+                projectProgress: Number(editData.projectProgress || 0),
+                projectMarks: editData.projectMarks
+                    ? Number(editData.projectMarks)
+                    : null,
+                projectFeedback: editData.projectFeedback || null,
             });
 
             if (result.success) {
@@ -744,6 +762,52 @@ function GroupDetailsModal({
                                     className="bg-[#0A1020]/50 border-blue-500/30 text-white placeholder:text-slate-500"
                                 />
                             </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                    <Label className="text-slate-400 font-semibold">Deadline</Label>
+                                    <Input
+                                        type="date"
+                                        value={editData.projectDeadline}
+                                        onChange={(e) => setEditData({ ...editData, projectDeadline: e.target.value })}
+                                        className="bg-[#0A1020]/50 border-blue-500/30 text-white"
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label className="text-slate-400 font-semibold">Progress (%)</Label>
+                                    <Input
+                                        type="number"
+                                        min="0"
+                                        max="100"
+                                        value={editData.projectProgress}
+                                        onChange={(e) => setEditData({ ...editData, projectProgress: e.target.value })}
+                                        className="bg-[#0A1020]/50 border-blue-500/30 text-white"
+                                    />
+                                </div>
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                    <Label className="text-slate-400 font-semibold">Marks</Label>
+                                    <Input
+                                        type="number"
+                                        min="0"
+                                        step="0.01"
+                                        value={editData.projectMarks}
+                                        onChange={(e) => setEditData({ ...editData, projectMarks: e.target.value })}
+                                        placeholder="Enter marks"
+                                        className="bg-[#0A1020]/50 border-blue-500/30 text-white placeholder:text-slate-500"
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label className="text-slate-400 font-semibold">Faculty Feedback</Label>
+                                    <Textarea
+                                        value={editData.projectFeedback}
+                                        onChange={(e) => setEditData({ ...editData, projectFeedback: e.target.value })}
+                                        rows={3}
+                                        placeholder="Share project feedback for students"
+                                        className="bg-[#0A1020]/50 border-blue-500/30 text-white placeholder:text-slate-500"
+                                    />
+                                </div>
+                            </div>
                         </div>
                     )}
 
@@ -768,6 +832,30 @@ function GroupDetailsModal({
                             </div>
                         )}
                     </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                        <div className="p-4 bg-white/5 rounded-xl">
+                            <p className="text-xs text-slate-400 uppercase tracking-wide font-medium mb-1">Deadline</p>
+                            <p className="font-semibold text-white">
+                                {group.deadline ? new Date(group.deadline).toLocaleDateString() : "Not set"}
+                            </p>
+                        </div>
+                        <div className="p-4 bg-white/5 rounded-xl">
+                            <p className="text-xs text-slate-400 uppercase tracking-wide font-medium mb-1">Progress</p>
+                            <p className="font-semibold text-white">{group.progress}%</p>
+                        </div>
+                        <div className="p-4 bg-white/5 rounded-xl">
+                            <p className="text-xs text-slate-400 uppercase tracking-wide font-medium mb-1">Marks</p>
+                            <p className="font-semibold text-white">{group.marks ?? "Pending"}</p>
+                        </div>
+                    </div>
+
+                    {!isEditing && group.feedback && (
+                        <div className="mb-6">
+                            <h3 className="text-sm font-medium text-slate-200 mb-2">Faculty Feedback</h3>
+                            <p className="text-slate-300 bg-white/5 p-4 rounded-lg">{group.feedback}</p>
+                        </div>
+                    )}
 
                     {/* Faculty Info */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
@@ -1088,6 +1176,10 @@ function CreateGroupModal({
     const [projectTitle, setProjectTitle] = useState("");
     const [projectArea, setProjectArea] = useState("");
     const [projectDescription, setProjectDescription] = useState("");
+    const [projectDeadline, setProjectDeadline] = useState("");
+    const [projectProgress, setProjectProgress] = useState("0");
+    const [projectMarks, setProjectMarks] = useState("");
+    const [projectFeedback, setProjectFeedback] = useState("");
     const [projectTypeId, setProjectTypeId] = useState<string>("");
     const [expertStaffId, setExpertStaffId] = useState<string>("");
     const [selectedMembers, setSelectedMembers] = useState<{
@@ -1140,6 +1232,10 @@ function CreateGroupModal({
                 projectTitle: projectTitle || undefined,
                 projectArea: projectArea || undefined,
                 projectDescription: projectDescription || undefined,
+                projectDeadline: projectDeadline ? new Date(projectDeadline) : undefined,
+                projectProgress: Number(projectProgress || 0),
+                projectMarks: projectMarks ? Number(projectMarks) : undefined,
+                projectFeedback: projectFeedback || undefined,
                 projectTypeId: isNumeric ? parseInt(projectTypeId, 10) : undefined,
                 projectTypeName: !isNumeric ? projectTypeId : undefined,
                 expertStaffId: expertStaffId && expertStaffId !== "none" ? parseInt(expertStaffId) : undefined,
@@ -1258,6 +1354,55 @@ function CreateGroupModal({
                                     value={projectDescription}
                                     onChange={(e) => setProjectDescription(e.target.value)}
                                 />
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                    <Label htmlFor="projectDeadline">Deadline</Label>
+                                    <Input
+                                        id="projectDeadline"
+                                        type="date"
+                                        value={projectDeadline}
+                                        onChange={(e) => setProjectDeadline(e.target.value)}
+                                    />
+                                    <p className="text-xs text-slate-500">Defaults to 3 months from creation if left empty.</p>
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="projectProgress">Progress (%)</Label>
+                                    <Input
+                                        id="projectProgress"
+                                        type="number"
+                                        min="0"
+                                        max="100"
+                                        value={projectProgress}
+                                        onChange={(e) => setProjectProgress(e.target.value)}
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                    <Label htmlFor="projectMarks">Marks</Label>
+                                    <Input
+                                        id="projectMarks"
+                                        type="number"
+                                        min="0"
+                                        step="0.01"
+                                        value={projectMarks}
+                                        onChange={(e) => setProjectMarks(e.target.value)}
+                                        placeholder="Optional"
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="projectFeedback">Feedback</Label>
+                                    <Textarea
+                                        id="projectFeedback"
+                                        placeholder="Optional faculty feedback for the student group"
+                                        rows={3}
+                                        value={projectFeedback}
+                                        onChange={(e) => setProjectFeedback(e.target.value)}
+                                    />
+                                </div>
                             </div>
 
                             <div className="space-y-2">
