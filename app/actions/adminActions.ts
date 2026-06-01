@@ -373,12 +373,64 @@ export async function getProjectStats() {
         prisma.projectmeeting.count(),
     ]);
 
-    return {
-        totalProjects,
-        totalProjectTypes,
-        totalMembers,
-        totalMeetings,
-    };
+  return {
+    totalProjects,
+    totalProjectTypes,
+    totalMembers,
+    totalMeetings,
+  };
+}
+
+export async function updateProjectGroupByAdmin(data: {
+    groupId: number;
+    projectDeadline?: Date | null;
+    projectProgress?: number;
+    projectMarks?: number | null;
+    projectFeedback?: string | null;
+}) {
+    await verifyAdmin();
+
+    const project = await prisma.projectgroup.findUnique({
+        where: { projectgroupid: data.groupId },
+        select: {
+            projectgroupid: true,
+            projectdeadline: true,
+            projectprogress: true,
+            projectmarks: true,
+            projectfeedback: true,
+        },
+    });
+
+    if (!project) {
+        throw new Error("Project group not found");
+    }
+
+    const normalizedProgress =
+        data.projectProgress === undefined
+            ? project.projectprogress
+            : Math.min(100, Math.max(0, Math.round(data.projectProgress)));
+
+    const updated = await prisma.projectgroup.update({
+        where: { projectgroupid: data.groupId },
+        data: {
+            projectdeadline:
+                data.projectDeadline === undefined
+                    ? project.projectdeadline
+                    : data.projectDeadline,
+            projectprogress: normalizedProgress,
+            projectmarks:
+                data.projectMarks === undefined
+                    ? project.projectmarks
+                    : data.projectMarks,
+            projectfeedback:
+                data.projectFeedback === undefined
+                    ? project.projectfeedback
+                    : data.projectFeedback,
+            modified: new Date(),
+        },
+    });
+
+    return JSON.parse(JSON.stringify(updated));
 }
 
 /**

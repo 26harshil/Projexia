@@ -1,6 +1,7 @@
+
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { StreamChat, Channel as StreamChannel } from "stream-chat";
 import {
   Chat,
@@ -12,7 +13,15 @@ import {
   useChannelStateContext,
 } from "stream-chat-react";
 import { useUser } from "@clerk/nextjs";
-import { Loader2, MessageSquare, Users, Search, ArrowLeft } from "lucide-react";
+import {
+  Loader2,
+  MessageSquare,
+  Search,
+  ArrowLeft,
+  MoreVertical,
+  Plus,
+  Lock,
+} from "lucide-react";
 
 import "stream-chat-react/dist/css/v2/index.css";
 import "./chat.css";
@@ -20,28 +29,64 @@ import "./chat.css";
 const API_KEY = process.env.NEXT_PUBLIC_STREAM_API_KEY!;
 
 // ---------------------------------------------------------------------------
-// Custom Channel Header
+// Custom Channel Header — WhatsApp style
 // ---------------------------------------------------------------------------
 function CustomChannelHeader({ onBack }: { onBack?: () => void }) {
   const { channel } = useChannelStateContext();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
   const memberCount = Object.keys(channel.state.members || {}).length;
   const channelName =
     (channel.data as any)?.name || channel.id?.replace(/-/g, " ") || "Chat";
 
+  // Build member names string (WhatsApp-style)
+  const memberNames = Object.values(channel.state.members || {})
+    .map((m: any) => m.user?.name || m.user?.id || "Unknown")
+    .slice(0, 4)
+    .join(", ");
+  const subtitle =
+    memberCount > 4
+      ? `${memberNames} +${memberCount - 4} more`
+      : memberNames || `${memberCount} members`;
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    function handler(e: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setMenuOpen(false);
+      }
+    }
+    if (menuOpen) document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [menuOpen]);
+
   return (
     <div className="chat-channel-header">
+      {/* Back arrow — visible only on mobile */}
       {onBack && (
-        <button onClick={onBack} className="chat-back-btn md:hidden">
+        <button
+          onClick={onBack}
+          className="chat-back-btn"
+          aria-label="Back to chat list"
+        >
           <ArrowLeft size={20} />
+          <span>Chats</span>
         </button>
       )}
+
+      {/* Avatar */}
       <div className="chat-avatar-circle">
         {channelName.charAt(0).toUpperCase()}
       </div>
+
+      {/* Name + subtitle */}
       <div className="chat-header-info">
         <h3 className="chat-header-title">{channelName}</h3>
-        <p className="chat-header-subtitle">{memberCount} members</p>
+        <p className="chat-header-subtitle">{subtitle}</p>
       </div>
+
+      {/* Action icons — WhatsApp style */}
     </div>
   );
 }
@@ -61,15 +106,14 @@ export default function ChatComponent({
     null,
   );
   const [showSidebar, setShowSidebar] = useState(true);
+  const [sidebarMenuOpen, setSidebarMenuOpen] = useState(false);
+  const sidebarMenuRef = useRef<HTMLDivElement>(null);
 
   const initChat = useCallback(async () => {
     if (!user || !isLoaded) return;
 
     try {
-      // Step 1 — get a server-signed token (server-only, uses API secret)
-      const res = await fetch("/api/stream-token", {
-        method: "POST",
-      });
+      const res = await fetch("/api/stream-token", { method: "POST" });
 
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
@@ -79,15 +123,12 @@ export default function ChatComponent({
       const { token } = await res.json();
       if (!token) throw new Error("No token received from server");
 
-      // Step 2 — get (or reuse) the singleton client with the PUBLIC api key
       const chatClient = StreamChat.getInstance(API_KEY);
 
-      // If a different user was previously connected, disconnect first
       if (chatClient.userID && chatClient.userID !== user.id) {
         await chatClient.disconnectUser();
       }
 
-      // Step 3 — connect the user with the server-signed token
       if (!chatClient.userID) {
         await chatClient.connectUser(
           {
@@ -115,19 +156,30 @@ export default function ChatComponent({
     if (isLoaded && user) {
       initChat();
     }
-    // Do NOT disconnect on unmount — preserve connection across navigation
   }, [user?.id, isLoaded, initChat]);
 
-  // -------------------------------------------------------------------------
-  // Guard renders
-  // -------------------------------------------------------------------------
+  // Close sidebar menu on outside click
+  useEffect(() => {
+    function handler(e: MouseEvent) {
+      if (
+        sidebarMenuRef.current &&
+        !sidebarMenuRef.current.contains(e.target as Node)
+      ) {
+        setSidebarMenuOpen(false);
+      }
+    }
+    if (sidebarMenuOpen) document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [sidebarMenuOpen]);
+
+  // ── Guards ──
   if (!isLoaded) return <ChatLoader text="Loading..." />;
 
   if (!user) {
     return (
       <div className="chat-error-state">
         <MessageSquare size={48} className="text-[#3B9EFF] opacity-50" />
-        <p>Please sign in to use chat.</p>
+        <p className="text-[#8BA0BF]">Please sign in to use chat.</p>
       </div>
     );
   }
@@ -147,59 +199,66 @@ export default function ChatComponent({
 
   if (!client) return <ChatLoader text="Connecting to Chat..." />;
 
-  // Show only channels this user is a member of (general-hub + project groups)
   const filters = { type: "messaging", members: { $in: [user.id] } };
   const sort = { last_message_at: -1 } as const;
 
-  // -------------------------------------------------------------------------
-  // Render
-  // -------------------------------------------------------------------------
+  // ── Render ──
   return (
     <div className="chat-wrapper">
       <Chat client={client} theme="str-chat__theme-dark">
-        {/* ── Left Sidebar ── */}
+        {/* ═══ LEFT SIDEBAR — Conversation List ═══ */}
         <div
           className={`chat-sidebar ${!showSidebar ? "chat-sidebar-hidden" : ""}`}
         >
-          {/* Sidebar Header */}
+          {/* ── WhatsApp-style Sidebar Header ── */}
           <div className="chat-sidebar-header">
             <div className="chat-sidebar-avatar">
               {user.imageUrl ? (
-                <img
-                  src={user.imageUrl}
-                  alt="You"
-                  className="w-full h-full object-cover"
-                />
+                <img src={user.imageUrl} alt="You" />
               ) : (
                 <span>{(user.fullName || "U").charAt(0)}</span>
               )}
             </div>
-            <div className="flex-1">
+
+            <div className="chat-sidebar-user-info">
               <p className="chat-sidebar-name">
                 {user.fullName || user.firstName || "You"}
               </p>
               <p className="chat-sidebar-role">{role || "Member"}</p>
             </div>
-            <div className="chat-online-dot" />
+
+            {/* Action buttons — WhatsApp style */}
+            <div className="chat-sidebar-actions">
+              <div className="chat-dropdown-wrapper" ref={sidebarMenuRef}>
+                <div
+                  className={`chat-dropdown-menu ${sidebarMenuOpen ? "open" : ""}`}
+                >
+                  <button
+                    className="chat-dropdown-item"
+                    onClick={() => setSidebarMenuOpen(false)}
+                  >
+                    New group
+                  </button>
+                  <button
+                    className="chat-dropdown-item"
+                    onClick={() => setSidebarMenuOpen(false)}
+                  >
+                    Starred messages
+                  </button>
+                  <button
+                    className="chat-dropdown-item"
+                    onClick={() => setSidebarMenuOpen(false)}
+                  >
+                    Settings
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
 
-          {/* Search Bar */}
-          <div className="chat-search-bar">
-            <Search size={16} className="chat-search-icon" />
-            <input
-              type="text"
-              placeholder="Search chats..."
-              className="chat-search-input"
-            />
-          </div>
+          {/* ── Search ── */}
 
-          {/* Section label */}
-          <div className="chat-section-label">
-            <Users size={14} />
-            <span>Your Group Chats</span>
-          </div>
-
-          {/* Channel List */}
+          {/* ── Channel List ── */}
           <div className="chat-channel-list-wrap">
             <ChannelList
               filters={filters}
@@ -207,6 +266,7 @@ export default function ChatComponent({
               Preview={(previewProps) => (
                 <CustomChannelPreview
                   {...previewProps}
+                  activeChannelId={activeChannel?.id}
                   onSelect={(ch: StreamChannel) => {
                     setActiveChannel(ch);
                     setShowSidebar(false);
@@ -217,14 +277,19 @@ export default function ChatComponent({
           </div>
         </div>
 
-        {/* ── Main Chat Area ── */}
+        {/* ═══ RIGHT PANEL — Active Chat ═══ */}
         <div
           className={`chat-main ${showSidebar ? "chat-main-hidden-mobile" : ""}`}
         >
           {activeChannel ? (
             <Channel channel={activeChannel as any}>
               <Window>
-                <CustomChannelHeader onBack={() => setShowSidebar(true)} />
+                <CustomChannelHeader
+                  onBack={() => {
+                    setActiveChannel(null);
+                    setShowSidebar(true);
+                  }}
+                />
                 <div className="chat-message-list-wrap">
                   <MessageList />
                 </div>
@@ -234,11 +299,26 @@ export default function ChatComponent({
               </Window>
             </Channel>
           ) : (
+            /* WhatsApp empty landing screen */
             <div className="chat-empty-state">
-              <MessageSquare size={48} className="text-[#3B9EFF] opacity-30" />
-              <p className="text-[#8BA0BF] mt-3 text-sm">
-                Select a chat to start messaging
+              <div className="chat-empty-icon-circle">
+                <MessageSquare
+                  size={80}
+                  strokeWidth={1}
+                  className="text-[#3B9EFF] opacity-20"
+                />
+              </div>
+              <h2 className="chat-empty-title">Projexia Communication Hub</h2>
+              <p className="chat-empty-desc">
+                Send and receive messages with your project team, faculty, and
+                administrators. Select a conversation from the sidebar to get
+                started.
               </p>
+              <div className="chat-empty-divider" />
+              <div className="chat-empty-encryption">
+                <Lock size={12} />
+                <span>End-to-end encrypted</span>
+              </div>
             </div>
           )}
         </div>
@@ -248,16 +328,18 @@ export default function ChatComponent({
 }
 
 // ---------------------------------------------------------------------------
-// Custom channel preview row — WhatsApp-style
+// Custom Channel Preview — WhatsApp conversation row
 // ---------------------------------------------------------------------------
 function CustomChannelPreview({
   channel,
   latestMessage,
   onSelect,
+  activeChannelId,
 }: {
   channel: StreamChannel;
   latestMessage?: any;
   onSelect?: (ch: StreamChannel) => void;
+  activeChannelId?: string;
 }) {
   const channelName =
     (channel.data as any)?.name || channel.id?.replace(/_/g, " ") || "Channel";
@@ -266,22 +348,52 @@ function CustomChannelPreview({
   const lastMsg: string = latestMessage?.text || "No messages yet";
 
   const rawDate = channel.lastMessage()?.created_at;
-  const lastTime = rawDate
-    ? new Date(rawDate).toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
-    })
-    : "";
+  let lastTime = "";
+  if (rawDate) {
+    const msgDate = new Date(rawDate);
+    const today = new Date();
+    const yesterday = new Date();
+    yesterday.setDate(today.getDate() - 1);
+
+    const isSameDay = (a: Date, b: Date) =>
+      a.getDate() === b.getDate() &&
+      a.getMonth() === b.getMonth() &&
+      a.getFullYear() === b.getFullYear();
+
+    if (isSameDay(msgDate, today)) {
+      lastTime = msgDate.toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    } else if (isSameDay(msgDate, yesterday)) {
+      lastTime = "Yesterday";
+    } else {
+      lastTime = msgDate.toLocaleDateString([], {
+        day: "2-digit",
+        month: "2-digit",
+        year: "2-digit",
+      });
+    }
+  }
+
+  const isActive = channel.id === activeChannelId;
 
   return (
-    <div className="chat-preview-item" onClick={() => onSelect?.(channel)}>
+    <div
+      className={`chat-preview-item ${isActive ? "active" : ""}`}
+      onClick={() => onSelect?.(channel)}
+    >
       <div className="chat-preview-avatar">
         {channelName.charAt(0).toUpperCase()}
       </div>
       <div className="chat-preview-content">
         <div className="chat-preview-top">
           <span className="chat-preview-name">{channelName}</span>
-          <span className="chat-preview-time">{lastTime}</span>
+          <span
+            className={`chat-preview-time ${unread > 0 ? "has-unread" : ""}`}
+          >
+            {lastTime}
+          </span>
         </div>
         <div className="chat-preview-bottom">
           <span className="chat-preview-msg">{lastMsg}</span>
@@ -299,7 +411,7 @@ function ChatLoader({ text }: { text: string }) {
   return (
     <div className="chat-loader">
       <Loader2 className="w-10 h-10 animate-spin text-[#3B9EFF]" />
-      <span className="text-[#8BA0BF] mt-3 text-sm">{text}</span>
+      <span className="text-[#8BA0BF] text-sm">{text}</span>
     </div>
   );
 }

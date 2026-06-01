@@ -36,6 +36,10 @@ interface ProjectDetails {
     projecttitle: string | null;
     projectarea: string | null;
     projectdescription: string | null;
+    projectdeadline: Date | null;
+    projectprogress: number;
+    projectmarks: number | null;
+    projectfeedback: string | null;
     guidestaffname: string | null;
     averagecpi: any;
     projecttype: {
@@ -229,6 +233,40 @@ export function StudentDashboardContent({
                                             <p className="text-sm text-slate-200 mb-4 line-clamp-2">
                                                 {projectDetails.projectdescription}
                                             </p>
+                                        )}
+
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                            <div className="flex items-center gap-3 p-3 bg-white/5 backdrop-blur-sm rounded-lg border border-blue-500/20">
+                                                <div className="p-2 bg-blue-500/15 rounded-full">
+                                                    <CalendarClock className="h-4 w-4 text-cyan-400" />
+                                                </div>
+                                                <div className="min-w-0">
+                                                    <p className="text-xs text-slate-500">Deadline</p>
+                                                    <p className="font-medium text-white text-sm">
+                                                        {projectDetails.projectdeadline
+                                                            ? new Date(projectDetails.projectdeadline).toLocaleDateString()
+                                                            : "Not set"}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <div className="flex items-center gap-3 p-3 bg-white/5 backdrop-blur-sm rounded-lg border border-cyan-500/20">
+                                                <div className="p-2 bg-cyan-500/15 rounded-full">
+                                                    <ClipboardCheck className="h-4 w-4 text-cyan-400" />
+                                                </div>
+                                                <div className="min-w-0">
+                                                    <p className="text-xs text-slate-500">Marks</p>
+                                                    <p className="font-medium text-white text-sm">
+                                                        {projectDetails.projectmarks ?? "Pending"}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {projectDetails.projectfeedback && (
+                                            <div className="mt-3 p-3 bg-white/5 backdrop-blur-sm rounded-lg border border-blue-500/20">
+                                                <p className="text-xs text-slate-500 mb-1">Faculty Feedback</p>
+                                                <p className="text-sm text-slate-200">{projectDetails.projectfeedback}</p>
+                                            </div>
                                         )}
 
                                         {/* Guide Information */}

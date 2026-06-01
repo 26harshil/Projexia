@@ -141,8 +141,8 @@ export default async function StudentDashboard() {
 
   let projectProgress = 0;
   const primaryProject = student?.projectgroupmember?.[0]?.projectgroup;
-  if (primaryProject?.averagecpi) {
-    projectProgress = Math.round((Number(primaryProject.averagecpi) / 10) * 100);
+  if (primaryProject) {
+    projectProgress = primaryProject.projectprogress ?? 0;
   }
 
   // Upcoming Meetings Count (meetings with datetime >= now)
@@ -184,6 +184,12 @@ export default async function StudentDashboard() {
     projecttitle: primaryProject.projecttitle,
     projectarea: primaryProject.projectarea,
     projectdescription: primaryProject.projectdescription,
+    projectdeadline: primaryProject.projectdeadline,
+    projectprogress: primaryProject.projectprogress,
+    projectmarks: primaryProject.projectmarks
+      ? primaryProject.projectmarks.toNumber()
+      : null,
+    projectfeedback: primaryProject.projectfeedback,
     guidestaffname: primaryProject.guidestaffname,
     averagecpi: primaryProject.averagecpi
       ? primaryProject.averagecpi.toNumber()

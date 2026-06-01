@@ -103,6 +103,10 @@ export async function getFacultyGroups() {
     title: group.projecttitle,
     area: group.projectarea,
     description: group.projectdescription,
+    deadline: group.projectdeadline,
+    progress: group.projectprogress,
+    marks: group.projectmarks ? group.projectmarks.toNumber() : null,
+    feedback: group.projectfeedback,
     projectType: group.projecttype?.projecttypename || null,
     status: group.projectstatus || "Active",
     averageCpi: group.averagecpi ? group.averagecpi.toNumber() : null,
@@ -179,6 +183,10 @@ export async function getFacultyGroupById(groupId: number) {
     title: group.projecttitle,
     area: group.projectarea,
     description: group.projectdescription,
+    deadline: group.projectdeadline,
+    progress: group.projectprogress,
+    marks: group.projectmarks ? group.projectmarks.toNumber() : null,
+    feedback: group.projectfeedback,
     projectType: group.projecttype,
     status: group.projectstatus || "Active",
     averageCpi: group.averagecpi ? group.averagecpi.toNumber() : null,
@@ -1023,6 +1031,10 @@ export async function updateGroupDetails(data: {
   title?: string;
   area?: string;
   description?: string;
+  deadline?: Date | null;
+  progress?: number;
+  marks?: number | null;
+  feedback?: string | null;
 }) {
   const staff = await getStaffId();
   if (!staff) throw new Error("Unauthorized: Staff not found");
@@ -1046,6 +1058,10 @@ export async function updateGroupDetails(data: {
       ...(data.description !== undefined && {
         projectdescription: data.description,
       }),
+      ...(data.deadline !== undefined && { projectdeadline: data.deadline }),
+      ...(data.progress !== undefined && { projectprogress: data.progress }),
+      ...(data.marks !== undefined && { projectmarks: data.marks }),
+      ...(data.feedback !== undefined && { projectfeedback: data.feedback }),
       modified: new Date(),
     },
   });
@@ -1242,6 +1258,10 @@ export async function createGroup(data: {
   projectTitle?: string;
   projectArea?: string;
   projectDescription?: string;
+  projectDeadline?: Date;
+  projectProgress?: number;
+  projectMarks?: number;
+  projectFeedback?: string;
   projectTypeId?: number;
   projectTypeName?: string;
   expertStaffId?: number;
@@ -1257,6 +1277,11 @@ export async function createGroup(data: {
   }
 
   try {
+    const normalizedProgress = Math.min(
+      100,
+      Math.max(0, Math.round(data.projectProgress ?? 0)),
+    );
+
     let finalProjectTypeId = data.projectTypeId;
 
     if (!finalProjectTypeId && data.projectTypeName) {
@@ -1282,6 +1307,12 @@ export async function createGroup(data: {
         projecttitle: data.projectTitle || null,
         projectarea: data.projectArea || null,
         projectdescription: data.projectDescription || null,
+        projectdeadline:
+          data.projectDeadline ||
+          new Date(Date.now() + 90 * 24 * 60 * 60 * 1000),
+        projectprogress: normalizedProgress,
+        projectmarks: data.projectMarks ?? null,
+        projectfeedback: data.projectFeedback?.trim() || null,
         projecttypeid: finalProjectTypeId,
         convenerstaffid: staff.staffid,
         expertstaffid: data.expertStaffId || null,
@@ -1342,6 +1373,10 @@ export async function updateGroup(data: {
   projectTitle?: string;
   projectArea?: string;
   projectDescription?: string;
+  projectDeadline?: Date | null;
+  projectProgress?: number;
+  projectMarks?: number | null;
+  projectFeedback?: string | null;
   projectTypeId?: number;
   projectTypeName?: string;
   expertStaffId?: number;
@@ -1364,6 +1399,11 @@ export async function updateGroup(data: {
   }
 
   try {
+    const normalizedProgress =
+      data.projectProgress === undefined
+        ? group.projectprogress
+        : Math.min(100, Math.max(0, Math.round(data.projectProgress)));
+
     let finalProjectTypeId = data.projectTypeId;
     if (!finalProjectTypeId && data.projectTypeName) {
       let pt = await prisma.projecttype.findFirst({
@@ -1384,6 +1424,10 @@ export async function updateGroup(data: {
         projecttitle: data.projectTitle ?? group.projecttitle,
         projectarea: data.projectArea ?? group.projectarea,
         projectdescription: data.projectDescription ?? group.projectdescription,
+        projectdeadline: data.projectDeadline ?? group.projectdeadline,
+        projectprogress: normalizedProgress,
+        projectmarks: data.projectMarks ?? group.projectmarks,
+        projectfeedback: data.projectFeedback ?? group.projectfeedback,
         projecttypeid: finalProjectTypeId ?? group.projecttypeid,
         expertstaffid: data.expertStaffId ?? group.expertstaffid,
         modified: new Date(),

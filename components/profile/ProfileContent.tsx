@@ -1,4 +1,3 @@
-// /components/profile/ProfileContent.tsx
 "use client";
 
 import { motion } from "framer-motion";
@@ -6,38 +5,35 @@ import { SignOutButton } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
   ArrowLeft,
+  Briefcase,
+  Calendar,
+  CheckCircle2,
+  Clock,
+  Crown,
+  ExternalLink,
+  FolderKanban,
+  GraduationCap,
+  Hash,
+  LogOut,
   Mail,
   Phone,
-  Shield,
-  Calendar,
-  Clock,
-  User,
-  GraduationCap,
-  Briefcase,
-  FolderKanban,
-  Crown,
-  MapPin,
-  LogOut,
-  ExternalLink,
-  CheckCircle2,
-  XCircle,
-  Settings,
-  Hash,
   Save,
+  PencilLine,
+  Shield,
+  Sparkles,
+  User,
   X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import {
-  updateStudentPhone,
   updateFacultyPhone,
-  updateStudentEnrollmentNumber,
   updateProfileName,
+  updateStudentPhone,
 } from "@/app/actions/profileActions";
 
 interface ProfileData {
@@ -85,42 +81,49 @@ interface ProfileContentProps {
 
 const roleConfig: Record<
   string,
-  { label: string; color: string; gradient: string; icon: React.ElementType }
+  {
+    label: string;
+    gradient: string;
+    accent: string;
+    soft: string;
+    icon: React.ElementType;
+  }
 > = {
   ADMIN: {
     label: "Administrator",
-    color: "emerald",
-    gradient: "from-emerald-500 to-teal-600",
+    gradient: "from-emerald-600 via-teal-500 to-cyan-400",
+    accent: "text-emerald-700",
+    soft: "bg-emerald-50 border-emerald-100",
     icon: Shield,
   },
   FACULTY: {
     label: "Faculty Member",
-    color: "blue",
-    gradient: "from-blue-500 to-indigo-600",
+    gradient: "from-blue-700 via-indigo-600 to-cyan-500",
+    accent: "text-blue-700",
+    soft: "bg-blue-50 border-blue-100",
     icon: Briefcase,
   },
   STUDENT: {
     label: "Student",
-    color: "violet",
-    gradient: "from-violet-500 to-purple-600",
+    gradient: "from-indigo-700 via-blue-600 to-cyan-500",
+    accent: "text-indigo-700",
+    soft: "bg-indigo-50 border-indigo-100",
     icon: GraduationCap,
   },
 };
 
 function formatDate(dateInput: string | number | null) {
   if (!dateInput) return "N/A";
-  const d = new Date(dateInput);
-  return d.toLocaleDateString("en-US", {
+  return new Date(dateInput).toLocaleDateString("en-US", {
     year: "numeric",
-    month: "long",
+    month: "short",
     day: "numeric",
   });
 }
 
-function formatTime(dateInput: string | number | null) {
+function formatDateTime(dateInput: string | number | null) {
   if (!dateInput) return "N/A";
-  const d = new Date(dateInput);
-  return d.toLocaleDateString("en-US", {
+  return new Date(dateInput).toLocaleString("en-US", {
     year: "numeric",
     month: "short",
     day: "numeric",
@@ -129,32 +132,43 @@ function formatTime(dateInput: string | number | null) {
   });
 }
 
+function primaryFallbackName(email: string | null | undefined) {
+  if (!email) return "User";
+  const local = email.split("@")[0] || "User";
+  return local
+    .split(/[._-]+/)
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
+}
+
 export function ProfileContent({ profile }: ProfileContentProps) {
   const router = useRouter();
   const role = roleConfig[profile.role] || roleConfig.STUDENT;
   const RoleIcon = role.icon;
-  const initialName =
-    profile.name?.trim() || `${profile.firstName} ${profile.lastName}`.trim();
+  const derivedProfileName =
+    profile.name?.trim() ||
+    profile.student?.studentname?.trim() ||
+    profile.staff?.staffname?.trim() ||
+    `${profile.firstName} ${profile.lastName}`.trim() ||
+    primaryFallbackName(profile.email);
 
+  const [activeTab, setActiveTab] = useState<"overview" | "academic" | "edit">(
+    "overview",
+  );
   const [editingName, setEditingName] = useState(false);
-  const [nameValue, setNameValue] = useState(initialName);
-  const [currentName, setCurrentName] = useState(initialName || "User");
+  const [nameValue, setNameValue] = useState(derivedProfileName);
+  const [currentName, setCurrentName] = useState(derivedProfileName || "User");
   const [isSavingName, setIsSavingName] = useState(false);
   const [nameSaveMessage, setNameSaveMessage] = useState("");
   const [editingPhone, setEditingPhone] = useState(false);
   const [phoneValue, setPhoneValue] = useState(
     profile.role === "STUDENT"
       ? profile.student?.phone || ""
-      : profile.staff?.phone || ""
+      : profile.staff?.phone || "",
   );
-  const [editingEnrollment, setEditingEnrollment] = useState(false);
-  const [enrollmentValue, setEnrollmentValue] = useState(
-    profile.student?.enrollment ?? ""
-  );
-  const [isSaving, setIsSaving] = useState(false);
+  const [isSavingPhone, setIsSavingPhone] = useState(false);
   const [saveMessage, setSaveMessage] = useState("");
-  const [isSavingEnrollment, setIsSavingEnrollment] = useState(false);
-  const [enrollmentSaveMessage, setEnrollmentSaveMessage] = useState("");
 
   const dashboardHref =
     profile.role === "ADMIN"
@@ -163,13 +177,109 @@ export function ProfileContent({ profile }: ProfileContentProps) {
         ? "/faculty/dashboard"
         : "/student/dashboard";
 
+  const projectGroups = profile.student?.projectGroups || [];
+  const primaryEmail =
+    profile.emailAddresses.find((item) => item.isPrimary)?.email ||
+    profile.email;
+  const fallbackPhone =
+    phoneValue || profile.phoneNumbers[0]?.phone || "Not provided";
+  const profileDescription =
+    profile.student?.description ||
+    profile.staff?.description ||
+    "No profile description has been added yet.";
+  const leaderCount = projectGroups.filter((group) => group.isLeader).length;
+  const profileCompletion = useMemo(() => {
+    const checks = [
+      Boolean(currentName?.trim()),
+      Boolean(primaryEmail?.trim()),
+      Boolean(fallbackPhone && fallbackPhone !== "Not provided"),
+      profile.role !== "STUDENT" ||
+        Boolean(profile.student?.enrollment?.trim()),
+    ];
+    return Math.round((checks.filter(Boolean).length / checks.length) * 100);
+  }, [
+    currentName,
+    primaryEmail,
+    fallbackPhone,
+    profile.role,
+    profile.student?.enrollment,
+  ]);
+
+  const topStats =
+    profile.role === "STUDENT"
+      ? [
+          {
+            label: "Project Groups",
+            value: String(projectGroups.length),
+            sub: "currently linked",
+            icon: FolderKanban,
+            color: "from-indigo-500 to-blue-500",
+          },
+          {
+            label: "Leadership Roles",
+            value: String(leaderCount),
+            sub: "group leader positions",
+            icon: Crown,
+            color: "from-amber-500 to-orange-400",
+          },
+          {
+            label: "Profile Completion",
+            value: `${profileCompletion}%`,
+            sub: "account readiness",
+            icon: Sparkles,
+            color: "from-emerald-500 to-teal-500",
+          },
+          {
+            label: "Account Status",
+            value: profile.isactive ? "Active" : "Inactive",
+            sub: `last sign-in ${formatDate(profile.lastSignInAt)}`,
+            icon: CheckCircle2,
+            color: "from-cyan-500 to-sky-500",
+          },
+        ]
+      : [
+          {
+            label: "Profile Completion",
+            value: `${profileCompletion}%`,
+            sub: "contact + identity",
+            icon: Sparkles,
+            color: "from-indigo-500 to-blue-500",
+          },
+          {
+            label: "Role Access",
+            value: role.label,
+            sub: "current permission level",
+            icon: RoleIcon,
+            color: "from-emerald-500 to-teal-500",
+          },
+          {
+            label: "System ID",
+            value:
+              profile.role === "FACULTY" && profile.staff
+                ? String(profile.staff.staffid)
+                : String(profile.userid),
+            sub:
+              profile.role === "FACULTY"
+                ? "faculty identifier"
+                : "user identifier",
+            icon: Hash,
+            color: "from-violet-500 to-purple-500",
+          },
+          {
+            label: "Account Status",
+            value: profile.isactive ? "Active" : "Inactive",
+            sub: `joined ${formatDate(profile.createdAt)}`,
+            icon: CheckCircle2,
+            color: "from-amber-500 to-orange-400",
+          },
+        ];
+
   const handleSaveName = async () => {
     const trimmedName = nameValue.trim();
     if (!trimmedName) {
       setNameSaveMessage("Name is required");
       return;
     }
-
     setIsSavingName(true);
     setNameSaveMessage("");
     try {
@@ -177,7 +287,7 @@ export function ProfileContent({ profile }: ProfileContentProps) {
       setCurrentName(trimmedName);
       setNameValue(trimmedName);
       setEditingName(false);
-      setNameSaveMessage("Name updated successfully!");
+      setNameSaveMessage("Name updated successfully.");
       setTimeout(() => setNameSaveMessage(""), 3000);
       router.refresh();
     } catch (error) {
@@ -188,14 +298,8 @@ export function ProfileContent({ profile }: ProfileContentProps) {
     }
   };
 
-  const handleCancelName = () => {
-    setNameValue(currentName);
-    setEditingName(false);
-    setNameSaveMessage("");
-  };
-
   const handleSavePhone = async () => {
-    setIsSaving(true);
+    setIsSavingPhone(true);
     setSaveMessage("");
     try {
       if (profile.role === "STUDENT") {
@@ -203,551 +307,578 @@ export function ProfileContent({ profile }: ProfileContentProps) {
       } else if (profile.role === "FACULTY") {
         await updateFacultyPhone(phoneValue);
       }
-      setSaveMessage("Phone number updated successfully!");
+      setSaveMessage("Phone number updated successfully.");
       setEditingPhone(false);
       setTimeout(() => setSaveMessage(""), 3000);
-      // Optionally refresh the page
       router.refresh();
     } catch (error) {
       setSaveMessage("Error updating phone number");
       console.error(error);
     } finally {
-      setIsSaving(false);
+      setIsSavingPhone(false);
     }
   };
 
-  const handleSaveEnrollment = async () => {
-    setIsSavingEnrollment(true);
-    setEnrollmentSaveMessage("");
-    try {
-      await updateStudentEnrollmentNumber(enrollmentValue);
-      setEnrollmentSaveMessage("Enrollment number updated successfully!");
-      setEditingEnrollment(false);
-      setTimeout(() => setEnrollmentSaveMessage(""), 3000);
-      router.refresh();
-    } catch (error) {
-      setEnrollmentSaveMessage("Error updating enrollment number");
-      console.error(error);
-    } finally {
-      setIsSavingEnrollment(false);
-    }
-  };
-
-  const handleCancelEnrollment = () => {
-    setEnrollmentValue(profile.student?.enrollment ?? "");
-    setEditingEnrollment(false);
-  };
-
-  const handleCancelEdit = () => {
+  const resetPhoneEdit = () => {
     setPhoneValue(
       profile.role === "STUDENT"
         ? profile.student?.phone || ""
-        : profile.staff?.phone || ""
+        : profile.staff?.phone || "",
     );
     setEditingPhone(false);
+    setSaveMessage("");
   };
 
   return (
-    <div className="min-h-screen bg-[#050A14]">
-      {/* Header Banner */}
-      <div className={cn("relative h-56 bg-linear-to-r", role.gradient)}>
-        {/* Decorative pattern */}
-        <div className="absolute inset-0 opacity-10">
-          <svg className="h-full w-full" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <pattern
-                id="grid"
-                width="40"
-                height="40"
-                patternUnits="userSpaceOnUse"
-              >
-                <path
-                  d="M 40 0 L 0 0 0 40"
-                  fill="none"
-                  stroke="white"
-                  strokeWidth="0.5"
-                />
-              </pattern>
-            </defs>
-            <rect width="100%" height="100%" fill="url(#grid)" />
-          </svg>
-        </div>
-
-        {/* Back button */}
-        <div className="absolute top-6 left-6 z-10">
-          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+    <div className="min-h-screen bg-[radial-gradient(circle_at_top,rgba(59,158,255,0.16),transparent_34%),linear-gradient(180deg,#050A14_0%,#07111F_46%,#050A14_100%)] text-slate-100">
+      <header className="sticky top-0 z-30 border-b border-slate-800/70 bg-slate-950/75 backdrop-blur-xl">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
+          <div className="flex items-center gap-3">
             <Link href={dashboardHref}>
               <Button
                 variant="ghost"
-                className="bg-white/20 backdrop-blur-sm text-white hover:bg-white/30 hover:text-white"
+                size="sm"
+                className="text-slate-300 hover:bg-white/5 hover:text-white"
               >
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Back to Dashboard
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Dashboard
               </Button>
             </Link>
-          </motion.div>
+            <div className="hidden h-6 w-px bg-slate-800 sm:block" />
+            <div className="hidden sm:block">
+              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">
+                SPMS Profile
+              </p>
+              <p className="text-sm font-semibold text-slate-100">
+                {role.label}
+              </p>
+            </div>
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <SignOutButton>
+              <Button className="bg-slate-100 text-slate-950 hover:bg-white">
+                <LogOut className="mr-2 h-4 w-4" />
+                Sign Out
+              </Button>
+            </SignOutButton>
+          </div>
         </div>
+      </header>
 
-        {/* Decorative circles */}
-        <motion.div
-          animate={{ y: [0, -10, 0] }}
-          transition={{ duration: 6, repeat: Infinity }}
-          className="absolute -bottom-6 right-12 w-48 h-48 bg-white/5 rounded-full"
-        />
-        <motion.div
-          animate={{ y: [0, 10, 0] }}
-          transition={{ duration: 8, repeat: Infinity }}
-          className="absolute top-12 right-48 w-24 h-24 bg-white/5 rounded-full"
-        />
-      </div>
+      <main className="mx-auto max-w-6xl space-y-6 px-4 py-8 sm:px-6">
+        <section className="overflow-hidden rounded-[32px] border border-slate-800/70 bg-slate-950/70 shadow-2xl shadow-blue-950/20 backdrop-blur-xl">
+          <div className={cn("relative h-24 bg-linear-to-r", role.gradient)}>
+            <div
+              className="absolute inset-0 opacity-20"
+              style={{
+                backgroundImage:
+                  "url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.5'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\")",
+              }}
+            />
+          </div>
 
-      <div className="max-w-4xl mx-auto px-4 md:px-6 -mt-20 relative z-10 pb-12">
-        {/* Profile Card */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="bg-white/5 backdrop-blur-md rounded-2xl border border-blue-500/20 shadow-xl shadow-blue-900/20 overflow-hidden"
-        >
-          {/* Avatar + Name Section */}
-          <div className="p-6 md:p-8">
-            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
-              {/* Avatar */}
-              <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ type: "spring", stiffness: 200, delay: 0.2 }}
-                className="relative"
-              >
-                <div
-                  className={cn(
-                    "absolute -inset-1 bg-linear-to-r rounded-full blur-sm opacity-60",
-                    role.gradient,
-                  )}
-                />
+          <div className="px-5 pb-6 sm:px-6">
+            <div className="-mt-12 flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-end">
                 <div className="relative">
                   <Image
                     src={profile.imageUrl}
-                    alt={`${profile.firstName} ${profile.lastName}`}
-                    width={96}
-                    height={96}
-                    className="rounded-full ring-4 ring-white object-cover"
+                    alt={currentName}
+                    width={104}
+                    height={104}
+                    className="h-24 w-24 rounded-3xl border-4 border-slate-950 object-cover shadow-lg shadow-blue-950/30 sm:h-26 sm:w-26"
                   />
-                  {/* Active indicator */}
-                  <div
+                  <span
                     className={cn(
-                      "absolute bottom-1 right-1 h-5 w-5 rounded-full border-3 border-white",
-                      profile.isactive ? "bg-blue-500" : "bg-slate-400",
+                      "absolute -bottom-1 -right-1 h-5 w-5 rounded-full border-2 border-slate-950",
+                      profile.isactive ? "bg-emerald-400" : "bg-slate-400",
                     )}
                   />
                 </div>
-              </motion.div>
 
-              {/* Name + Role */}
-              <div className="flex-1 text-center sm:text-left">
-                <motion.h1
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.3 }}
-                  className="text-2xl md:text-3xl font-bold text-white"
-                >
-                  {currentName}
-                </motion.h1>
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.32 }}
-                  className="mt-2"
-                >
-                  {editingName ? (
-                    <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
-                      <input
-                        type="text"
-                        value={nameValue}
-                        onChange={(e) => setNameValue(e.target.value)}
-                        className="min-w-55 text-sm px-2 py-1 border border-blue-500/25 rounded-md focus:outline-none focus:ring-2 focus:ring-slate-500"
-                        placeholder="Enter your name"
-                      />
-                      <button
-                        onClick={handleSaveName}
-                        disabled={isSavingName}
-                        className="bg-slate-800 hover:bg-slate-900 text-white px-2 py-1 rounded-md text-xs disabled:opacity-50"
-                      >
-                        <Save className="h-3 w-3" />
-                      </button>
-                      <button
-                        onClick={handleCancelName}
-                        className="bg-slate-300 hover:bg-slate-400 text-slate-200 px-2 py-1 rounded-md text-xs"
-                      >
-                        <X className="h-3 w-3" />
-                      </button>
-                    </div>
-                  ) : (
-                    <button
-                      onClick={() => setEditingName(true)}
-                      className="text-xs text-slate-300 hover:text-white underline"
-                    >
-                      Edit name
-                    </button>
-                  )}
-                  {nameSaveMessage && (
-                    <p
-                      className={`text-xs mt-1 ${nameSaveMessage.includes("Error") ||
-                          nameSaveMessage.includes("required")
-                          ? "text-red-600"
-                          : "text-cyan-400"
-                        }`}
-                    >
-                      {nameSaveMessage}
+                <div className="space-y-2">
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-[0.3em] text-cyan-200/80">
+                      Your Profile
                     </p>
-                  )}
-                </motion.div>
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.35 }}
-                  className="flex flex-wrap items-center justify-center sm:justify-start gap-2 mt-2"
-                >
-                  <Badge
-                    className={cn(
-                      "text-sm px-3 py-1",
-                      role.color === "emerald" &&
-                      "bg-blue-500/15 text-cyan-400",
-                      role.color === "blue" && "bg-blue-500/15 text-blue-700",
-                      role.color === "violet" &&
-                      "bg-violet-100 text-violet-700",
+                    {editingName ? (
+                      <div className="mt-2 flex flex-wrap items-center gap-2">
+                        <input
+                          type="text"
+                          value={nameValue}
+                          onChange={(e) => setNameValue(e.target.value)}
+                          className="min-w-[260px] flex-1 rounded-2xl border border-cyan-400/30 bg-slate-950/80 px-4 py-3 text-2xl font-bold tracking-tight text-white outline-none focus:border-cyan-300 sm:text-3xl"
+                          placeholder="Enter your name"
+                        />
+                        <Button
+                          onClick={handleSaveName}
+                          disabled={isSavingName}
+                          className="bg-cyan-400 text-slate-950 hover:bg-cyan-300"
+                        >
+                          <Save className="mr-2 h-4 w-4" />
+                          Save
+                        </Button>
+                        <Button
+                          variant="outline"
+                          className="border-slate-700 bg-slate-950/70 text-slate-200 hover:bg-white/5"
+                          onClick={() => {
+                            setNameValue(currentName || derivedProfileName);
+                            setEditingName(false);
+                            setNameSaveMessage("");
+                          }}
+                        >
+                          <X className="mr-2 h-4 w-4" />
+                          Cancel
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="mt-2 flex flex-wrap items-center gap-3">
+                        <h1 className="inline-block rounded-2xl bg-slate-950/55 px-4 py-2 text-4xl font-black tracking-tight text-white shadow-[0_12px_30px_rgba(0,0,0,0.45)] sm:text-5xl lg:text-6xl">
+                          {currentName || "User"}
+                        </h1>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="border-cyan-400/30 bg-cyan-400/10 text-cyan-100 hover:bg-cyan-400/20 hover:text-white"
+                          onClick={() => setEditingName(true)}
+                        >
+                          <PencilLine className="mr-2 h-4 w-4" />
+                          Edit Name
+                        </Button>
+                      </div>
                     )}
-                  >
-                    <RoleIcon className="h-3.5 w-3.5 mr-1.5" />
-                    {role.label}
-                  </Badge>
-                  <Badge
-                    className={cn(
-                      "text-xs",
-                      profile.isactive
-                        ? "bg-blue-500/10 text-cyan-400 border-cyan-500/25"
-                        : "bg-red-500/10 text-red-600 border-red-200",
+                    {nameSaveMessage && (
+                      <p
+                        className={cn(
+                          "mt-2 text-sm",
+                          nameSaveMessage.toLowerCase().includes("error") ||
+                            nameSaveMessage.toLowerCase().includes("required")
+                            ? "text-red-300"
+                            : "text-emerald-300",
+                        )}
+                      >
+                        {nameSaveMessage}
+                      </p>
                     )}
+                  </div>
+
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Badge className="border border-white/10 bg-white/5 px-3 py-1 text-xs text-slate-100">
+                      <RoleIcon className="mr-1.5 h-3.5 w-3.5" />
+                      {role.label}
+                    </Badge>
+                    {profile.role === "STUDENT" && leaderCount > 0 && (
+                      <Badge className="border border-amber-400/30 bg-amber-400/10 px-3 py-1 text-xs text-amber-200">
+                        <Crown className="mr-1.5 h-3.5 w-3.5" />
+                        {leaderCount} Leadership Role
+                        {leaderCount > 1 ? "s" : ""}
+                      </Badge>
+                    )}
+                    <Badge className="border border-cyan-400/20 bg-cyan-400/10 px-3 py-1 text-xs text-cyan-100">
+                      <Mail className="mr-1.5 h-3.5 w-3.5" />
+                      {primaryEmail}
+                    </Badge>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4">
+                <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-slate-400">
+                  ✉️ Primary Email
+                </p>
+                <p className="truncate text-sm font-semibold text-slate-800">
+                  {primaryEmail}
+                </p>
+              </div>
+
+              <div className="rounded-2xl border border-cyan-200 bg-cyan-50/70 p-4">
+                <div className="mb-3 flex items-center justify-between gap-3">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                    📞 Phone
+                  </p>
+                  <Button
+                    size="sm"
+                    onClick={() => {
+                      if (editingPhone) {
+                        void handleSavePhone();
+                      } else {
+                        setEditingPhone(true);
+                        setSaveMessage("");
+                      }
+                    }}
+                    disabled={isSavingPhone}
+                    className="h-8 bg-cyan-500 px-3 text-slate-950 hover:bg-cyan-400"
                   >
-                    {profile.isactive ? (
+                    {editingPhone ? (
                       <>
-                        <CheckCircle2 className="h-3 w-3 mr-1" /> Active
+                        <Save className="mr-1.5 h-3.5 w-3.5" />
+                        Save
                       </>
                     ) : (
                       <>
-                        <XCircle className="h-3 w-3 mr-1" /> Inactive
+                        <PencilLine className="mr-1.5 h-3.5 w-3.5" />
+                        Edit
                       </>
                     )}
-                  </Badge>
-                </motion.div>
-                <motion.p
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.4 }}
-                  className="text-slate-500 mt-2 text-sm"
-                >
-                  {profile.email}
-                </motion.p>
+                  </Button>
+                </div>
+                {editingPhone ? (
+                  <input
+                    type="tel"
+                    value={phoneValue}
+                    onChange={(e) => setPhoneValue(e.target.value)}
+                    className="w-full rounded-xl border border-cyan-300 bg-white px-3 py-2 text-sm font-semibold text-slate-800 outline-none focus:border-cyan-500"
+                    placeholder="Enter phone number"
+                  />
+                ) : (
+                  <p className="truncate text-sm font-semibold text-slate-800">
+                    {fallbackPhone}
+                  </p>
+                )}
+                {saveMessage && (
+                  <p
+                    className={cn(
+                      "mt-2 text-xs",
+                      saveMessage.toLowerCase().includes("error")
+                        ? "text-red-600"
+                        : "text-emerald-600",
+                    )}
+                  >
+                    {saveMessage}
+                  </p>
+                )}
+              </div>
+
+              <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4">
+                <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-slate-400">
+                  {profile.role === "STUDENT" ? "# Enrollment" : "🛡️ Role Access"}
+                </p>
+                <p className="truncate text-sm font-semibold text-slate-800">
+                  {profile.role === "STUDENT"
+                    ? profile.student?.enrollment || "Not provided"
+                    : role.label}
+                </p>
+              </div>
+
+              <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4">
+                <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-slate-400">
+                  📅 Joined
+                </p>
+                <p className="truncate text-sm font-semibold text-slate-800">
+                  {formatDate(profile.createdAt)}
+                </p>
               </div>
             </div>
           </div>
+        </section>
 
-          <Separator />
+        <section className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+          {topStats.map((stat) => (
+            <div
+              key={stat.label}
+              className="rounded-3xl border border-slate-800/70 bg-slate-950/60 p-5 shadow-lg shadow-blue-950/10 transition hover:-translate-y-0.5 hover:border-cyan-400/25 hover:shadow-blue-950/20"
+            >
+              <div
+                className={cn(
+                  "mb-4 flex h-11 w-11 items-center justify-center rounded-2xl bg-linear-to-br text-white shadow-sm",
+                  stat.color,
+                )}
+              >
+                <stat.icon className="h-5 w-5" />
+              </div>
+              <p className="text-2xl font-bold text-white">{stat.value}</p>
+              <p className="mt-1 text-xs font-semibold text-slate-200">
+                {stat.label}
+              </p>
+              <p className="mt-0.5 text-xs text-slate-400">{stat.sub}</p>
+            </div>
+          ))}
+        </section>
 
-          {/* Info Grid */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            className="p-6 md:p-8"
-          >
-            <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-              <User className="h-5 w-5 text-slate-400" />
-              Account Information
-            </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {/* Email */}
-              {profile.emailAddresses.map((e, i) => (
-                <div
-                  key={i}
-                  className="bg-white/5 rounded-xl p-4 flex items-start gap-3"
-                >
-                  <div className="bg-blue-500/15 p-2 rounded-lg">
-                    <Mail className="h-4 w-4 text-blue-400" />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-[10px] font-medium text-slate-400 uppercase">
-                      Email{" "}
-                      {e.isPrimary && (
-                        <span className="text-cyan-400">(Primary)</span>
-                      )}
-                    </p>
-                    <p className="text-sm font-medium text-white truncate">
-                      {e.email}
-                    </p>
-                  </div>
-                </div>
-              ))}
-
-              {/* Phone - Editable for Students and Faculty */}
-              {(profile.role === "STUDENT" || profile.role === "FACULTY") &&
-                (profile.student || profile.staff) ? (
-                <div className="bg-white/5 rounded-xl p-4 flex items-start gap-3">
-                  <div className="bg-blue-500/15 p-2 rounded-lg">
-                    <Phone className="h-4 w-4 text-cyan-400" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-[10px] font-medium text-slate-400 uppercase">
-                      Phone
-                    </p>
-                    {editingPhone ? (
-                      <div className="flex gap-2 mt-1">
-                        <input
-                          type="tel"
-                          value={phoneValue}
-                          onChange={(e) => setPhoneValue(e.target.value)}
-                          className="flex-1 text-sm px-2 py-1 border border-blue-500/25 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                          placeholder="Enter phone number"
-                        />
-                        <button
-                          onClick={handleSavePhone}
-                          disabled={isSaving}
-                          className="bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded-md text-xs disabled:opacity-50"
-                        >
-                          <Save className="h-3 w-3" />
-                        </button>
-                        <button
-                          onClick={handleCancelEdit}
-                          className="bg-slate-300 hover:bg-slate-400 text-slate-200 px-2 py-1 rounded-md text-xs"
-                        >
-                          <X className="h-3 w-3" />
-                        </button>
-                      </div>
-                    ) : (
-                      <div className="flex items-center justify-between mt-1">
-                        <p className="text-sm font-medium text-white">
-                          {phoneValue || "Not provided"}
-                        </p>
-                        <button
-                          onClick={() => setEditingPhone(true)}
-                          className="ml-2 text-xs text-cyan-400 hover:text-cyan-400 underline"
-                        >
-                          Edit
-                        </button>
-                      </div>
-                    )}
-                    {saveMessage && (
-                      <p
-                        className={`text-xs mt-1 ${saveMessage.includes("Error")
-                            ? "text-red-600"
-                            : "text-cyan-400"
-                          }`}
-                      >
-                        {saveMessage}
-                      </p>
-                    )}
-                  </div>
-                </div>
-              ) : (
-                <div className="bg-white/5 rounded-xl p-4 flex items-start gap-3">
-                  <div className="bg-white/5 p-2 rounded-lg">
-                    <Phone className="h-4 w-4 text-slate-400" />
-                  </div>
+        <section className="overflow-hidden rounded-[32px] border border-slate-800/70 bg-slate-950/70 shadow-2xl shadow-blue-950/20 backdrop-blur-xl">
+          <div className="flex border-b border-slate-800/70">
+            {(["overview", "academic"] as const).map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={cn(
+                  "flex-1 border-b-2 px-5 py-4 text-sm font-semibold capitalize transition sm:flex-none",
+                  activeTab === tab
+                    ? "border-cyan-400 bg-cyan-400/10 text-cyan-200"
+                    : "border-transparent text-slate-400 hover:bg-white/5 hover:text-slate-100",
+                )}
+              >
+                {tab === "overview" && "Profile Overview"}
+                {tab === "academic" &&
+                  (profile.role === "STUDENT"
+                    ? "Projects & Academic"
+                    : "Professional Info")}
+              </button>
+            ))}
+          </div>
+          <div className="p-5 sm:p-6">
+            {activeTab === "overview" && (
+              <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
+                <div className="space-y-6">
                   <div>
-                    <p className="text-[10px] font-medium text-slate-400 uppercase">
-                      Phone
-                    </p>
-                    <p className="text-sm text-slate-400 italic">
-                      Not provided
-                    </p>
-                  </div>
-                </div>
-              )}
-
-              {/* Enrollment Number - For Students (editable) */}
-              {profile.role === "STUDENT" && profile.student && (
-                <div className="bg-white/5 rounded-xl p-4 flex items-start gap-3">
-                  <div className="bg-violet-100 p-2 rounded-lg">
-                    <Hash className="h-4 w-4 text-violet-600" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-[10px] font-medium text-slate-400 uppercase">
-                      Enrollment No
-                    </p>
-                    {editingEnrollment ? (
-                      <div className="flex gap-2 mt-1">
-                        <input
-                          type="text"
-                          value={enrollmentValue}
-                          onChange={(e) => setEnrollmentValue(e.target.value)}
-                          className="flex-1 text-sm px-2 py-1 border border-blue-500/25 rounded-md focus:outline-none focus:ring-2 focus:ring-violet-500"
-                          placeholder="Enter enrollment number"
-                        />
-                        <button
-                          onClick={handleSaveEnrollment}
-                          disabled={isSavingEnrollment}
-                          className="bg-violet-500 hover:bg-violet-600 text-white px-2 py-1 rounded-md text-xs disabled:opacity-50"
-                        >
-                          <Save className="h-3 w-3" />
-                        </button>
-                        <button
-                          onClick={handleCancelEnrollment}
-                          className="bg-slate-300 hover:bg-slate-400 text-slate-200 px-2 py-1 rounded-md text-xs"
-                        >
-                          <X className="h-3 w-3" />
-                        </button>
-                      </div>
-                    ) : (
-                      <div className="flex items-center justify-between mt-1">
-                        <p className="text-sm font-mono text-white">
-                          {profile.student.enrollment || "Not provided"}
-                        </p>
-                        <button
-                          onClick={() => setEditingEnrollment(true)}
-                          className="ml-2 text-xs text-violet-600 hover:text-violet-700 underline"
-                        >
-                          Edit
-                        </button>
-                      </div>
-                    )}
-                    {enrollmentSaveMessage && (
-                      <p
-                        className={`text-xs mt-1 ${enrollmentSaveMessage.includes("Error")
-                            ? "text-red-600"
-                            : "text-violet-600"
-                          }`}
-                      >
-                        {enrollmentSaveMessage}
+                    <h3 className="mb-4 text-base font-bold text-slate-100">
+                      About
+                    </h3>
+                    <div className="rounded-2xl border border-slate-800/70 bg-slate-900/60 p-5">
+                      <p className="text-sm leading-7 text-slate-300">
+                        {profileDescription}
                       </p>
-                    )}
+                    </div>
                   </div>
-                </div>
-              )}
 
-              {/* Faculty ID - For Faculty */}
-              {profile.role === "FACULTY" && profile.staff && (
-                <div className="bg-white/5 rounded-xl p-4 flex items-start gap-3">
-                  <div className="bg-blue-500/15 p-2 rounded-lg">
-                    <Briefcase className="h-4 w-4 text-blue-400" />
-                  </div>
                   <div>
-                    <p className="text-[10px] font-medium text-slate-400 uppercase">
-                      Faculty ID
-                    </p>
-                    <p className="text-sm font-mono text-white">
-                      {profile.staff.staffid}
-                    </p>
+                    <h3 className="mb-4 text-base font-bold text-slate-100">
+                      Identity Snapshot
+                    </h3>
+                    <div className="grid gap-4 sm:grid-cols-2">
+                      {[
+                        {
+                          icon: User,
+                          label: "Display Name",
+                          value: currentName,
+                        },
+                        {
+                          icon: Mail,
+                          label: "Primary Email",
+                          value: primaryEmail,
+                        },
+                        { icon: Phone, label: "Phone", value: fallbackPhone },
+                        {
+                          icon: Hash,
+                          label:
+                            profile.role === "STUDENT"
+                              ? "Enrollment Number"
+                              : "System ID",
+                          value:
+                            profile.role === "STUDENT"
+                              ? profile.student?.enrollment || "Not provided"
+                              : String(profile.userid),
+                        },
+                      ].map((item) => (
+                        <div
+                          key={item.label}
+                          className="rounded-2xl border border-slate-800/70 bg-slate-900/60 p-4"
+                        >
+                          <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-2xl bg-slate-950 text-cyan-200 shadow-sm shadow-blue-950/20">
+                            <item.icon className="h-5 w-5" />
+                          </div>
+                          <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                            {item.label}
+                          </p>
+                          <p className="mt-1 text-sm font-semibold text-slate-100">
+                            {item.value}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
-              )}
 
-              {/* User ID - System ID, separate from enrollment */}
-              <div className="bg-white/5 rounded-xl p-4 flex items-start gap-3">
-                <div className="bg-violet-100 p-2 rounded-lg">
-                  <Hash className="h-4 w-4 text-violet-600" />
-                </div>
-                <div>
-                  <p className="text-[10px] font-medium text-slate-400 uppercase">
-                    User ID
-                  </p>
-                  <p className="text-sm font-mono text-white">
-                    {profile.userid}
-                  </p>
+                <div className="space-y-6">
+                  <div>
+                    <h3 className="mb-4 text-base font-bold text-slate-100">
+                      Account Health
+                    </h3>
+                    <div className="rounded-2xl border border-slate-800/70 bg-slate-900/60 p-5">
+                      <div className="mb-3 flex items-center justify-between">
+                        <span className="text-sm font-medium text-slate-300">
+                          Profile completeness
+                        </span>
+                        <span className="text-sm font-bold text-cyan-200">
+                          {profileCompletion}%
+                        </span>
+                      </div>
+                      <div className="h-2 overflow-hidden rounded-full bg-slate-800">
+                        <motion.div
+                          className="h-full rounded-full bg-linear-to-r from-cyan-400 to-blue-500"
+                          initial={{ width: 0 }}
+                          animate={{ width: `${profileCompletion}%` }}
+                          transition={{ duration: 0.7 }}
+                        />
+                      </div>
+                      <div className="mt-5 space-y-3">
+                        {[
+                          {
+                            label: "Account Status",
+                            value: profile.isactive ? "Active" : "Inactive",
+                          },
+                          {
+                            label: "Joined Platform",
+                            value: formatDate(profile.createdAt),
+                          },
+                          {
+                            label: "Last Sign-In",
+                            value: formatDateTime(profile.lastSignInAt),
+                          },
+                          {
+                            label: "Clerk Created",
+                            value: formatDate(profile.createdAtClerk),
+                          },
+                        ].map((item) => (
+                          <div
+                            key={item.label}
+                            className="flex items-center justify-between gap-3 rounded-xl bg-slate-950/70 px-4 py-3"
+                          >
+                            <span className="text-sm text-slate-400">
+                              {item.label}
+                            </span>
+                            <span className="text-sm font-semibold text-slate-100">
+                              {item.value}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
+            )}
 
-              {/* Role */}
-              <div className="bg-white/5 rounded-xl p-4 flex items-start gap-3">
-                <div
-                  className={cn(
-                    "p-2 rounded-lg",
-                    role.color === "emerald" && "bg-blue-500/15",
-                    role.color === "blue" && "bg-blue-500/15",
-                    role.color === "violet" && "bg-violet-100",
+            {activeTab === "academic" && profile.role === "STUDENT" && (
+              <div className="space-y-6">
+                <div>
+                  <h3 className="mb-4 text-base font-bold text-slate-100">
+                    Linked Project Groups
+                  </h3>
+                  {projectGroups.length > 0 ? (
+                    <div className="space-y-3">
+                      {projectGroups.map((group, index) => (
+                        <div
+                          key={`${group.groupName}-${index}`}
+                          className="flex flex-col gap-3 rounded-2xl border border-slate-800/70 bg-slate-900/60 p-4 sm:flex-row sm:items-center sm:justify-between"
+                        >
+                          <div className="min-w-0">
+                            <div className="flex flex-wrap items-center gap-2">
+                              <p className="font-semibold text-slate-100">
+                                {group.projectTitle || group.groupName}
+                              </p>
+                              {group.isLeader && (
+                                <Badge className="border border-amber-400/30 bg-amber-400/10 text-amber-200">
+                                  <Crown className="mr-1.5 h-3.5 w-3.5" />
+                                  Group Leader
+                                </Badge>
+                              )}
+                            </div>
+                            <p className="mt-1 text-sm text-slate-400">
+                              Group: {group.groupName}
+                            </p>
+                            <p className="text-sm text-slate-400">
+                              Area: {group.projectArea || "Not specified"}
+                            </p>
+                          </div>
+                          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-slate-950 text-cyan-200 shadow-sm shadow-blue-950/20">
+                            <FolderKanban className="h-5 w-5" />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="rounded-2xl border border-dashed border-slate-700 bg-slate-900/50 p-8 text-center text-sm text-slate-400">
+                      No project groups are linked to this student yet.
+                    </div>
                   )}
-                >
-                  <RoleIcon
-                    className={cn(
-                      "h-4 w-4",
-                      role.color === "emerald" && "text-cyan-400",
-                      role.color === "blue" && "text-blue-400",
-                      role.color === "violet" && "text-violet-600",
-                    )}
-                  />
                 </div>
-                <div>
-                  <p className="text-[10px] font-medium text-slate-400 uppercase">
-                    Role
-                  </p>
-                  <p className="text-sm font-medium text-white">
-                    {role.label}
-                  </p>
-                </div>
-              </div>
 
-              {/* Joined Date */}
-              <div className="bg-white/5 rounded-xl p-4 flex items-start gap-3">
-                <div className="bg-amber-500/15 p-2 rounded-lg">
-                  <Calendar className="h-4 w-4 text-amber-400" />
-                </div>
-                <div>
-                  <p className="text-[10px] font-medium text-slate-400 uppercase">
-                    Joined
-                  </p>
-                  <p className="text-sm font-medium text-white">
-                    {formatDate(profile.createdAt)}
-                  </p>
+                <div className="grid gap-4 md:grid-cols-3">
+                  {[
+                    {
+                      label: "Enrollment",
+                      value: profile.student?.enrollment || "Not provided",
+                      icon: GraduationCap,
+                    },
+                    {
+                      label: "Leadership Count",
+                      value: leaderCount,
+                      icon: Crown,
+                    },
+                  ].map((item) => (
+                    <div
+                      key={item.label}
+                      className="rounded-2xl border border-slate-800/70 bg-slate-900/60 p-5"
+                    >
+                      <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-2xl bg-slate-950 text-cyan-200 shadow-sm shadow-blue-950/20">
+                        <item.icon className="h-5 w-5" />
+                      </div>
+                      <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                        {item.label}
+                      </p>
+                      <p className="mt-1 text-lg font-bold text-slate-100">
+                        {item.value}
+                      </p>
+                    </div>
+                  ))}
                 </div>
               </div>
+            )}
 
-              {/* Last Sign In */}
-              <div className="bg-white/5 rounded-xl p-4 flex items-start gap-3">
-                <div className="bg-indigo-100 p-2 rounded-lg">
-                  <Clock className="h-4 w-4 text-indigo-600" />
+            {activeTab === "academic" && profile.role !== "STUDENT" && (
+              <div className="grid gap-6 lg:grid-cols-2">
+                <div className="rounded-2xl border border-slate-800/70 bg-slate-900/60 p-5">
+                  <h3 className="mb-4 text-base font-bold text-slate-100">
+                    Professional Information
+                  </h3>
+                  <div className="space-y-3">
+                    {[
+                      {
+                        label: "Staff ID",
+                        value: profile.staff?.staffid || "N/A",
+                        icon: Briefcase,
+                      },
+                      {
+                        label: "Official Email",
+                        value: profile.staff?.email || primaryEmail,
+                        icon: Mail,
+                      },
+                      { label: "Phone", value: fallbackPhone, icon: Phone },
+                    ].map((item) => (
+                      <div
+                        key={item.label}
+                        className="flex items-center gap-3 rounded-xl bg-slate-950/70 px-4 py-3"
+                      >
+                        <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-slate-900 text-cyan-200">
+                          <item.icon className="h-5 w-5" />
+                        </div>
+                        <div>
+                          <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                            {item.label}
+                          </p>
+                          <p className="text-sm font-semibold text-slate-100">
+                            {item.value}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-                <div>
-                  <p className="text-[10px] font-medium text-slate-400 uppercase">
-                    Last Sign In
-                  </p>
-                  <p className="text-sm font-medium text-white">
-                    {formatTime(profile.lastSignInAt)}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </motion.div>
 
-          {/* Footer Actions */}
-          <Separator />
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.6 }}
-            className="p-6 md:p-8 bg-white/5/50"
-          >
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-              <p className="text-xs text-slate-400">{ }</p>
-              <div className="flex gap-3">
-                <Link href={dashboardHref}>
-                  <Button
-                    variant="outline"
-                    className="border-blue-500/20 text-slate-300"
-                  >
-                    <ExternalLink className="h-4 w-4 mr-2" />
-                    Go to Dashboard
-                  </Button>
-                </Link>
-                <SignOutButton>
-                  <Button className="bg-red-500 hover:bg-red-600 text-white">
-                    <LogOut className="h-4 w-4 mr-2" />
-                    Sign Out
-                  </Button>
-                </SignOutButton>
+                <div className="rounded-2xl border border-slate-800/70 bg-slate-900/60 p-5">
+                  <h3 className="mb-4 text-base font-bold text-slate-100">
+                    Role Summary
+                  </h3>
+                  <div className="rounded-2xl border border-slate-800/70 bg-slate-950/70 p-5">
+                    <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-900 text-cyan-200">
+                      <RoleIcon className="h-6 w-6" />
+                    </div>
+                    <p className="text-lg font-bold text-slate-100">
+                      {role.label}
+                    </p>
+                    <p className="mt-2 text-sm leading-7 text-slate-300">
+                      {profileDescription}
+                    </p>
+                  </div>
+                </div>
               </div>
-            </div>
-          </motion.div>
-        </motion.div>
-      </div>
+            )}
+          </div>
+        </section>
+      </main>
     </div>
   );
 }

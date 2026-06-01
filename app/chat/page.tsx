@@ -54,7 +54,7 @@ export default async function ChatPage() {
 
       {/* ── Chat Component ── */}
       <div className="flex-1 overflow-hidden p-4 md:p-6">
-        <div className="h-full max-w-7xl mx-auto">
+        <div className="h-full max-w-full mx-auto">
           <ChatComponent role={role ?? undefined} />
         </div>
       </div>
