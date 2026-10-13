@@ -1,6 +1,6 @@
 import { Resend } from 'resend';
 
-const resend = new Resend('re_HLPSbYti_C9yDdpNRnaPJerNLH36E3mUw');
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function sendMeetingNotification({
     studentEmails,
