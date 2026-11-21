@@ -1,162 +1,300 @@
-# 🛡️ Projexia: Student Project Management System (SPMS) Hub
+# Projexia - Student Project Management System
 
-Welcome to **Projexia (SPMS Project Hub)**, a state-of-the-art, full-stack Academic Project Management platform designed to streamline, track, and elevate the entire lifecycle of student projects. From team formation to final evaluations, Projexia brings students, faculty mentors, and administrators into a cohesive, high-performance digital workspace.
+Projexia is a role-based academic project management platform for students, faculty, and administrators. It centralizes project groups, proposals, reports, meetings, attendance, file submissions, role management, email notifications, and real-time chat.
 
----
+## Features
 
-## 🚀 What It Does
+- **Student workspace:** create project groups, add members, submit proposals and reports, upload files, and view meetings.
+- **Faculty workspace:** manage assigned groups, schedule meetings, record attendance and grades, and review reports.
+- **Admin workspace:** manage users and students, monitor projects and reports, and configure project allocations.
+- **Authentication and RBAC:** Clerk authentication with `ADMIN`, `FACULTY`, and `STUDENT` roles.
+- **Real-time communication:** private Stream Chat channels synchronized with project groups.
+- **File management:** Cloudinary uploads and controlled downloads.
+- **Notifications:** meeting notifications sent through Resend.
+- **PDF support:** report and project documents generated with jsPDF.
 
-Academic projects often suffer from fragmented communication, manual guide allocation, chaotic file tracking, and disjointed scheduling. **Projexia** addresses these pain points by offering a centralized hub that manages the three pillars of academic projects: **Structure, Progress, and Communication**.
+## Technology Stack
 
-### 🌟 Core Capabilities
-1. **Multi-Role Workspace (RBAC)**: Personalized, feature-rich dashboards for **Students**, **Faculty Mentors**, and **Administrators**, powered by secure Clerk Authentication.
-2. **Dynamic Project Lifecycle Management**: Structured stages from registration, group formation, project proposal submission, and review approvals.
-3. **Smart Allocation System**: Structured matchmaking between student project themes and faculty expertise (Guide, Convener, and Expert allocations).
-4. **Comprehensive Progress Tracking**: Automated milestone tracking, file submission version control, and graded faculty reviews (Proposals, Midterms, Finals).
-5. **WhatsApp-Style Real-time Chat**: Fully integrated instant messaging using the Stream Chat engine, contextually linking groups to their assigned guides.
-6. **Milestone Meeting Manager**: Faculty can schedule progress reviews, mark interactive student attendance, record review notes, and assign grades.
+| Area | Technology |
+|---|---|
+| Framework | Next.js 16.1.1, React 19.2.3 |
+| Language | TypeScript 5 |
+| Styling | Tailwind CSS 4, PostCSS |
+| UI | Radix UI, Lucide React, Framer Motion, React Spring |
+| Authentication | Clerk |
+| Database | PostgreSQL |
+| ORM | Prisma 7.5.0 |
+| Realtime chat | Stream Chat SDK and Stream Chat React |
+| File storage | Cloudinary |
+| Email | Resend |
+| Forms and validation | React Hook Form, Zod |
+| PDF generation | jsPDF, jsPDF-AutoTable |
 
----
+## Project Structure
 
-## 🎨 Technical Architecture
-
-```mermaid
-graph TD
-    %% User Authentication
-    Clerk[Clerk Auth & Webhooks] -->|Sync user.created| DB[(PostgreSQL DB)]
-    
-    %% User Roles & Access control
-    DB --> UsersTable{users table}
-    UsersTable -->|STUDENT| StudentDashboard[Student Dashboard]
-    UsersTable -->|FACULTY| FacultyDashboard[Faculty Dashboard]
-    UsersTable -->|ADMIN| AdminDashboard[Admin Dashboard]
-
-    %% Workflows
-    StudentDashboard -->|Create Group| ProjectGroup[projectgroup]
-    StudentDashboard -->|Upload Files| ProjectFile[projectfile]
-    
-    FacultyDashboard -->|Schedule Meeting| ProjectMeeting[projectmeeting]
-    FacultyDashboard -->|Grade & Comment| ProjectReport[projectreport]
-    
-    AdminDashboard -->|Manage Allocations| GuideAlloc[Guide Assignment]
-    
-    %% Realtime Communication
-    StreamChat[Stream Chat Engine] <-->|Contextual Sync| ChatComponent[Chat.tsx /chat]
-    ChatComponent <--> StudentDashboard
-    ChatComponent <--> FacultyDashboard
+```text
+.
+|-- app/
+|   |-- page.tsx                 # Public landing page
+|   |-- layout.tsx               # Root layout and Clerk provider
+|   |-- globals.css              # Global styles
+|   |-- check-role/              # Post-authentication role routing
+|   |-- profile/                 # Signed-in user profile
+|   |-- chat/                    # Realtime chat page
+|   |-- admin/
+|   |   |-- dashboard/           # Admin dashboard
+|   |   |-- projects/            # Project management
+|   |   |-- reports/             # Report overview
+|   |   |-- students/            # Student management
+|   |   `-- users/               # User and role management
+|   |-- faculty/
+|   |   |-- dashboard/           # Faculty dashboard
+|   |   |-- group/               # Assigned project groups
+|   |   |-- meetings/            # Meeting management
+|   |   |-- reports/             # Report submissions
+|   |   `-- reviews/             # Report review workflow
+|   |-- student/
+|   |   |-- dashboard/           # Student dashboard
+|   |   |-- group/               # Group formation
+|   |   |-- project/             # Project details
+|   |   |-- meetings/            # Meeting schedule
+|   |   `-- reports/             # Proposal, midterm, and final reports
+|   |-- actions/                 # Server actions for application workflows
+|   `-- api/
+|       |-- upload/              # Cloudinary file upload
+|       |-- download/            # Controlled file downloads
+|       |-- stream-token/        # Stream chat user token
+|       |-- chat/sync-group/     # Stream channel synchronization
+|       |-- webhooks/clerk/      # Clerk user synchronization webhook
+|       |-- posts/               # Post model endpoints
+|       `-- seed/                # Development seed endpoint
+|-- components/
+|   |-- admin/                   # Admin UI
+|   |-- faculty/                 # Faculty UI
+|   |-- student/                # Student UI
+|   |-- dashboard/              # Shared dashboard UI
+|   |-- profile/                 # Profile UI
+|   |-- section/                # Public landing sections
+|   |-- react-bits/             # Additional animated components
+|   `-- ui/                     # Reusable Radix and utility components
+|-- hooks/
+|   `-- use-scroll.ts
+|-- lib/
+|   |-- prisma.ts                # Prisma and PostgreSQL connection
+|   |-- cloudinary.ts            # Cloudinary configuration
+|   |-- email.ts                 # Resend meeting notifications
+|   |-- stream.ts                # Stream server client
+|   |-- streamGroupChat.ts       # Group chat synchronization
+|   |-- pdfGenerator.ts          # PDF helpers
+|   |-- roleUtils.ts             # Role helpers
+|   `-- utils.ts                 # Shared utilities
+|-- prisma/
+|   |-- schema.prisma            # Database models and relations
+|   `-- migrations/              # Prisma migration history
+|-- public/                      # Logos and static assets
+|-- types/                       # Shared TypeScript definitions
+|-- proxy.ts                     # Clerk middleware and route authorization
+|-- prisma.config.ts             # Prisma datasource configuration
+|-- package.json                 # Dependencies and npm scripts
+|-- next.config.ts               # Next.js image configuration
+|-- components.json             # UI component configuration
+|-- tsconfig.json                # TypeScript configuration
+`-- eslint.config.mjs            # ESLint configuration
 ```
 
-### 💻 Modern Tech Stack
-- **Framework**: Next.js 15+ (App Router) for highly performant Server Components and seamless Client Hydration.
-- **Styling & UI**: Tailwind CSS with beautifully integrated Framer Motion micro-animations.
-- **Database ORM**: Prisma Client mapped to a robust PostgreSQL relational database.
-- **Identity & RBAC**: Clerk Core Security with custom JWT Claims synchronization via secure Clerk Webhooks.
-- **Real-Time Communication**: Stream Chat SDK with customized dark-themed, mobile-responsive styling.
+## Database Models
 
----
+The PostgreSQL schema is defined in [`prisma/schema.prisma`](./prisma/schema.prisma).
 
-## 🔄 The Complete Project Workflow
+| Model | Purpose |
+|---|---|
+| `users` | Clerk-linked application users and roles |
+| `student` | Student profile and enrollment information |
+| `staff` | Faculty profile and staff information |
+| `projecttype` | Available project categories |
+| `projectgroup` | Project group, title, area, progress, deadline, and allocations |
+| `projectgroupmember` | Group membership and group-leader status |
+| `projectmeeting` | Scheduled meetings and faculty review notes |
+| `projectmeetingattendance` | Per-student meeting attendance |
+| `projectfile` | Uploaded project files and Cloudinary URLs |
+| `projectreport` | Proposal, midterm, and final reports |
+| `Post` | Supporting post content |
 
-```
-[Student Registration] ➔ [Group Formation] ➔ [Guide/Role Assignment] 
-                                                        │
-[Final Evaluation] 🍕 [Progress Reviews] 🍕 [Proposal & File Uploads]
-```
+Roles are represented by the `ADMIN`, `FACULTY`, and `STUDENT` enum values.
 
-### 1. Registration & Authentication Workflow
-- **Step 1**: The user registers on the platform via Clerk.
-- **Step 2**: A secure Clerk Webhook triggers an API endpoint (`/api/webhooks/clerk`) that automatically creates a matching entry in the Postgres `users` table.
-- **Step 3**: By default, new users receive the `STUDENT` role. Admins can update roles in the system, which are then synchronized back to Clerk's custom JWT metadata claims to ensure immediate role-based frontend protection.
+## Prerequisites
 
-### 2. Group Formation & Project Proposal Workflow
-- **Step 1**: A Student registers a new project group (`projectgroup`), becoming the **Group Leader**.
-- **Step 2**: They invite teammates (`projectgroupmember`) using their unique enrollment numbers or student profiles.
-- **Step 3**: The group defines their proposed Project Title, Area of Interest, and description, then submits a formal **Project Proposal**.
+- Node.js 20 or newer
+- npm
+- PostgreSQL database
+- Clerk application
+- Stream account
+- Cloudinary account
+- Resend account
 
-### 3. Guide & Expert Allocation Workflow
-- **Step 1**: **Admins** assign faculty members (`staff`) to the group in three crucial capacities:
-  - **Guide Staff**: Mentors the group on a weekly basis.
-  - **Convener Staff**: Monitors timelines and process compliance.
-  - **Expert Staff**: Acts as an external panel reviewer for milestone evaluations.
-- **Step 2**: Upon allocation, the status of the project group shifts to **Active**, unlocking file submissions and communication channels.
+## Installation
 
-### 4. Continuous Progress Tracking & Meetings
-- **Step 1**: The assigned **Guide Staff** schedules review meetings (`projectmeeting`) specifying purpose, date, and location.
-- **Step 2**: During the meeting, the guide logs student presence/absence (`projectmeetingattendance`), adds comprehensive review notes, and assigns milestone grades.
-- **Step 3**: Students can upload their work and source code (`projectfile`) directly to the group folder, maintaining full version transparency.
+1. Clone the repository:
 
-### 5. Milestone Reporting & Evaluation
-- **Step 1**: Students submit structured reports (`projectreport`) categorized as **Proposal**, **Midterm**, or **Final**.
-- **Step 2**: Faculty guides review the reports, add review feedback, and transition their status:
-  - 🟡 `PENDING`: Under review.
-  - 🟢 `ACCEPTED`: Milestone cleared successfully.
-  - 🔴 `DECLINED`: Requires revisions based on comments.
-
-### 6. Dynamic Team Communication (Chat Hub)
-- **Step 1**: The team and their allocated faculty mentor are synchronized into a private messaging channel on the **Stream Chat Engine**.
-- **Step 2**: They utilize the custom, premium dark-themed Communication Hub (`/chat`) to chat, share assets, and schedule informal check-ins right inside the app.
-
----
-
-## 📊 Database Schema Blueprint
-
-Below is an overview of the PostgreSQL relational tables configured in [schema.prisma](file:///d:/CollageProject/AWT/Student_Project/SPMSMSMSMSMMSMSMSMSM/spms_project_hub/prisma/schema.prisma):
-
-| Model Name | Primary Key | Key Fields & Purpose |
-| :--- | :--- | :--- |
-| **`users`** | `userid` | clerkid (unique), email, name, role (`ADMIN`, `FACULTY`, `STUDENT`) |
-| **`student`** | `studentid` | enrollment (unique), phone, email, linked to a specific user record |
-| **`staff`** | `staffid` | staffname, phone, email, linked to a specific user record |
-| **`projectgroup`** | `projectgroupid` | projectgroupname, projecttitle, projectprogress, status, guide/convener/expert FKs |
-| **`projectgroupmember`**| `projectgroupmemberid`| studentid, projectgroupid, isgroupleader (flag), studentcgpa |
-| **`projectmeeting`** | `projectmeetingid` | meetingdatetime, meetingpurpose, meetinglocation, meetingnotes, meetinggrade |
-| **`projectmeetingattendance`**| `projectmeetingattendanceid`| projectmeetingid, studentid, ispresent (boolean), attendanceremarks |
-| **`projectfile`** | `fileid` | filename, fileurl, filetype, studentid, projectgroupid |
-| **`projectreport`** | `reportid` | reporttitle, reporttype (proposal/midterm/final), status, reviewcomments |
-
----
-
-## 🛠️ Installation & Setup Guide
-
-### 1. Clone & Install Dependencies
 ```bash
-# Install NPM packages
+git clone https://github.com/26harshil/Projexia.git
+cd Projexia
+```
+
+2. Install dependencies:
+
+```bash
 npm install
 ```
 
-### 2. Configure Environment Variables
-Create a `.env` file in the root directory:
+3. Create a local `.env` file in the project root.
+
+> [!IMPORTANT]
+> Never commit `.env` files or paste real credentials into source code or documentation. The `.gitignore` already excludes `.env*` files. Use environment-variable secrets in development and hosting providers in production.
+
+### Required Environment Variables
+
 ```env
-# Clerk Authentication Configuration
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_...
-CLERK_SECRET_KEY=sk_test_...
-CLERK_WEBHOOK_SECRET=whsec_...
+# Clerk
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=<clerk-publishable-key>
+CLERK_SECRET_KEY=<clerk-secret-key>
+CLERK_WEBHOOK_SECRET=<clerk-webhook-signing-secret>
 
-# Database Configuration (PostgreSQL)
-DATABASE_URL="postgresql://<username>:<password>@<host>:<port>/<dbname>?schema=public"
+# PostgreSQL
+DATABASE_URL=<postgresql-runtime-connection-url>
+DIRECT_URL=<postgresql-direct-connection-url>
 
-# Stream Chat API Configuration
-NEXT_PUBLIC_STREAM_API_KEY=YOUR_STREAM_API_KEY
-STREAM_API_SECRET=YOUR_STREAM_API_SECRET
+# Stream Chat
+NEXT_PUBLIC_STREAM_API_KEY=<stream-public-api-key>
+STREAM_API_KEY=<stream-server-api-key>
+STREAM_API_SECRET=<stream-server-api-secret>
+
+# Cloudinary
+CLOUDINARY_CLOUD_NAME=<cloudinary-cloud-name>
+CLOUDINARY_API_KEY=<cloudinary-api-key>
+CLOUDINARY_API_SECRET=<cloudinary-api-secret>
+
+# Resend
+RESEND_API_KEY=<resend-api-key>
 ```
 
-### 3. Initialize the Database
-```bash
-# Push schema structure and run migrations
-npx prisma migrate dev --name init
+Variable use:
 
-# Generate the type-safe Prisma client
+- `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` and `CLERK_SECRET_KEY` configure Clerk.
+- `CLERK_WEBHOOK_SECRET` verifies Clerk webhook requests.
+- `DATABASE_URL` is used by the application Prisma connection.
+- `DIRECT_URL` is used by Prisma CLI configuration for migrations.
+- `NEXT_PUBLIC_STREAM_API_KEY` is used by the browser chat client.
+- `STREAM_API_KEY` and `STREAM_API_SECRET` are server-only Stream credentials.
+- Cloudinary variables configure file upload and private download support.
+- `RESEND_API_KEY` configures meeting notification emails.
+
+Do not expose `CLERK_SECRET_KEY`, `CLERK_WEBHOOK_SECRET`, `STREAM_API_SECRET`, `CLOUDINARY_API_SECRET`, database passwords, or `RESEND_API_KEY` as `NEXT_PUBLIC_*` variables.
+
+## Database Setup
+
+Apply migrations and generate the Prisma client:
+
+```bash
+npx prisma migrate deploy
 npx prisma generate
 ```
 
-### 4. Spin up Dev Server
+For local schema iteration:
+
 ```bash
-# Run the local server
+npx prisma migrate dev
+npx prisma generate
+```
+
+Optional database tools:
+
+```bash
+npx prisma studio
+```
+
+## Run the Application
+
+Start the development server:
+
+```bash
 npm run dev
 ```
-Open [http://localhost:3000](http://localhost:3000) to view your application!
 
----
+Open `http://localhost:3000`.
 
-> [!NOTE]
-> Projexia is designed to scale effortlessly. Future versions plan to incorporate AI-driven teammate matchmaking based on skills/CPI and automated document analysis for plagiarism checks.
+Production build:
+
+```bash
+npm run build
+npm start
+```
+
+## npm Scripts
+
+| Command | Purpose |
+|---|---|
+| `npm run dev` | Start the Next.js development server |
+| `npm run build` | Generate Prisma client and create a production build |
+| `npm start` | Start the production server |
+| `npm run lint` | Run ESLint |
+
+## Application Routes
+
+| Route | Access | Purpose |
+|---|---|---|
+| `/` | Public | Landing page |
+| `/check-role` | Authenticated | Redirect based on Clerk role claims |
+| `/profile` | Authenticated | User profile |
+| `/chat` | Public route matcher; chat authentication handled in UI | Project communication |
+| `/student/*` | Student role | Student project workspace |
+| `/faculty/*` | Faculty role | Faculty project workspace |
+| `/admin/*` | Admin role | Administration workspace |
+
+Authorization is enforced by [`proxy.ts`](./proxy.ts), which protects non-public routes and redirects users to dashboards matching their Clerk role metadata.
+
+## API Routes
+
+| Endpoint | Method | Purpose |
+|---|---|---|
+| `/api/webhooks/clerk` | POST | Verify Clerk events and synchronize users |
+| `/api/stream-token` | GET/POST | Create a Stream chat token |
+| `/api/chat/sync-group` | POST | Synchronize project group channels |
+| `/api/upload` | POST | Upload files to Cloudinary |
+| `/api/download` | GET | Download approved Cloudinary files |
+| `/api/posts` | Varies | Post model operations |
+| `/api/seed` | POST | Seed development data |
+
+Configure the Clerk webhook endpoint to `https://<your-domain>/api/webhooks/clerk`.
+
+## Dependency Summary
+
+### Runtime dependencies
+
+- `@clerk/nextjs`: authentication and role-aware route protection
+- `@hookform/resolvers`, `react-hook-form`, `zod`: forms and validation
+- `@prisma/client`, `@prisma/adapter-neon`, `@prisma/adapter-pg`, `pg`: database access
+- `@radix-ui/*`, `radix-ui`, `lucide-react`: accessible UI primitives and icons
+- `class-variance-authority`, `clsx`, `tailwind-merge`: component and class utilities
+- `framer-motion`, `@react-spring/web`, `react-day-picker`, `date-fns`: animation and date UI
+- `cloudinary`: file storage and downloads
+- `jspdf`, `jspdf-autotable`: PDF generation
+- `resend`, `nodemailer`: email support
+- `stream-chat`, `stream-chat-react`: chat
+- `svix`: webhook verification support
+- `dotenv`, `multer`: environment loading and upload support
+
+### Development dependencies
+
+- `typescript`, `@types/*`: TypeScript and type declarations
+- `eslint`, `eslint-config-next`: linting
+- `prisma`: schema, migrations, and Prisma Studio
+- `tailwindcss`, `@tailwindcss/postcss`, `tw-animate-css`: styling pipeline
+
+## Development Notes
+
+- `.env*` files are intentionally ignored by Git.
+- The generated Prisma client is written to `app/generated/prisma` and is ignored by Git.
+- `next-env.d.ts`, `.next`, `node_modules`, build output, and TypeScript build metadata are generated and should not be committed.
+- Configure production secrets through the deployment provider rather than committing an `.env.production` file.
+- Review any test or seed endpoint before deployment to ensure it is appropriate for the environment.
